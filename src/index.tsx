@@ -9,6 +9,7 @@ import CatalogPage from "./components/CatalogPage";
 import CustomListPage from "./components/CustomListPage";
 import LanePage from "./components/LanePage";
 import DashboardPage from "./components/DashboardPage";
+import StatisticsPage from "./finland/components/StatisticsPage";
 import ConfigPage from "./components/ConfigPage";
 import AccountPage from "./components/AccountPage";
 import SetupPage from "./components/SetupPage";
@@ -99,6 +100,11 @@ class CirculationAdmin {
               <Route
                 path="/admin/web/troubleshooting(/:tab)(/:subtab)"
                 component={TroubleshootingPage}
+              />
+              {/* Finland */}
+              <Route
+                path="/admin/web/statistics(/:library)"
+                component={StatisticsPage}
               />
             </Router>
           </TOSContextProvider>

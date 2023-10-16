@@ -1,0 +1,94 @@
+.fin-stats-page {
+  margin-inline: 1em;
+  margin-bottom: 2rem;
+
+  & > * {
+    margin-top: 2em;
+  }
+  :is(h2, h3) {
+    text-transform: uppercase;
+  }
+
+  p {
+    font-size: 1.2rem;
+  }
+
+  svg {
+    height: initial;
+    width: initial;
+    fill: initial;
+  }
+
+  .side-scrollable {
+    max-width: 100%;
+    height: auto;
+    overflow-x: scroll;
+    box-sizing: border-box;
+  }
+
+  .chart {
+    width: 800px;
+    height: 400px;
+  }
+
+  .chip {
+    border: 0;
+    border-radius: 999px;
+    background: hsl(140deg, 60%, 80%);
+    color: black;
+    padding: 4px 16px;
+    font-size: 0.9rem;
+  }
+  .chip-single {
+    padding-right: 8px;
+  }
+  .chip-single::after {
+    content: "  ⓧ";
+  }
+  .chip:not(.chip-single) {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    background: none;
+    padding-inline: 4px;
+  }
+  .chip-container {
+    margin: 1rem 0 2rem;
+    gap: 8px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-height: 28px;
+  }
+  .input-wrapper {
+    gap: 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 800px;
+    margin-bottom: 16px;
+  }
+  @media screen and (min-width: 600px) {
+    .input-wrapper {
+      grid-template-columns: 50% 50%;
+    }
+  }
+  @media screen and (min-width: 900px) {
+    .input-wrapper {
+      grid-template-columns: 33.33% 33.33% 33.33%;
+    }
+  }
+  .infobox {
+    padding: 1.25rem 1.5rem;
+    background: hsl(140deg, 60%, 80%);
+    border: solid 1px hsl(142, 25%, 42%);
+  }
+  .flex-col {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .fin-stats-page {
+    margin-inline: 2em;
+  }
+}

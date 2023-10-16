@@ -105,6 +105,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     // Dashboard link that will be rendered in a Link router component.
     const dashboardLinkItem = { label: "Dashboard", href: "dashboard/" };
 
+    const finlandStatisticsLinkItem = {
+      label: "Tilastot",
+      href: "statistics/",
+    };
+
     // Links that will be rendered in a NavItem Bootstrap component.
     const libraryNavItems = [
       { label: "Catalog", href: "%2Fgroups?max_cache_age=0" },
@@ -165,6 +170,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
             <Nav>
               {this.renderLinkItem(
                 dashboardLinkItem,
+                currentPathname,
+                currentLibrary
+              )}
+              {this.renderLinkItem(
+                finlandStatisticsLinkItem,
                 currentPathname,
                 currentLibrary
               )}
