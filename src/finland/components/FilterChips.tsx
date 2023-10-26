@@ -1,7 +1,5 @@
 import * as React from "react";
-
-import { ActiveFilters, Selection } from "../useFilters";
-import { readable } from "../finlandUtils";
+import { KeyValuePair, readable } from "../finlandUtils";
 
 type ChipProps = {
   onClick: () => void;
@@ -10,8 +8,8 @@ type ChipProps = {
 };
 
 type FilterChipsProps = {
-  activeFilters: ActiveFilters;
-  toggleFilter: (selection: Selection) => void;
+  activeFilters: KeyValuePair[];
+  toggleFilter: (selection: KeyValuePair) => void;
   clearFilters: () => void;
 };
 

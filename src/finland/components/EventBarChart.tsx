@@ -1,7 +1,11 @@
 import * as React from "react";
-import { useEffect, useMemo } from "react";
-import { Params, useFilters } from "../useFilters";
-import { readable, EventKey, getColor, filterKeys } from "../finlandUtils";
+import { useContext, useEffect, useMemo } from "react";
+import {
+  readable,
+  getColor,
+  prefersReducedMotion,
+  KeyValuePair,
+} from "../finlandUtils";
 import { FilterChips } from "./FilterChips";
 import {
   ResponsiveContainer,
@@ -13,6 +17,10 @@ import {
   Tooltip,
 } from "recharts";
 import { OpenSearchAnalyticsContext } from "../OpenSearchAnalyticsContext";
+import { TimeframeSelector } from "./TimeframeSelector";
+import { DateRangeHeader } from "./DateRangeHeader";
+import { FilterContext } from "../FilterContext";
+import { FilterInputs } from "./FilterInputs";
 
 export function EventBarChart() {
   const {
@@ -23,17 +31,20 @@ export function EventBarChart() {
     setStartDate,
     endDate,
     setEndDate,
-  } = useFilters(filterKeys);
+    activeTimeframe,
+    setActiveTimeframe,
+    setTimeframeOffset,
+  } = useContext(FilterContext);
 
-  const { facetData, eventData, fetchEventData } = React.useContext(
+  const { facetData, eventData, fetchEventData } = useContext(
     OpenSearchAnalyticsContext
   );
 
   useEffect(() => {
-    const selections: Params = [...activeFilters];
+    const selections: KeyValuePair[] = [...activeFilters];
     if (startDate) selections.push({ key: "from", value: startDate });
     if (endDate) selections.push({ key: "to", value: endDate });
-    fetchEventData(selections as Params);
+    fetchEventData(selections as KeyValuePair[]);
   }, [activeFilters, startDate, endDate]);
 
   // Format data for Rechart
@@ -51,55 +62,14 @@ export function EventBarChart() {
 
   return (
     <div>
-      <div className="input-wrapper">
-        <div className="flex-col">
-          <label htmlFor="start-date">Alkaen</label>
-          <input
-            className="form-control"
-            type="date"
-            id="start-date"
-            value={startDate}
-            onChange={(event) => setStartDate(event.target.value)}
-          />
-        </div>
-        <div className="flex-col">
-          <label htmlFor="end-date">Päättyen</label>
-          <input
-            className="form-control"
-            type="date"
-            id="end-date"
-            value={endDate}
-            min={startDate}
-            onChange={(event) => setEndDate(event.target.value)}
-          />
-        </div>
-        {filterKeys.map((key) => (
-          <div key={key} className="flex-col">
-            <label htmlFor={key}>{readable(key)}</label>
-            <select
-              className="form-control"
-              name={key}
-              id={key}
-              onChange={(event) => {
-                toggleFilter({
-                  key: key as EventKey,
-                  value: event.target.value,
-                });
-                event.target.value = "";
-              }}
-            >
-              <option key="all" value="">
-                – rajaa –
-              </option>
-              {facetData[key]?.buckets.map((item) => (
-                <option key={item.key} value={item.key}>
-                  {item.key}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
+      <FilterInputs
+        toggleFilter={toggleFilter}
+        facetData={facetData}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
 
       <FilterChips
         activeFilters={activeFilters}
@@ -107,18 +77,36 @@ export function EventBarChart() {
         clearFilters={clearFilters}
       />
 
+      <div className="chart-prefix">
+        <TimeframeSelector
+          activeTimeframe={activeTimeframe}
+          handleTimeframeClick={setActiveTimeframe}
+          handleOffsetChange={setTimeframeOffset}
+        />
+      </div>
+
+      <DateRangeHeader
+        activeTimeframe={activeTimeframe}
+        startDate={startDate}
+        endDate={endDate}
+      />
+
       <div className="side-scrollable">
         <div className="chart">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={groupData}>
-              <Bar dataKey="määrä" />
+              <Bar
+                dataKey="määrä"
+                isAnimationActive={!prefersReducedMotion}
+                animationDuration={300}
+              />
               <CartesianGrid
                 stroke="#ccc"
                 strokeDasharray="5 5"
                 vertical={false}
               />
               <XAxis dataKey="name" interval={0} />
-              <YAxis />
+              <YAxis allowDecimals={false} />
               <Tooltip cursor={{ fill: "#fff6" }} />
             </BarChart>
           </ResponsiveContainer>

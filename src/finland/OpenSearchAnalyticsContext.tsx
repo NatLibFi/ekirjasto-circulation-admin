@@ -1,7 +1,6 @@
 import * as React from "react";
 import { createContext, useEffect, useState } from "react";
-import { Params } from "./useFilters";
-
+import { KeyValuePair } from "./finlandUtils";
 const termsEndpoint = "/admin/events/terms";
 const histogramEndpoint = "/admin/events/histogram";
 const facetsEndpoint = "/admin/events/facets";
@@ -27,14 +26,14 @@ type HistogramData = {
   };
 };
 
-type FacetData = Record<string, { buckets: BucketItem[] }>;
+export type FacetData = Record<string, { buckets: BucketItem[] }>;
 
 type OpenSearchAnalyticsContextType = {
   facetData?: FacetData;
   eventData?: TermBucketData;
-  fetchEventData?: (params: Params) => void;
+  fetchEventData?: (params: KeyValuePair[]) => void;
   histogramData?: HistogramData;
-  fetchHistogramData?: (params: Params) => void;
+  fetchHistogramData?: (params: KeyValuePair[]) => void;
   isReady?: boolean;
 };
 
@@ -71,7 +70,7 @@ export function OpenSearchAnalyticsContextProvider({
     fetchFacets();
   }, [library]);
 
-  async function fetchEventData(selections?: Params) {
+  async function fetchEventData(selections?: KeyValuePair[]) {
     try {
       const queryString = selections?.length
         ? selectionsToQueryString(selections)
@@ -87,7 +86,7 @@ export function OpenSearchAnalyticsContextProvider({
     }
   }
 
-  async function fetchHistogramData(selections?: Params) {
+  async function fetchHistogramData(selections?: KeyValuePair[]) {
     try {
       const queryString = selections?.length
         ? selectionsToQueryString(selections)
@@ -120,7 +119,7 @@ export function OpenSearchAnalyticsContextProvider({
 }
 
 // Helper functions
-function selectionsToQueryString(selections?: Params) {
+function selectionsToQueryString(selections?: KeyValuePair[]) {
   const searchParams = new URLSearchParams();
 
   selections.forEach(({ key, value }) => {

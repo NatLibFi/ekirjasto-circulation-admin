@@ -12,21 +12,34 @@ import {
 } from "recharts";
 
 import {
-  EventKey,
   Interval,
-  filterKeys,
+  KeyValuePair,
+  daysBetween,
+  estimateBestTimeInterval,
+  getColor,
   intervals,
+  prefersReducedMotion,
   readable,
+  timeStampToLabel,
+  timeStampToTick,
 } from "../finlandUtils";
-import { Params, useFilters } from "../useFilters";
 import { FilterChips } from "./FilterChips";
 import { OpenSearchAnalyticsContext } from "../OpenSearchAnalyticsContext";
+import { TimeframeSelector } from "./TimeframeSelector";
+import { DateRangeHeader } from "./DateRangeHeader";
+import { FilterContext } from "../FilterContext";
+import { FilterInputs } from "./FilterInputs";
 
 export function Histogram() {
   const [interval, setInterval] = useState<Interval>("hour");
+  // const [activeTimeframe, setActiveTimeframe] = useState<Timeframe>("day");
+  // const [timeframeOffset, setTimeframeOffset] = useState(0);
+  const [inactiveGroups, setInactiveGroups] = useState<string[]>([]);
+
   const { facetData, histogramData, fetchHistogramData } = useContext(
     OpenSearchAnalyticsContext
   );
+
   const {
     activeFilters,
     toggleFilter,
@@ -35,17 +48,33 @@ export function Histogram() {
     setStartDate,
     endDate,
     setEndDate,
-  } = useFilters(filterKeys);
+    activeTimeframe,
+    setActiveTimeframe,
+    setTimeframeOffset,
+  } = useContext(FilterContext);
 
+  // Fetch data when filters or start/end dates change
   useEffect(() => {
-    const selections: Params = [...activeFilters];
-    selections.push({ key: "interval", value: interval });
+    const newInterval = estimateBestTimeInterval(startDate, endDate);
+    setInterval(newInterval);
+    const selections: KeyValuePair[] = [...activeFilters];
+    selections.push({ key: "interval", value: newInterval });
     if (startDate) selections.push({ key: "from", value: startDate });
     if (endDate) selections.push({ key: "to", value: endDate });
-    fetchHistogramData(selections as Params);
-  }, [activeFilters, startDate, endDate, interval]);
+    fetchHistogramData(selections as KeyValuePair[]);
+    setInterval(estimateBestTimeInterval(startDate, endDate));
+  }, [activeFilters, startDate, endDate]);
 
-  // Event keys present in the data
+  function handleChangeInterval(newInterval: Interval) {
+    setInterval(newInterval);
+    const selections: KeyValuePair[] = [...activeFilters];
+    selections.push({ key: "interval", value: newInterval });
+    if (startDate) selections.push({ key: "from", value: startDate });
+    if (endDate) selections.push({ key: "to", value: endDate });
+    fetchHistogramData(selections as KeyValuePair[]);
+  }
+
+  // Event keys that are present in the data
   const eventKeys = useMemo(
     () =>
       histogramData
@@ -60,91 +89,44 @@ export function Histogram() {
     [histogramData]
   );
 
-  // Format data for Rechart
+  // Format data for Recharts LineChart
   const timeData = useMemo(() => {
     if (!histogramData) return null;
     return histogramData?.events_per_interval?.buckets.map((item) => {
       const out = { time: item.key, label: item.readable_time };
+      // Add values (or zeroes) for each event type to the bucket
       eventKeys.forEach((eventType) => {
         out[eventType] =
           item.type.buckets.find((bucket) => bucket.key === eventType)
             ?.doc_count || 0;
       });
+
       return out;
     });
   }, [histogramData]);
 
+  function toggleGroup(key: string) {
+    setInactiveGroups(
+      inactiveGroups.includes(key)
+        ? inactiveGroups.filter((item) => item !== key)
+        : [...inactiveGroups, key]
+    );
+  }
+
   if (!timeData || !facetData) return null;
+
+  const dateRangeLength = daysBetween(startDate, endDate);
 
   return (
     <div>
-      <div className="input-wrapper">
-        <div className="flex-col">
-          <label htmlFor="start-date">Alkaen</label>
-          <input
-            className="form-control"
-            type="date"
-            id="start-date"
-            value={startDate}
-            onChange={(event) => setStartDate(event.target.value)}
-          />
-        </div>
-        <div className="flex-col">
-          <label htmlFor="end-date">Päättyen</label>
-          <input
-            className="form-control"
-            type="date"
-            id="end-date"
-            value={endDate}
-            min={startDate}
-            onChange={(event) => setEndDate(event.target.value)}
-          />
-        </div>
-        <div className="flex-col">
-          <label htmlFor="interval">Aikaväli</label>
-          <select
-            className="form-control"
-            name="interval"
-            id="interval"
-            value={interval}
-            onChange={(event) => {
-              setInterval(event.target.value as Interval);
-            }}
-          >
-            {intervals.map((item) => (
-              <option key={item} value={item}>
-                {readable(item)}
-              </option>
-            ))}
-          </select>
-        </div>
-        {filterKeys.map((key) => (
-          <div key={key} className="flex-col">
-            <label htmlFor={key}>{readable(key)}</label>
-            <select
-              className="form-control"
-              name={key}
-              id={key}
-              onChange={(event) => {
-                toggleFilter({
-                  key: key as EventKey,
-                  value: event.target.value,
-                });
-                event.target.value = "";
-              }}
-            >
-              <option key="all" value="">
-                – rajaa –
-              </option>
-              {facetData[key]?.buckets.map((item) => (
-                <option key={item.key} value={item.key}>
-                  {item.key}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
+      <FilterInputs
+        toggleFilter={toggleFilter}
+        facetData={facetData}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
 
       <FilterChips
         activeFilters={activeFilters}
@@ -152,97 +134,103 @@ export function Histogram() {
         clearFilters={clearFilters}
       />
 
-      <div className="side-scrollable">
-        <div className="chart">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={timeData}>
-              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-              <XAxis
-                dataKey="time"
-                minTickGap={48}
-                tickFormatter={(unixTime) =>
-                  timeStampToTick(unixTime, interval)
-                }
-              />
-              <YAxis type="number" minTickGap={1} />
-              <Tooltip
-                labelFormatter={(unixTime) =>
-                  timeStampToLabel(unixTime as number, interval)
-                }
-              />
-              <Legend />
-              {eventKeys.map((item, idx) => (
-                <Line
-                  isAnimationActive={false}
-                  key={item}
-                  type="monotone"
-                  name={readable(item)}
-                  dataKey={item}
-                  stroke={`hsl(${idx * 40}deg, 80%, 40%)`}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="chart-prefix">
+        <TimeframeSelector
+          activeTimeframe={activeTimeframe}
+          handleTimeframeClick={setActiveTimeframe}
+          handleOffsetChange={setTimeframeOffset}
+        />
+
+        <TimeIntervalSelector
+          interval={interval}
+          handleChangeInterval={handleChangeInterval}
+          dateRangeLength={dateRangeLength}
+        />
       </div>
+
+      <DateRangeHeader
+        activeTimeframe={activeTimeframe}
+        startDate={startDate}
+        endDate={endDate}
+      />
+
+      {/* The histogram chart */}
+      {!!histogramData && (
+        <div className="side-scrollable">
+          <div className="chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={timeData}>
+                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                <XAxis
+                  dataKey="time"
+                  tickFormatter={(unixTime) =>
+                    timeStampToTick(unixTime, interval)
+                  }
+                />
+                <YAxis type="number" allowDecimals={false} />
+                <Tooltip
+                  labelFormatter={(unixTime) =>
+                    timeStampToLabel(unixTime as number, interval)
+                  }
+                />
+                <Legend onClick={(item) => toggleGroup(item.dataKey)} />
+                {eventKeys.map((item, idx) => (
+                  <Line
+                    isAnimationActive={!prefersReducedMotion}
+                    animationDuration={300}
+                    key={item}
+                    type="monotone"
+                    name={readable(item)}
+                    dataKey={item}
+                    stroke={getColor(idx)}
+                    hide={inactiveGroups.includes(item)}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// Helper functions
-function timeStampToTick(unixTime: number, interval: Interval) {
-  const time = new Date(unixTime);
-  if (interval === "hour") {
-    const hours = time.getHours();
-    if (hours !== 0) {
-      return time.getHours();
-    }
-    const options: Intl.DateTimeFormatOptions = {
-      month: "numeric",
-      day: "numeric",
-    };
-    return time.toLocaleDateString("fi-FI", options);
-  }
-  if (interval === "day") {
-    const options: Intl.DateTimeFormatOptions = {
-      month: "numeric",
-      day: "numeric",
-    };
-    return time.toLocaleDateString("fi-FI", options);
-  }
-  if (interval === "month") {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "numeric",
-    };
-    return time.toLocaleDateString("fi-FI", options);
-  }
-  return unixTime;
-}
-function timeStampToLabel(unixTime: number, interval: Interval) {
-  const time = new Date(unixTime);
-  if (interval === "hour") {
-    const options: Intl.DateTimeFormatOptions = {
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    };
-    return time.toLocaleDateString("fi-FI", options);
-  }
-  if (interval === "day") {
-    const options: Intl.DateTimeFormatOptions = {
-      month: "numeric",
-      day: "numeric",
-    };
-    return time.toLocaleDateString("fi-FI", options);
-  }
-  if (interval === "month") {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "numeric",
-    };
-    return time.toLocaleDateString("fi-FI", options);
-  }
-  return unixTime;
+type TimeIntervalSelectorProps = {
+  interval: string;
+  handleChangeInterval: (newInterval: Interval) => void;
+  dateRangeLength: number;
+};
+
+function TimeIntervalSelector({
+  interval,
+  handleChangeInterval,
+  dateRangeLength,
+}: TimeIntervalSelectorProps) {
+  return (
+    <div className="flex-col items-end">
+      <label className="mini-label" htmlFor="interval">
+        Tarkkuus
+      </label>
+      <select
+        className="mini-selector"
+        name="interval"
+        id="interval"
+        value={interval}
+        onChange={(event) => {
+          handleChangeInterval(event.target.value as Interval);
+        }}
+      >
+        {intervals.map((item) => (
+          <option
+            key={item}
+            value={item}
+            // Disable hour interval option for long date ranges
+            disabled={item === "hour" && dateRangeLength > 31}
+          >
+            {readable(item)}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 }
