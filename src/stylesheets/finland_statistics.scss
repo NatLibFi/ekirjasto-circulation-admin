@@ -1,3 +1,16 @@
+/*
+ *  Global
+ */
+
+// Logo in header
+.navbar-default .navbar-header > img {
+  max-width: 168px;
+}
+
+/*
+ *  Scoped
+ */
+
 .fin-stats-page {
   margin-bottom: 2rem;
   --chart-width: 960px;
