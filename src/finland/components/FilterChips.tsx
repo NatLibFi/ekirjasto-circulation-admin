@@ -1,12 +1,6 @@
 import * as React from "react";
 import { KeyValuePair, readable } from "../finlandUtils";
 
-type ChipProps = {
-  onClick: () => void;
-  isSingle?: boolean;
-  children: React.ReactNode;
-};
-
 type FilterChipsProps = {
   activeFilters: KeyValuePair[];
   toggleFilter: (selection: KeyValuePair) => void;
@@ -31,7 +25,11 @@ export function FilterChips({
               {readable(item.key)}: {item.value}
             </Chip>
           ))}
-          <Chip key="clear" onClick={() => clearFilters()}>
+          <Chip
+            key="clear"
+            data-testid="clear-all"
+            onClick={() => clearFilters()}
+          >
             poista kaikki
           </Chip>
         </>
@@ -40,11 +38,24 @@ export function FilterChips({
   );
 }
 
-function Chip({ onClick, children, isSingle = false }: ChipProps) {
+type ChipProps = {
+  onClick: () => void;
+  isSingle?: boolean;
+  children: React.ReactNode;
+  "data-testid"?: string;
+};
+
+function Chip({
+  onClick,
+  children,
+  isSingle = false,
+  "data-testid": testId,
+}: ChipProps) {
   return (
     <button
       className={isSingle ? "chip chip-single" : "chip"}
       onClick={onClick}
+      data-testid={testId}
     >
       {children}
     </button>

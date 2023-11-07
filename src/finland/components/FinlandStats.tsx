@@ -1,15 +1,14 @@
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
 import { useStatistics } from "../../components/Stats";
 import { EventBarChart } from "./EventBarChart";
 import { Histogram } from "./Histogram";
 import { LoanReport } from "./LoanReport";
-import {
-  OpenSearchAnalyticsContext,
-  OpenSearchAnalyticsContextProvider,
-} from "../OpenSearchAnalyticsContext";
+import { OpenSearchAnalyticsContextProvider } from "../OpenSearchAnalyticsContext";
 import { FilterContextProvider } from "../FilterContext";
 import { filterKeys } from "../finlandUtils";
+import { useHash } from "../hooks/useHash";
+import { useOpenSearchAnalytics } from "../hooks/useOpenSearchAnalytics";
+import { useIsNarrowView } from "../hooks/useIsNarrowView";
 
 interface FinlandStatsProps {
   library?: string;
@@ -22,7 +21,8 @@ type TabOption = {
   label: string;
   narrowLabel: string;
 };
-const tabs: TabOption[] = [
+
+export const statTabs: TabOption[] = [
   {
     key: "histogram",
     label: "Tapahtumat aikajanalla",
@@ -80,7 +80,7 @@ export function FinlandStats({ library }: FinlandStatsProps) {
   return (
     <div className="fin-stats-page">
       <h1>Tilastot ({libraryDisplayName})</h1>
-      <Tabs options={tabs} activeTab={activeTab} />
+      <Tabs options={statTabs} activeTab={activeTab} />
       <OpenSearchAnalyticsContextProvider library={library}>
         {renderSubComponent()}
       </OpenSearchAnalyticsContextProvider>
@@ -89,11 +89,11 @@ export function FinlandStats({ library }: FinlandStatsProps) {
 }
 
 function Tabs({ options, activeTab }) {
-  const isNarrow = useIsNarrow();
+  const isNarrow = useIsNarrowView();
 
   // CSS class structure is copied from EntrypointsTabs.tsx (for consistency)
   return (
-    <div className="entry-points-tab-container p-0">
+    <div className="entry-points-tab-container p-0" data-testid="page-tabs">
       <ul className="nav nav-tabs entry-points-list">
         {options.map(({ key, label, narrowLabel }) => (
           <li key={key} className={key === activeTab ? "active" : ""}>
@@ -106,61 +106,11 @@ function Tabs({ options, activeTab }) {
 }
 
 function OpenSearchStatConsumer({ children }) {
-  const { isReady } = useContext(OpenSearchAnalyticsContext);
+  const { isReady } = useOpenSearchAnalytics();
   if (!isReady) {
     return null;
   }
   return (
     <FilterContextProvider keys={filterKeys}>{children}</FilterContextProvider>
   );
-}
-
-// React-router v3 is old and has rather poor support for nested routing in sub components
-// so let's create a quick hash-based navigation system until it is updated in the upstream
-function useHash(fallback?: string) {
-  const [currentHash, setCurrentHash] = useState(
-    fallback
-      ? window.location.hash.replace("#", "") || fallback
-      : window.location.hash.replace("#", "")
-  );
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      setCurrentHash(window.location.hash.replace("#", ""));
-    };
-
-    // Add event listener to handle hash changes
-    window.addEventListener("hashchange", handleHashChange);
-
-    // Cleanup: remove the event listener when the component unmounts
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
-  }, []);
-
-  return currentHash;
-}
-
-const WIDTH_THRESHOLD = 800;
-
-function useIsNarrow() {
-  const [isBelowThreshold, setIsBelowThreshold] = useState(
-    window.innerWidth < WIDTH_THRESHOLD
-  );
-
-  useEffect(() => {
-    function handleResize() {
-      const width = window.innerWidth;
-      setIsBelowThreshold(width < WIDTH_THRESHOLD);
-    }
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  return isBelowThreshold;
 }

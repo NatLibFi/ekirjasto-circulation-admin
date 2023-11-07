@@ -34,6 +34,7 @@ export function FilterInputs({
           <div key={key} className="flex-col">
             <label htmlFor={key}>{label}</label>
             <SelectSearch
+              id={key}
               options={options}
               search
               placeholder="Rajaa.."

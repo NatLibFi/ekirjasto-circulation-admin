@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useContext, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   readable,
   getColor,
@@ -16,11 +16,11 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import { OpenSearchAnalyticsContext } from "../OpenSearchAnalyticsContext";
 import { TimeframeSelector } from "./TimeframeSelector";
 import { DateRangeHeader } from "./DateRangeHeader";
-import { FilterContext } from "../FilterContext";
 import { FilterInputs } from "./FilterInputs";
+import { useFilters } from "../hooks/useFilters";
+import { useOpenSearchAnalytics } from "../hooks/useOpenSearchAnalytics";
 
 export function EventBarChart() {
   const {
@@ -34,11 +34,9 @@ export function EventBarChart() {
     activeTimeframe,
     setActiveTimeframe,
     setTimeframeOffset,
-  } = useContext(FilterContext);
+  } = useFilters();
 
-  const { facetData, eventData, fetchEventData } = useContext(
-    OpenSearchAnalyticsContext
-  );
+  const { facetData, eventData, fetchEventData } = useOpenSearchAnalytics();
 
   useEffect(() => {
     const selections: KeyValuePair[] = [...activeFilters];
@@ -92,12 +90,12 @@ export function EventBarChart() {
       />
 
       <div className="side-scrollable">
-        <div className="chart">
+        <div className="chart" data-testid="events">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={groupData}>
               <Bar
                 dataKey="määrä"
-                isAnimationActive={!prefersReducedMotion}
+                isAnimationActive={!prefersReducedMotion()}
                 animationDuration={300}
               />
               <CartesianGrid

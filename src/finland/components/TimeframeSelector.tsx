@@ -13,7 +13,7 @@ export function TimeframeSelector({
   handleOffsetChange,
 }: TimeframeSelectorProps) {
   return (
-    <div className="timeframe-button-wrapper">
+    <div className="timeframe-button-wrapper" data-testid="timeframe-selector">
       {Object.entries(timeframeOptions).map(([key, { label }]) => (
         <button
           key={key}

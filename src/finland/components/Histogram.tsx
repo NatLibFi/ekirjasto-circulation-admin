@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -24,21 +24,21 @@ import {
   timeStampToTick,
 } from "../finlandUtils";
 import { FilterChips } from "./FilterChips";
-import { OpenSearchAnalyticsContext } from "../OpenSearchAnalyticsContext";
 import { TimeframeSelector } from "./TimeframeSelector";
 import { DateRangeHeader } from "./DateRangeHeader";
-import { FilterContext } from "../FilterContext";
 import { FilterInputs } from "./FilterInputs";
+import { useFilters } from "../hooks/useFilters";
+import { useOpenSearchAnalytics } from "../hooks/useOpenSearchAnalytics";
 
 export function Histogram() {
   const [interval, setInterval] = useState<Interval>("hour");
-  // const [activeTimeframe, setActiveTimeframe] = useState<Timeframe>("day");
-  // const [timeframeOffset, setTimeframeOffset] = useState(0);
   const [inactiveGroups, setInactiveGroups] = useState<string[]>([]);
 
-  const { facetData, histogramData, fetchHistogramData } = useContext(
-    OpenSearchAnalyticsContext
-  );
+  const {
+    facetData,
+    histogramData,
+    fetchHistogramData,
+  } = useOpenSearchAnalytics();
 
   const {
     activeFilters,
@@ -51,7 +51,7 @@ export function Histogram() {
     activeTimeframe,
     setActiveTimeframe,
     setTimeframeOffset,
-  } = useContext(FilterContext);
+  } = useFilters();
 
   // Fetch data when filters or start/end dates change
   useEffect(() => {
@@ -157,7 +157,7 @@ export function Histogram() {
       {/* The histogram chart */}
       {!!histogramData && (
         <div className="side-scrollable">
-          <div className="chart">
+          <div className="chart" data-testid="histogram">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={timeData}>
                 <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -176,7 +176,7 @@ export function Histogram() {
                 <Legend onClick={(item) => toggleGroup(item.dataKey)} />
                 {eventKeys.map((item, idx) => (
                   <Line
-                    isAnimationActive={!prefersReducedMotion}
+                    isAnimationActive={!prefersReducedMotion()}
                     animationDuration={300}
                     key={item}
                     type="monotone"

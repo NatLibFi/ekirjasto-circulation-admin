@@ -28,7 +28,7 @@ type HistogramData = {
 
 export type FacetData = Record<string, { buckets: BucketItem[] }>;
 
-type OpenSearchAnalyticsContextType = {
+export type OpenSearchAnalyticsContextType = {
   facetData?: FacetData;
   eventData?: TermBucketData;
   fetchEventData?: (params: KeyValuePair[]) => void;
@@ -60,9 +60,12 @@ export function OpenSearchAnalyticsContextProvider({
     async function fetchFacets() {
       try {
         const response = await fetch(`/${library}${facetsEndpoint}`);
-        const newFacetData = await response.json();
-        setFacetData(newFacetData?.facets);
-        setIsReady(true);
+        const data = await response.json();
+        const newFacetData = data?.facets;
+        if (newFacetData) {
+          setFacetData(newFacetData);
+          setIsReady(true);
+        }
       } catch (err) {
         console.error("Error while fetching facets for statistics", err);
       }

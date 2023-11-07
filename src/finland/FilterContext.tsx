@@ -18,7 +18,7 @@ import {
 // Context & provider for facet filters
 export const FilterContext = createContext({} as FilterContextType);
 
-type FilterContextType = {
+export type FilterContextType = {
   activeFilters: KeyValuePair[];
   toggleFilter: (selection: KeyValuePair) => void;
   removeFilter: (selection: KeyValuePair) => void;

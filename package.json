@@ -28,6 +28,7 @@
     "test-firefox": "node_modules/.bin/selenium-standalone install && nightwatch -e firefox",
     "test-jest": "jest --verbose --roots tests/jest",
     "test-jest-file": "jest --verbose",
+    "test-finland": "jest --verbose --silent --roots src/finland/tests",
     "dev": "webpack --watch --progress --config webpack.dev.config",
     "dev-server": "webpack serve --progress --hot --config webpack.dev-server.config",
     "dev-test-axe": "TEST_AXE=true npm run dev",

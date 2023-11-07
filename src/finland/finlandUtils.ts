@@ -376,6 +376,5 @@ export function getISODate(offset = 0) {
 }
 
 // Misc
-export const prefersReducedMotion = window.matchMedia(
-  "(prefers-reduced-motion: reduced)"
-).matches;
+export const prefersReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduced)").matches;

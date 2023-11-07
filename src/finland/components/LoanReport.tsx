@@ -33,7 +33,7 @@ export function LoanReport({ library }: LoanReportProps) {
 
   return (
     <div>
-      <div className="input-wrapper">
+      <div className="input-wrapper" data-testid="loan-stats">
         <div className="flex-col">
           <label htmlFor="start-date">Alkaen</label>
           <input
@@ -58,6 +58,7 @@ export function LoanReport({ library }: LoanReportProps) {
         </div>
       </div>
       <Button
+        data-testid="download-button"
         className="inverted left-align"
         callback={downloadLoanExcel}
         content="Lataa Excel-taulukkona"
