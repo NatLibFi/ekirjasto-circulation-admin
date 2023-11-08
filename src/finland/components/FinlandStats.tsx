@@ -79,7 +79,9 @@ export function FinlandStats({ library }: FinlandStatsProps) {
   }
   return (
     <div className="fin-stats-page">
-      <h1>Tilastot ({libraryDisplayName})</h1>
+      <h1>
+        {libraryDisplayName ? `Tilastot (${libraryDisplayName})}` : "Tilastot"}
+      </h1>
       <Tabs options={statTabs} activeTab={activeTab} />
       <OpenSearchAnalyticsContextProvider library={library}>
         {renderSubComponent()}

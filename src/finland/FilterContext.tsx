@@ -6,14 +6,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import {
-  EventKey,
-  IEvent,
-  KeyValuePair,
-  Timeframe,
-  groupBy,
-  timeframeOptions,
-} from "./finlandUtils";
+import { KeyValuePair, Timeframe, timeframeOptions } from "./finlandUtils";
 
 // Context & provider for facet filters
 export const FilterContext = createContext({} as FilterContextType);
@@ -22,7 +15,6 @@ export type FilterContextType = {
   activeFilters: KeyValuePair[];
   toggleFilter: (selection: KeyValuePair) => void;
   removeFilter: (selection: KeyValuePair) => void;
-  checkFilters: (event: IEvent) => boolean;
   clearFilters: () => void;
   startDate: string;
   endDate: string;
@@ -117,24 +109,6 @@ export function FilterContextProvider({ children, keys }: ProviderProps) {
     dispatch({ type: "REMOVE", selection });
   }, []);
 
-  const checkFilters = useCallback(
-    (event: IEvent) => {
-      const filterBuckets: Record<string, KeyValuePair[]> = groupBy(
-        activeFilters,
-        "key"
-      );
-      return Object.entries(filterBuckets).every(([key, selections]) => {
-        const value = event[key as EventKey];
-        return Array.isArray(value)
-          ? selections.some((item) =>
-              value.some((subValue) => subValue === item.value)
-            )
-          : selections.some((item) => value === item.value);
-      });
-    },
-    [activeFilters]
-  );
-
   const clearFilters = useCallback(() => {
     dispatch({ type: "INIT" });
   }, []);
@@ -164,7 +138,6 @@ export function FilterContextProvider({ children, keys }: ProviderProps) {
         activeFilters,
         toggleFilter,
         removeFilter,
-        checkFilters,
         clearFilters,
         startDate,
         endDate,

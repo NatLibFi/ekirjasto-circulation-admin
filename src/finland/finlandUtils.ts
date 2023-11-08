@@ -159,43 +159,45 @@ export const getColor = (hueFactor: number, startHue = 140) =>
  *  Helper functions for datetime presentations
  */
 
+const millisecondsInDay = 24 * 60 * 60 * 1000;
+const millisecondsInWeek = millisecondsInDay * 7;
+
 // Converts a Unix timestamp to a tick label based on the specified time interval.
 export function timeStampToTick(unixTime: number, interval: Interval) {
   const time = new Date(unixTime);
 
-  if (interval === "hour") {
-    const hour = time.getHours();
-    return hour === 0 ? getNumericDate(time) : time.getHours();
-  }
+  switch (interval) {
+    case "hour":
+      return time.getHours();
 
-  if (interval === "day") {
-    return getNumericDate(time);
-  }
+    case "day":
+      return getNumericDate(time);
 
-  if (interval === "month") {
-    return getShortMonthAndYear(time);
-  }
+    case "month":
+      return getShortMonthAndYear(time);
 
-  return unixTime;
+    default:
+      return unixTime;
+  }
 }
 
 // Converts a Unix timestamp to a tooltip label based on the specified time interval.
 export function timeStampToLabel(unixTime: number, interval: Interval) {
   const time = new Date(unixTime);
 
-  if (interval === "hour") {
-    return getNumericDateTime(time);
-  }
+  switch (interval) {
+    case "hour":
+      return getNumericDateTime(time);
 
-  if (interval === "day") {
-    return getNumericDateWithWeekday(time);
-  }
+    case "day":
+      return getNumericDateWithWeekday(time);
 
-  if (interval === "month") {
-    return getShortMonthAndYear(time);
-  }
+    case "month":
+      return getShortMonthAndYear(time);
 
-  return unixTime;
+    default:
+      return unixTime;
+  }
 }
 
 // Time Formatter functions
@@ -266,27 +268,21 @@ export function getNumericDateWithYearAndWeekday(time: Date) {
   return time.toLocaleDateString("fi-FI", options);
 }
 
-export function getWeekNumber(time: Date) {
-  const year = time.getFullYear();
-  const month = time.getMonth();
-  const date = time.getDate();
-
-  // In ISO 8601 week 1 is basicly the week that includes Jan 4th
-  const january4 = new Date(year, 0, 4);
-
-  const daysSinceJanuary4 = Math.floor(
-    (Number(time) - Number(january4)) / (24 * 60 * 60 * 1000)
-  );
-  const weekNumber = Math.ceil(
-    (Number(daysSinceJanuary4) + Number(january4.getUTCDay()) + 1) / 7
-  );
-
-  // If January 4th is in the next year and it's a Friday, it's part of the last week of the previous year
-  if (weekNumber === 0) {
-    return getWeekNumber(new Date(year - 1, month, date));
+export function getWeekNumber(date: Date) {
+  // In ISO 8601 week 1 is basically the week that includes Jan 4th
+  const referenceDate = new Date(date.valueOf());
+  const dayOfWeek = (date.getDay() + 6) % 7; // Adjust to start week on monday
+  referenceDate.setDate(referenceDate.getDate() - dayOfWeek + 3);
+  const thisWeeksThursday = referenceDate.valueOf();
+  referenceDate.setMonth(0, 1);
+  if (referenceDate.getDay() !== 4) {
+    referenceDate.setMonth(0, 1 + ((4 - referenceDate.getDay() + 7) % 7));
   }
+  const firstThursday = referenceDate.valueOf();
 
-  return weekNumber;
+  return (
+    1 + Math.ceil((thisWeeksThursday - firstThursday) / millisecondsInWeek)
+  );
 }
 
 // Returns time difference between two ISO dates (eg. "2023-30-11") in days
@@ -297,7 +293,7 @@ export function daysBetween(startDate: string, endDate: string) {
   const timeDifference = Number(date2) - Number(date1);
 
   // Convert milliseconds to days
-  const daysDifference = timeDifference / (24 * 60 * 60 * 1000);
+  const daysDifference = timeDifference / millisecondsInDay;
 
   return daysDifference;
 }
@@ -315,8 +311,8 @@ export function estimateBestTimeInterval(startDate: string, endDate: string) {
   return "month";
 }
 
-export function getFirstAndLastDateOfYear(offset = 0) {
-  const today = new Date();
+export function getFirstAndLastDateOfYear(offset = 0, referenceDate?: Date) {
+  const today = referenceDate || new Date();
   today.setHours(12);
   const year = today.getFullYear() + offset;
 
@@ -326,8 +322,8 @@ export function getFirstAndLastDateOfYear(offset = 0) {
   };
 }
 
-export function getFirstAndLastDateOfMonth(offset = 0) {
-  const today = new Date();
+export function getFirstAndLastDateOfMonth(offset = 0, referenceDate?: Date) {
+  const today = referenceDate || new Date();
   today.setHours(12);
 
   const firstDayOfMonth = new Date(
@@ -349,8 +345,8 @@ export function getFirstAndLastDateOfMonth(offset = 0) {
   };
 }
 
-export function getFirstAndLastDateOfWeek(offset = 0) {
-  const today = new Date();
+export function getFirstAndLastDateOfWeek(offset = 0, referenceDate?: Date) {
+  const today = referenceDate || new Date();
   today.setHours(12);
   today.setDate(today.getDate() + offset * 7);
 
