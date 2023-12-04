@@ -82,7 +82,7 @@ export const normalizeStatistics = (statistics): StatisticsData => {
   return { ...statistics, libraries, summaryStatistics };
 };
 
-const useStatistics = (): StatsLocalState => {
+export const useStatistics = (): StatsLocalState => {
   const data = useSelector(statsStateSelector.data);
   const isLoaded = useSelector(statsStateSelector.isLoaded);
   const fetchError = useSelector(statsStateSelector.fetchError);
