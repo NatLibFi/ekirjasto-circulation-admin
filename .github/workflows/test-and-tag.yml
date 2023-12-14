@@ -4,7 +4,8 @@ on:
   # The build will be triggered on push to main
   push:
     branches:
-      - main
+      # - main # Disable until customised for E-kirjasto
+      - none
 
 concurrency:
   group: test-build-${{ github.ref_name }}-${{ github.event_name }}

@@ -4,8 +4,9 @@ on:
     # If we are pushing to a release branch (main or master), then we need
     # to deploy the documentation to GitHub Pages.
     branches:
-      - main
-      - master
+      # - main # Disable until customised for E-kirjasto
+      # - master # Disable until customised for E-kirjasto
+      - none
 
 jobs:
   gh-pages:

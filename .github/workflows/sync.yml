@@ -1,7 +1,8 @@
 name: Sync branch with NYPL
 on:
   schedule:
-    - cron:  '0 7 * * *'
+    # - cron:  '0 7 * * *' # Disable until customised for E-kirjasto (or remove)
+    - cron:  '0 0 31 2 *' # Never runs (Feb 31st)
 
   workflow_dispatch:
 
