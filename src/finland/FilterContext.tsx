@@ -122,7 +122,6 @@ export function FilterContextProvider({ children, keys }: ProviderProps) {
   }
 
   function handleSetTimeframeOffset(amount: number) {
-    console.log(timeframeOffset, amount);
     const newOffset = timeframeOffset + amount;
     setTimeframeOffset(newOffset);
     const { firstDay, lastDay } = timeframeOptions[
