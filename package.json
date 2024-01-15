@@ -1,12 +1,17 @@
 {
-  "name": "@thepalaceproject/circulation-admin",
-  "description": "Admin Interface for The Palace Project Circulation Manager",
+  "name": "@natlibfi/ekirjasto-circulation-admin",
+  "description": "Admin Interface for the E-kirjasto Circulation Manager",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ThePalaceProject/circulation-admin.git"
+    "url": "https://github.com/NatLibFi/ekirjasto-circulation-admin"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ],
   "main": "dist/circulation-admin.js",
-  "author": "The Palace Project",
+  "author": "National Library of Finland",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18.0.0",
