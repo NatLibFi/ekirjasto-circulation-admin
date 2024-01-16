@@ -1,16 +1,11 @@
 # Circulation Manager Administrative Interface
 
-[![Test Client & Deploy Documentation](https://github.com/lyrasis/simplye-circulation-web/actions/workflows/test-and-deploy.yml/badge.svg?branch=main)](https://github.com/lyrasis/simplye-circulation-web/actions/workflows/test-and-deploy.yml)
-
-This is a [LYRASIS](http://lyrasis.org)-maintained fork of the NYPL [Library Simplified](http://www.librarysimplified.org/) Circulation Manager administrative interface.
-
-## Library Simplified Documentation
-
-To see screenshots, read in-depth documentation, and find out more about the project, check out the [Confluence](https://confluence.nypl.org/display/SIM/) site hosted by The New York Public Library.
+This is the E-kirjasto fork of the [The Palace Project](https://thepalaceproject.org) Palace Manager Administrative Interface (which is a fork of
+[Library Simplified](http://www.librarysimplified.org/) Circulation Manager Administrative Interface).
 
 ## Set Up
 
-This package may be used in a local build of the Palace Project [Circulation Manager](https://github.com/ThePalaceProject/circulation), or it may be run against a remote Circulation Manager.
+This package may be used in a local build of the E-kirjasto [Circulation Manager](https://github.com/NatLibFi/ekirjasto-circulation), or it may be run against a remote Circulation Manager.
 
 This project uses Node.js 18. We recommend the latest version of Node.js 18.
 

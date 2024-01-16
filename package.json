@@ -1,12 +1,17 @@
 {
-  "name": "@thepalaceproject/circulation-admin",
-  "description": "Admin Interface for The Palace Project Circulation Manager",
+  "name": "@natlibfi/ekirjasto-circulation-admin",
+  "description": "Admin Interface for the E-kirjasto Circulation Manager",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ThePalaceProject/circulation-admin.git"
+    "url": "https://github.com/NatLibFi/ekirjasto-circulation-admin"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ],
   "main": "dist/circulation-admin.js",
-  "author": "The Palace Project",
+  "author": "National Library of Finland",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18.0.0",
@@ -28,6 +33,7 @@
     "test-firefox": "node_modules/.bin/selenium-standalone install && nightwatch -e firefox",
     "test-jest": "jest --verbose --roots tests/jest",
     "test-jest-file": "jest --verbose",
+    "test-finland": "jest --verbose --silent --roots src/finland/tests",
     "dev": "webpack --watch --progress --config webpack.dev.config",
     "dev-server": "webpack serve --progress --hot --config webpack.dev-server.config",
     "dev-test-axe": "TEST_AXE=true npm run dev",
@@ -58,6 +64,7 @@
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
     "react-router": "^3.2.0",
+    "react-select-search": "^3.0.10",
     "recharts": "^1.8.6",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
