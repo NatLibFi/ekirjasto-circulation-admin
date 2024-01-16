@@ -183,7 +183,7 @@ describe("SelfTests", () => {
 
   it("should format the date and duration of the most recent tests", () => {
     expect(wrapper.instance().formatDate(collections[0])).to.equal(
-      "Tests last ran on Tue Aug 07 2018 15:34:54 and lasted 1.75s."
+      "Tests last ran on Tue Aug 07 2018 22:34:54 and lasted 1.75s." // TZ: Europe/Helsinki
     );
   });
 
@@ -208,7 +208,7 @@ describe("SelfTests", () => {
       expect(passSVGIcon.length).to.equal(1);
 
       expect(description.text().trim()).to.equal(
-        "Tests last ran on Tue Aug 07 2018 15:34:54 and lasted 1.75s."
+        "Tests last ran on Tue Aug 07 2018 22:34:54 and lasted 1.75s." // TZ: Europe/Helsinki
       );
     });
 
@@ -259,7 +259,7 @@ describe("SelfTests", () => {
       expect(passSVGIcon.length).to.equal(0);
 
       expect(description.text().trim()).to.equal(
-        "Tests last ran on Tue Aug 07 2018 15:34:54 and lasted 1.75s."
+        "Tests last ran on Tue Aug 07 2018 22:34:54 and lasted 1.75s." // TZ: Europe/Helsinki
       );
     });
 
