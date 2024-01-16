@@ -21,16 +21,16 @@ rules:
   no-debug: 2
   no-ids: 2
   no-important: 2
-  hex-notation:
-    - 2
+  hex-notation: # Disable and let Prettier handle formatting
+    - 0
     -
       style: uppercase
-  indentation:
-    - 2
+  indentation: # Disable and let Prettier handle formatting
+    - 0
     -
-      size: 2
-  property-sort-order:
-    - 2
+      size: 2  
+  property-sort-order: # Disable linting for sort order because it crashes on CSS variables
+    - 0
     -
       order:
         - display
