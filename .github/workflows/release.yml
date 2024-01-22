@@ -33,4 +33,4 @@ jobs:
     - name: Publish 📚
       run: npm publish --access public
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ secrets.CIRC_ADMIN_NPM_TOKEN }}
