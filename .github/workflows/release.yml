@@ -27,7 +27,7 @@ jobs:
 
     - name: Test 🧪
       env:
-        TZ: America/New_York
+        TZ: Europe/Helsinki
       run: npm test
 
     - name: Publish 📚
