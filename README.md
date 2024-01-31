@@ -38,7 +38,7 @@ nodenv install 18.14.2
 nodenv global 18.14.2
 ```
 
-If you have different projects requiring different Node.js versions, you can use nodenv to set a local version for the project by navigating to the root directory of circulation-admin and executing `nodenv local 18.14.2`.
+If you have different projects requiring different Node.js versions, you can use nodenv to set a local version for the project by navigating to the root directory of ekirjasto-circulation-admin and executing `nodenv local 18.14.2`.
 
 You can also use the `n` npm package to manage Node.js versions, or simply install the Node.js binary directly.
 
@@ -50,9 +50,9 @@ Once you have installed the correct versions of Node.js and npm, run `npm i` to 
 
 Suggested local folder setup:
 
-- `/[path to project folder]/circulation`
+- `/[path to project folder]/ekirjasto-circulation`
 
-To use the published version with your circulation manager, run `npm install` from `api/admin` in the `circulation` local installed repository.
+To use the published version with your circulation manager, run `npm install` from `api/admin` in the `ekirjasto-circulation` local installed repository.
 
 #### Use Local Development Version in a Local Circulation Manager
 
@@ -60,25 +60,25 @@ Follow the Circulation Manager README instructions before setting up this reposi
 
 Suggested local folder setup:
 
-- `/[path to project folder]/circulation`
-- `/[path to project folder]/circulation-admin`
+- `/[path to project folder]/ekirjasto-circulation`
+- `/[path to project folder]/ekirjasto-circulation-admin`
 
 If you're working on the administrative interface and want to test local changes, you can link your local clone of this repository to your local circulation manager. These steps will allow you to work on the front-end administrative interface and see updates while developing.
 
-1. Run `npm link` in this `circulation-admin` repository,
-2. run `npm link @thepalaceproject/circulation-admin` from `api/admin` in the `circulation` repository (which is where package.json is located),
-3. run the circulation manager using `python app.py` at the root in the `circulation` repository,
-4. run the web interface using `npm run dev` at the root of this `circulation-admin` repository,
-5. run the Elasticsearch server using `./bin/elasticsearch` in the elasticsearch-[version] directory,
+1. Run `npm link` in this `ekirjasto-circulation-admin` repository,
+2. run `npm link @natlibfi/ekirjasto-circulation-admin` from `api/admin` in the `ekirjasto-circulation` repository (which is where package.json is located),
+3. run the circulation manager using `python app.py` at the root in the `ekirjasto-circulation` repository,
+4. run the web interface using `npm run dev` at the root of this `ekirjasto-circulation-admin` repository,
+5. use docker-compose in the `ekirjasto-circulation` repository to run PostgreSQL, OpenSearch etc.
 6. visit `localhost:6500/admin/`.
 
-Webpack will take care of compiling and updating any new changes made locally for development. Just hard refresh the page (command + shift + R) to see updates without having to restart either the `circulation` or `circulation-admin` servers.
+Webpack will take care of compiling and updating any new changes made locally for development. Just hard refresh the page (command + shift + R) to see updates without having to restart either the `ekirjasto-circulation` or `ekirjasto-circulation-admin` servers.
 
 #### Use Local Development Version with a Remote Circulation Manager
 
 This front-end may be run locally in development against a remote Circulation Manager back-end. This removes the need to build a local Circulation Manager from source in order to work on the front-end.
 
-1. Run `npm run dev-server -- --env=backend=[url]` in this `circulation-admin` repository.
+1. Run `npm run dev-server -- --env=backend=[url]` in this `ekirjasto-circulation-admin` repository.
 
    Example: `npm run dev-server -- --env=backend=https://gorgon.tpp-qa.lyrasistechnology.org`
 
@@ -87,7 +87,7 @@ This front-end may be run locally in development against a remote Circulation Ma
 1. Visit `http://localhost:8080/admin/`.
 1. Log in using credentials for the CM back-end. Content from that Circulation Manager should appear.
 
-This works by running a local proxy server. HTML pages received from the Circulaton Manager that load assets from the `circulation-admin` package on jsdelivr are rewritten to load them from the local webpack build instead.
+This works by running a local proxy server. HTML pages received from the Circulation Manager that load assets from the `ekirjasto-circulation-admin` package on jsdelivr are rewritten to load them from the local webpack build instead.
 
 Webpack will take care of compiling and updating any new changes made locally for development. Hot module replacement and live reloading are enabled, so the browser will automatically update as changes are made.
 
@@ -97,19 +97,7 @@ The Circulation Manager administrative interface relies on the [OPDS Web Catalog
 
 ## Publishing a New Release
 
-Before publishing a new release, update the version number in package.json and add the new version number + comments about what the new version includes to CHANGELOG.md. For new version numbers, you can refer to [Semantic Versioning](https://semver.org/) (major.minor.patch). Then, run `npm install` to update the package-lock.json file to include the new version.
-
-Commit your changes, push them to Github, make a PR, and request your reviewer. Once approved, you may go back to your local repository, checkout the main branch, and `git pull`.
-
-This package is [published to npm](https://www.npmjs.com/package/simplified-circulation-web). To publish a new version, you need to create an npm account and be a collaborator on the package.
-
-If you're not already logged in to npm from your terminal, you'll have to do so at this point. Run `npm login` and enter your credentials when prompted.
-
-Then, you can run `npm publish` from your local copy of the repository (ensure you are on the main branch before doing so).
-
-Afterwards, you should tag the release and add comments to Github. On the main branch, run `git tag -a v[version number] -m '[commit message]'`. Then run `git push origin v[version number]`.
-
-Go to the Github repository, click on "tags," find the tag you pushed, click on it and hit "edit." Add a release title, and a description. Then save by clicking, "Update Release."
+This package is [published to NPM](https://www.npmjs.com/package/@natlibfi/ekirjasto-circulation-admin). To publish a new version, create a new release in GitHub. For new version numbers, you can refer to [Semantic Versioning](https://semver.org/) (major.minor.patch). The NPM build and publish will be done by GitHub Actions.
 
 ## Accessibility
 
@@ -127,7 +115,13 @@ To run the tests, perform `npm test`.
 
 We use GitHub Actions for continuous integration. Any pull requests submitted must have tests and those tests must pass on GitHub Actions.
 
+#### E-kirjasto Unit Tests
+
+E-kirjasto-specific Jest tests are in folder `/src/finland/tests`. To run them locally, use command `npm test-finland`.
+
 ### Nightwatch
+
+_(NOTE: Nightwatch is currently not configured for the E-kirjasto fork.)_
 
 There are end-to-end tests that run on Nightwatch. This selenium-based test runner allows us to include integration tests for logging into the admin and clicking through different pages.
 
