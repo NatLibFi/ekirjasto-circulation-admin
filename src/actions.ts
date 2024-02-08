@@ -11,7 +11,6 @@ import {
   PatronAuthServicesData,
   SitewideSettingsData,
   MetadataServicesData,
-  SearchServicesData,
   DiscoveryServicesData,
   LibraryRegistrationsData,
   CustomListsData,
@@ -23,11 +22,11 @@ import {
   RightsStatusData,
   CatalogServicesData,
   SelfTestsData,
-  PatronData,
   DiagnosticsData,
   FeatureFlags,
   SitewideAnnouncementsData,
   StatisticsData,
+  QuickSightEmbeddedURLData,
 } from "./interfaces";
 import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
 import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
@@ -86,9 +85,6 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly METADATA_SERVICES = "METADATA_SERVICES";
   static readonly EDIT_METADATA_SERVICE = "EDIT_METADATA_SERVICE";
   static readonly DELETE_METADATA_SERVICE = "DELETE_METADATA_SERVICE";
-  static readonly SEARCH_SERVICES = "SEARCH_SERVICES";
-  static readonly EDIT_SEARCH_SERVICE = "EDIT_SEARCH_SERVICE";
-  static readonly DELETE_SEARCH_SERVICE = "DELETE_SEARCH_SERVICE";
   static readonly CATALOG_SERVICES = "CATALOG_SERVICES";
   static readonly EDIT_CATALOG_SERVICE = "EDIT_CATALOG_SERVICE";
   static readonly DELETE_CATALOG_SERVICE = "DELETE_CATALOG_SERVICE";
@@ -194,6 +190,7 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly RESET_ADOBE_ID = "RESET_ADOBE_ID";
 
   static readonly DIAGNOSTICS = "DIAGNOSTICS";
+  static readonly QUICKSIGHT_EMBEDDED_URL = "QUICKSIGHT_EMBEDDED_URL";
 
   csrfToken: string;
 
@@ -592,31 +589,6 @@ export default class ActionCreator extends BaseActionCreator {
     const url = "/admin/metadata_service/" + identifier;
     return this.postForm(
       ActionCreator.DELETE_METADATA_SERVICE,
-      url,
-      null,
-      "DELETE"
-    ).bind(this);
-  }
-
-  fetchSearchServices() {
-    const url = "/admin/search_services";
-    return this.fetchJSON<SearchServicesData>(
-      ActionCreator.SEARCH_SERVICES,
-      url
-    ).bind(this);
-  }
-
-  editSearchService(data: FormData) {
-    const url = "/admin/search_services";
-    return this.postForm(ActionCreator.EDIT_SEARCH_SERVICE, url, data).bind(
-      this
-    );
-  }
-
-  deleteSearchService(identifier: string | number) {
-    const url = "/admin/search_service/" + identifier;
-    return this.postForm(
-      ActionCreator.DELETE_SEARCH_SERVICE,
       url,
       null,
       "DELETE"
@@ -1094,5 +1066,14 @@ export default class ActionCreator extends BaseActionCreator {
       name,
       value,
     };
+  }
+
+  fetchQuicksightEmbedUrl(dashboardId: string, ld: LibrariesData) {
+    const library_uuids: string = ld.libraries.map((l) => l.uuid).join(",");
+    const url = `/admin/quicksight_embed/${dashboardId}?libraryUuids=${library_uuids}`;
+    return this.fetchJSON<QuickSightEmbeddedURLData>(
+      ActionCreator.QUICKSIGHT_EMBEDDED_URL,
+      url
+    ).bind(this);
   }
 }
