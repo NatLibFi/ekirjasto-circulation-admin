@@ -11,11 +11,6 @@ import { Link } from "react-router";
 import Admin from "../../models/Admin";
 import title from "../../utils/title";
 
-// FilterWith function for removing E-kirjasto "Tilastot" form link nodes.
-// (It gets tested in src/finland/tests/Header.test.tsx)
-const filterTilastotLink = (link) =>
-  !link.children().text().includes("Tilastot");
-
 describe("Header", () => {
   let wrapper;
   let context;
@@ -43,7 +38,7 @@ describe("Header", () => {
   beforeEach(() => {
     context = { library: () => "nypl", admin: libraryManager, router };
 
-    wrapper = shallow(<Header />, { context });
+    wrapper = shallow(<Header isEkirjasto={false} />, { context });
   });
 
   describe("rendering", () => {
@@ -107,7 +102,7 @@ describe("Header", () => {
     });
 
     it("shows sitewide links, non-catalog library links, and system configuration link for library manager", () => {
-      let links = wrapper.find(Link).filterWhere(filterTilastotLink);
+      let links = wrapper.find(Link);
       expect(links.length).to.equal(4);
 
       let dashboardLink = links.at(0);
@@ -128,7 +123,7 @@ describe("Header", () => {
 
       // no selected library
       wrapper.setContext({ admin: libraryManager });
-      links = wrapper.find(Link).filterWhere(filterTilastotLink);
+      links = wrapper.find(Link);
       dashboardLink = links.at(0);
       expect(dashboardLink.prop("to")).to.equal("/admin/web/dashboard/");
 
@@ -139,7 +134,7 @@ describe("Header", () => {
     it("shows sitewide, system configuration, and non-catalog library links for librarian", () => {
       wrapper.setContext({ library: () => "nypl", admin: librarian });
 
-      const links = wrapper.find(Link).filterWhere(filterTilastotLink);
+      const links = wrapper.find(Link);
       expect(links.length).to.equal(3);
 
       const dashboardLink = links.at(0);
@@ -169,7 +164,7 @@ describe("Header", () => {
     describe("patron manager display", () => {
       it("does not show Patron Manager link for librarian", () => {
         wrapper.setContext({ library: () => "nypl", admin: librarian });
-        const links = wrapper.find(Link).filterWhere(filterTilastotLink);
+        const links = wrapper.find(Link);
         expect(links.length).to.equal(3);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Patrons");
@@ -177,7 +172,7 @@ describe("Header", () => {
       });
       it("does not show Patron Manager link for library manager", () => {
         wrapper.setContext({ library: () => "nypl", admin: libraryManager });
-        const links = wrapper.find(Link).filterWhere(filterTilastotLink);
+        const links = wrapper.find(Link);
         expect(links.length).to.equal(4);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Patrons");
@@ -185,7 +180,7 @@ describe("Header", () => {
       });
       it("shows Patron Manager link for system admin", () => {
         wrapper.setContext({ library: () => "nypl", admin: systemAdmin });
-        const links = wrapper.find(Link).filterWhere(filterTilastotLink);
+        const links = wrapper.find(Link);
         const patronManagerLink = links.at(3);
         expect(links.length).to.equal(6);
         expect(patronManagerLink.children().text()).to.equal("Patrons");
@@ -194,7 +189,7 @@ describe("Header", () => {
     describe("troubleshooting display", () => {
       it("does not show Troubleshooting link for librarian", () => {
         wrapper.setContext({ library: () => "nypl", admin: librarian });
-        const links = wrapper.find(Link).filterWhere(filterTilastotLink);
+        const links = wrapper.find(Link);
         expect(links.length).to.equal(3);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Troubleshooting");
@@ -202,7 +197,7 @@ describe("Header", () => {
       });
       it("does not show Troubleshooting link for library manager", () => {
         wrapper.setContext({ library: () => "nypl", admin: libraryManager });
-        const links = wrapper.find(Link).filterWhere(filterTilastotLink);
+        const links = wrapper.find(Link);
         expect(links.length).to.equal(4);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Troubleshooting");
@@ -210,7 +205,7 @@ describe("Header", () => {
       });
       it("shows Troubleshooting link for system admin", () => {
         wrapper.setContext({ library: () => "nypl", admin: systemAdmin });
-        const links = wrapper.find(Link).filterWhere(filterTilastotLink);
+        const links = wrapper.find(Link);
         expect(links.length).to.equal(6);
         expect(links.at(5).children().text()).to.equal("Troubleshooting");
       });
@@ -220,9 +215,12 @@ describe("Header", () => {
   describe("behavior", () => {
     it("fetches libraries on mount", () => {
       const fetchLibraries = stub();
-      wrapper = shallow(<Header fetchLibraries={fetchLibraries} />, {
-        context: { admin: libraryManager },
-      });
+      wrapper = shallow(
+        <Header isEkirjasto={false} fetchLibraries={fetchLibraries} />,
+        {
+          context: { admin: libraryManager },
+        }
+      );
       expect(fetchLibraries.callCount).to.equal(1);
     });
 
@@ -230,7 +228,11 @@ describe("Header", () => {
       const fetchLibraries = stub();
 
       wrapper = shallow(
-        <Header fetchLibraries={fetchLibraries} isFetchingLibraries />,
+        <Header
+          isEkirjasto={false}
+          fetchLibraries={fetchLibraries}
+          isFetchingLibraries
+        />,
         {
           context: { admin: libraryManager },
         }
@@ -249,7 +251,7 @@ describe("Header", () => {
         router,
         admin: libraryManager,
       });
-      wrapper = mount(<Header libraries={libraries} />, {
+      wrapper = mount(<Header isEkirjasto={false} libraries={libraries} />, {
         context: fullContext,
         childContextTypes,
       });
@@ -275,7 +277,10 @@ describe("Header", () => {
         router,
         admin,
       });
-      wrapper = mount(<Header />, { context: fullContext, childContextTypes });
+      wrapper = mount(<Header isEkirjasto={false} />, {
+        context: fullContext,
+        childContextTypes,
+      });
 
       const toggle = wrapper.find(".account-dropdown-toggle").hostNodes();
       let dropdownItems = wrapper.find("ul.dropdown-menu li");

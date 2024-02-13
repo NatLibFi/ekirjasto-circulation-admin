@@ -149,6 +149,7 @@ describe("CustomListEditor", () => {
         collections={collections}
         entries={entries}
         entryPoints={entryPoints}
+        isEkirjasto={false} // Finland
         isFetchingMoreCustomListEntries={false}
         isFetchingSearchResults={false}
         isFetchingMoreSearchResults={false}
