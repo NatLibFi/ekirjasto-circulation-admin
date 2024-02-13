@@ -27,8 +27,14 @@ export interface HeaderDispatchProps {
   fetchLibraries?: () => Promise<LibrariesData>;
 }
 
+// Finland
+// isEkirjasto boolean (default: true) is for adding/hiding
+// some links in menu and its purpose is to ease maintaining
+// of both upstream tests and our tests
+
 export interface HeaderOwnProps {
   store?: Store<RootState>;
+  isEkirjasto?: boolean; // Finland, default: true
 }
 
 export interface HeaderProps
@@ -49,6 +55,7 @@ export interface HeaderNavItem {
   label: string;
   href: string;
   auth?: boolean;
+  hidden?: boolean;
 }
 
 /** Header of all admin interface pages, with a dropdown for selecting a library,
@@ -62,10 +69,12 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     admin: PropTypes.object.isRequired,
   };
   private libraryRef = React.createRef<EditableInput>();
+  private isEkirjasto: boolean;
 
   constructor(props) {
     super(props);
     this.state = { showAccountDropdown: false };
+    this.isEkirjasto = this.props.isEkirjasto ?? true;
     this.changeLibrary = this.changeLibrary.bind(this);
     this.toggleAccountDropdown = this.toggleAccountDropdown.bind(this);
     this.renderNavItem = this.renderNavItem.bind(this);
@@ -103,11 +112,16 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     let isSomeLibraryManager = this.context.admin.isLibraryManagerOfSomeLibrary();
 
     // Dashboard link that will be rendered in a Link router component.
-    const dashboardLinkItem = { label: "Dashboard", href: "dashboard/" };
+    const dashboardLinkItem = {
+      label: "Dashboard",
+      href: "dashboard/",
+      hidden: this.isEkirjasto,
+    };
 
     const finlandStatisticsLinkItem = {
       label: "Tilastot",
       href: "statistics/",
+      hidden: !this.isEkirjasto,
     };
 
     // Links that will be rendered in a NavItem Bootstrap component.
@@ -119,7 +133,12 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     const libraryLinkItems = [
       { label: "Lists", href: "lists/" },
       { label: "Lanes", href: "lanes/", auth: isLibraryManager },
-      { label: "Patrons", href: "patrons/", auth: isSystemAdmin },
+      {
+        label: "Patrons",
+        href: "patrons/",
+        auth: isSystemAdmin,
+        hidden: this.isEkirjasto,
+      },
     ];
     // Links that will be rendered in a Link router component and are sitewide.
     const sitewideLinkItems = [
@@ -256,6 +275,9 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     currentPathname: string,
     currentLibrary: string = ""
   ) {
+    if (item.hidden) {
+      return null;
+    }
     const rootCatalogURL = "/admin/web/collection/";
     const { label, href } = item;
     const isActive = currentPathname.indexOf(href) !== -1;
@@ -285,6 +307,9 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     currentPathname: string,
     currentLibrary: string = ""
   ) {
+    if (item.hidden) {
+      return null;
+    }
     const rootUrl = "/admin/web/";
     const { label, href, auth } = item;
     let isActive = currentPathname.indexOf(href) !== -1;

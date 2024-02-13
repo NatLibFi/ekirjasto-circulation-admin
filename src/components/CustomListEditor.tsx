@@ -28,6 +28,7 @@ export type CustomListEditorProps = {
   entries?: CustomListEditorEntriesData;
   entryPoints?: string[];
   isAutoUpdateEnabled?: boolean;
+  isEkirjasto?: boolean; // Finland
   isFetchingMoreCustomListEntries: boolean;
   isFetchingSearchResults: boolean;
   isFetchingMoreSearchResults: boolean;
@@ -81,6 +82,7 @@ export default function CustomListEditor({
   entries,
   entryPoints,
   isAutoUpdateEnabled,
+  isEkirjasto = true, // Finland
   isFetchingMoreCustomListEntries,
   isFetchingSearchResults,
   isFetchingMoreSearchResults,
@@ -178,7 +180,7 @@ export default function CustomListEditor({
 
       <div className="custom-list-editor-body">
         <section>
-          {listId && (
+          {!isEkirjasto && listId && (
             <Panel
               headerText="Sharing"
               id="sharing"
@@ -234,7 +236,7 @@ export default function CustomListEditor({
             />
           )}
 
-          {collections?.length > 0 && (
+          {!isEkirjasto && collections?.length > 0 && (
             <div className="custom-list-filters">
               <Panel
                 headerText="Add from collections"
