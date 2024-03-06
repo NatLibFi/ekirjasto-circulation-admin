@@ -85,6 +85,15 @@ export default class ConfigTabContainer extends TabContainer<
     } else {
       tabNames = this.LIBRARIAN_TABS;
     }
+
+    // Finland, remove all tabs for non system admins
+    if (
+      this.context.admin.isEkirjastoUser() &&
+      !this.context.admin.isSystemAdmin()
+    ) {
+      tabNames = [];
+    }
+
     makeTabs(tabNames);
     return tabs;
   }

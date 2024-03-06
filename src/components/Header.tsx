@@ -108,6 +108,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     let currentLibrary = this.context.library && this.context.library();
     let isLibraryManager = this.context.admin.isLibraryManager(currentLibrary);
     let isSystemAdmin = this.context.admin.isSystemAdmin();
+    let isEkirjastoUser = this.context.admin.isEkirjastoUser();
     let isSiteWide = !this.context.library || !currentLibrary;
     let isSomeLibraryManager = this.context.admin.isLibraryManagerOfSomeLibrary();
 
@@ -121,7 +122,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     const finlandStatisticsLinkItem = {
       label: "Tilastot",
       href: "statistics/",
-      hidden: !this.isEkirjasto,
+      hidden: !this.isEkirjasto || !isSystemAdmin,
     };
 
     // Links that will be rendered in a NavItem Bootstrap component.
@@ -142,10 +143,21 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     ];
     // Links that will be rendered in a Link router component and are sitewide.
     const sitewideLinkItems = [
-      { label: "Dashboard", href: "dashboard/", auth: isSiteWide },
+      {
+        label: "Dashboard",
+        href: "dashboard/",
+        auth:
+          // Finland: Palace shows dashboard for all roles
+          // For E-kirjasto, limit to system admins only
+          (!this.isEkirjasto && isSiteWide) ||
+          (this.isEkirjasto && isSiteWide && isSystemAdmin),
+      },
       {
         label: "System Configuration",
         href: "config/",
+        // Finland: Palace shows system config for all roles.
+        // For E-kirjasto limit to system admins only.
+        auth: !this.isEkirjasto || isSystemAdmin,
       },
       {
         label: "Troubleshooting",
@@ -153,7 +165,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         auth: isSystemAdmin,
       },
     ];
-    const accountLink = { label: "Change password", href: "account/" };
+    const accountLink = {
+      label: "Change password",
+      href: "account/",
+      hidden: this.context.admin.isEkirjastoUser(),
+    };
 
     return (
       <Navbar fluid={true}>
