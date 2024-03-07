@@ -323,6 +323,8 @@ export interface PathFor {
   (collectionUrl: string, bookUrl: string, tab?: string): string;
 }
 
+export type AdminAuthType = "password" | "external";
+
 export interface AdminRoleData {
   library?: string;
   role: string;

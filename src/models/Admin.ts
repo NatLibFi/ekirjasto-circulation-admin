@@ -1,17 +1,23 @@
-import { AdminRoleData } from "../interfaces";
+import { AdminAuthType, AdminRoleData } from "../interfaces";
 
 export default class Admin {
   roles: AdminRoleData[];
   email: string | null = null;
+  private authType: AdminAuthType = "password";
   private systemAdmin: boolean = false;
   private sitewideLibraryManager: boolean = false;
   private sitewideLibrarian: boolean = false;
   private manager: boolean = false;
   private libraryRoles: { [library: string]: string } = {};
 
-  constructor(roles: AdminRoleData[], email?: string) {
+  constructor(
+    roles: AdminRoleData[],
+    email?: string,
+    authType?: AdminAuthType
+  ) {
     this.roles = roles;
     this.email = email;
+    this.authType = authType;
     for (const role of roles) {
       switch (role.role) {
         case "system": {
@@ -60,6 +66,10 @@ export default class Admin {
       return true;
     }
     return false;
+  }
+
+  isEkirjastoUser() {
+    return this.authType === "external";
   }
 
   isSystemAdmin() {

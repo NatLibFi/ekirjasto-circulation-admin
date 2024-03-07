@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as PropTypes from "prop-types";
 
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { Header } from "../../components/Header";
 
@@ -21,6 +21,7 @@ const testLibraryData = {
 
 class ContextWrapper extends React.Component<{
   hasLibrary: boolean;
+  isEkirjastoUser: boolean;
 }> {
   getChildContext() {
     return {
@@ -32,9 +33,11 @@ class ContextWrapper extends React.Component<{
       },
       library: () => (this.props.hasLibrary ? testLibraryData : null),
       admin: {
+        email: "test@example.com",
         isLibraryManager: () => true,
         isSystemAdmin: () => true,
         isLibraryManagerOfSomeLibrary: () => true,
+        isEkirjastoUser: () => this.props.isEkirjastoUser,
       },
     };
   }
@@ -52,7 +55,7 @@ class ContextWrapper extends React.Component<{
 describe("Header Modifications", () => {
   it("renders the 'Tilastot' link if a library is selected", () => {
     render(
-      <ContextWrapper hasLibrary>
+      <ContextWrapper hasLibrary isEkirjastoUser>
         <Header />
       </ContextWrapper>
     );
@@ -62,7 +65,7 @@ describe("Header Modifications", () => {
 
   it("does not render the 'Tilastot' link if library is not selected", () => {
     render(
-      <ContextWrapper hasLibrary={false}>
+      <ContextWrapper hasLibrary={false} isEkirjastoUser={false}>
         <Header />
       </ContextWrapper>
     );
@@ -72,7 +75,7 @@ describe("Header Modifications", () => {
 
   it("does not render hidden Dashboard and Patrons links in E-kirjasto", () => {
     render(
-      <ContextWrapper hasLibrary>
+      <ContextWrapper hasLibrary isEkirjastoUser>
         <Header />
       </ContextWrapper>
     );
@@ -83,9 +86,32 @@ describe("Header Modifications", () => {
     expect(linkElement2).not.toBeInTheDocument();
   });
 
+  it("does not render 'Change password' link for E-kirjasto user", () => {
+    render(
+      <ContextWrapper hasLibrary isEkirjastoUser>
+        <Header isEkirjasto={true} />
+      </ContextWrapper>
+    );
+
+    fireEvent.click(screen.queryByText("test@example.com"));
+    expect(screen.queryByText("Sign out")).toBeInTheDocument();
+    expect(screen.queryByText("Change password")).not.toBeInTheDocument();
+  });
+
+  it("renders 'Change password' link for password based user", () => {
+    render(
+      <ContextWrapper hasLibrary isEkirjastoUser={false}>
+        <Header isEkirjasto={true} />
+      </ContextWrapper>
+    );
+
+    fireEvent.click(screen.queryByText("test@example.com"));
+    expect(screen.queryByText("Change password")).toBeVisible();
+  });
+
   it("renders Dashboard and Patrons links if not in E-kirjasto", () => {
     render(
-      <ContextWrapper hasLibrary>
+      <ContextWrapper hasLibrary isEkirjastoUser>
         <Header isEkirjasto={false} />
       </ContextWrapper>
     );

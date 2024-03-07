@@ -2,7 +2,7 @@ import * as React from "react";
 import { Store } from "redux";
 import * as PropTypes from "prop-types";
 import buildStore, { RootState } from "../store";
-import { FeatureFlags, PathFor } from "../interfaces";
+import { AdminAuthType, FeatureFlags, PathFor } from "../interfaces";
 import Admin from "../models/Admin";
 import PathForProvider from "@thepalaceproject/web-opds-client/lib/components/context/PathForContext";
 import ActionCreator from "../actions";
@@ -17,6 +17,7 @@ export interface ContextProviderProps extends React.Props<ContextProvider> {
     role: string;
     library?: string;
   }[];
+  authType?: AdminAuthType;
   featureFlags?: FeatureFlags;
 }
 
@@ -32,7 +33,11 @@ export default class ContextProvider extends React.Component<
   constructor(props) {
     super(props);
     this.store = props.store ?? buildStore();
-    this.admin = new Admin(props.roles || [], props.email || null);
+    this.admin = new Admin(
+      props.roles || [],
+      props.email || null,
+      props.authType || null
+    );
     this.pathFor = (collectionUrl: string, bookUrl: string, tab?: string) => {
       let path = "/admin/web";
       path += collectionUrl
