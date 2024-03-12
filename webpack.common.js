@@ -31,7 +31,10 @@ module.exports = {
     }),
     // Publish the logo to dist.
     new CopyPlugin({
-      patterns: ["src/images/PalaceCollectionManagerLogo.svg"],
+      patterns: [
+        "src/images/PalaceCollectionManagerLogo.svg", 
+        "src/images/favicon.ico",
+      ],
     }),
   ],
   optimization: {
