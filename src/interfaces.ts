@@ -210,6 +210,7 @@ export interface LibraryData {
   uuid?: string;
   name?: string;
   short_name?: string;
+  is_default?: boolean;
   settings?: {
     [key: string]: string | string[] | {}[];
   };

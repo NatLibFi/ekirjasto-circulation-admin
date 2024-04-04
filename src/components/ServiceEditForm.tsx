@@ -355,8 +355,9 @@ export default class ServiceEditForm<
                       disabled={disabled}
                       onEdit={() => this.expandLibrary(library)}
                     >
-                      {this.getLibrary(library.short_name) &&
-                        this.getLibrary(library.short_name).name}
+                      {this.formatLibraryName(
+                        this.getLibrary(library.short_name)
+                      )}
                     </WithEditButton>
                   )}
                 {!(
@@ -365,8 +366,7 @@ export default class ServiceEditForm<
                   this.protocolLibrarySettings(protocol) &&
                   this.protocolLibrarySettings(protocol).length > 0
                 ) &&
-                  this.getLibrary(library.short_name) &&
-                  this.getLibrary(library.short_name).name}
+                  this.formatLibraryName(this.getLibrary(library.short_name))}
               </WithRemoveButton>
               {this.isExpanded(library) && (
                 <div className="edit-library-settings">
@@ -405,6 +405,8 @@ export default class ServiceEditForm<
               ref="addLibrary"
               value={this.state.selectedLibrary}
               onChange={this.selectLibrary}
+              description="Collections added for the default library will be
+              available for all libraries."
             >
               <option
                 value="none"
@@ -420,7 +422,7 @@ export default class ServiceEditForm<
                     this.state.selectedLibrary === "library.short_name"
                   }
                 >
-                  {library.name}
+                  {this.formatLibraryName(library)}
                 </option>
               ))}
             </EditableInput>
@@ -451,6 +453,13 @@ export default class ServiceEditForm<
         )}
       </fieldset>
     );
+  }
+
+  formatLibraryName(library: LibraryData): string {
+    if (!library) return "not found";
+    if (library.is_default) return library.name + " " + "(default)";
+
+    return library.name;
   }
 
   availableProtocols(props?): ProtocolData[] {
