@@ -225,7 +225,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
             {sitewideLinkItems.map((item) =>
               this.renderLinkItem(item, currentPathname)
             )}
-            {this.context.admin.email && (
+            {(this.context.admin.email || this.context.admin.givenName) && (
               <li className="dropdown">
                 <Button
                   className="account-dropdown-toggle transparent"
@@ -235,7 +235,8 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
                   callback={this.toggleAccountDropdown}
                   content={
                     <span>
-                      {this.context.admin.email} <GenericWedgeIcon />
+                      {this.context.admin.givenName || this.context.admin.email}{" "}
+                      <GenericWedgeIcon />
                     </span>
                   }
                 />

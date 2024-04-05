@@ -3,6 +3,7 @@ import { AdminAuthType, AdminRoleData } from "../interfaces";
 export default class Admin {
   roles: AdminRoleData[];
   email: string | null = null;
+  givenName: string | null = null;
   private authType: AdminAuthType = "password";
   private systemAdmin: boolean = false;
   private sitewideLibraryManager: boolean = false;
@@ -13,10 +14,12 @@ export default class Admin {
   constructor(
     roles: AdminRoleData[],
     email?: string,
+    givenName?: string,
     authType?: AdminAuthType
   ) {
     this.roles = roles;
     this.email = email;
+    this.givenName = givenName;
     this.authType = authType;
     for (const role of roles) {
       switch (role.role) {

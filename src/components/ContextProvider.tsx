@@ -13,6 +13,7 @@ export interface ContextProviderProps extends React.Props<ContextProvider> {
   showCircEventsDownload?: boolean;
   settingUp?: boolean;
   email?: string;
+  givenName?: string;
   roles?: {
     role: string;
     library?: string;
@@ -36,6 +37,7 @@ export default class ContextProvider extends React.Component<
     this.admin = new Admin(
       props.roles || [],
       props.email || null,
+      props.givenName || null,
       props.authType || null
     );
     this.pathFor = (collectionUrl: string, bookUrl: string, tab?: string) => {
