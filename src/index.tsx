@@ -38,6 +38,11 @@ interface ConfigurationSettings {
   /** `email` will be the email address of the currently logged in admin. */
   email?: string;
 
+  /** `givenName` will be the first name of currently logged in admin.
+      only available for externally authenticated users (who will have no
+      email). */
+  givenName?: string;
+
   /** `roles` contains the logged in admin's roles: system admininstrator,
       or library manager or librarian for one or more libraries. */
   roles?: {
