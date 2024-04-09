@@ -54,7 +54,8 @@ export class Libraries extends GenericEditableConfigList<
   }
 
   label(item): string {
-    return item[this.labelKey] || item.short_name || item.uuid;
+    const name = item[this.labelKey] || item.short_name || item.uuid;
+    return item.is_default ? `${name} (default)` : name;
   }
 
   canCreate() {

@@ -193,6 +193,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
                   aria-selected={currentLibrary === library.short_name}
                 >
                   {library.name || library.short_name}
+                  {library.is_default && " (default)"}
                 </option>
               ))}
             </EditableInput>
