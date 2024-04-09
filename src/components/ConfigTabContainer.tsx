@@ -26,6 +26,36 @@ export interface ConfigTabContainerContext extends TabContainerContext {
   admin: Admin;
 }
 
+const COMMON_TABS = { libraries: Libraries };
+
+const LIBRARY_MANAGER_TABS = {
+  ...COMMON_TABS,
+  individualAdmins: IndividualAdmins,
+};
+
+const EKIRJASTO_LIBRARY_MANAGER_TABS = { ...COMMON_TABS };
+
+const SYSTEM_ADMIN_TABS = {
+  ...LIBRARY_MANAGER_TABS,
+  collections: Collections,
+  patronAuth: PatronAuthServices,
+  sitewideSettings: SitewideSettings,
+  metadata: MetadataServices,
+  catalogServices: CatalogServices,
+  discovery: DiscoveryServices,
+  sitewideAnnouncements: SitewideAnnouncements,
+};
+
+const { individualAdmins, ...EKIRJASTO_SYSTEM_ADMIN_TABS } = SYSTEM_ADMIN_TABS;
+
+const DISPLAY_NAMES: Partial<Record<keyof typeof SYSTEM_ADMIN_TABS, string>> = {
+  individualAdmins: "Admins",
+  patronAuth: "Patron Authentication",
+  sitewideAnnouncements: "Sitewide Announcements",
+  sitewideSettings: "Sitewide Settings",
+  catalogServices: "External Catalogs",
+};
+
 /** Body of the system configuration page, with a tab for each type of
     service that can be configured. */
 export default class ConfigTabContainer extends TabContainer<
@@ -38,64 +68,37 @@ export default class ConfigTabContainer extends TabContainer<
     admin: PropTypes.object.isRequired as React.Validator<Admin>,
   };
 
-  COMPONENT_CLASSES = {
-    libraries: Libraries,
-    individualAdmins: IndividualAdmins,
-    collections: Collections,
-    patronAuth: PatronAuthServices,
-    sitewideSettings: SitewideSettings,
-    metadata: MetadataServices,
-    catalogServices: CatalogServices,
-    discovery: DiscoveryServices,
-    sitewideAnnouncements: SitewideAnnouncements,
-  };
-
-  LIBRARIAN_TABS = ["libraries"];
-  LIBRARY_MANAGER_TABS = [...this.LIBRARIAN_TABS, "individualAdmins"];
-  SYSTEM_ADMIN_TABS = Object.keys(this.COMPONENT_CLASSES);
-
-  DISPLAY_NAMES = {
-    individualAdmins: "Admins",
-    patronAuth: "Patron Authentication",
-    sitewideAnnouncements: "Sitewide Announcements",
-    sitewideSettings: "Sitewide Settings",
-    catalogServices: "External Catalogs",
-  };
-
   tabs() {
-    const tabs = {};
-    const makeTabs = (tabNames) => {
-      for (const tab of tabNames) {
-        const ComponentClass = this.COMPONENT_CLASSES[tab];
-        tabs[tab] = (
-          <ComponentClass
-            store={this.props.store}
-            csrfToken={this.props.csrfToken}
-            editOrCreate={this.props.editOrCreate}
-            identifier={this.props.identifier}
-          />
-        );
-      }
-    };
-    let tabNames;
-    if (this.context.admin.isSystemAdmin()) {
-      tabNames = this.SYSTEM_ADMIN_TABS;
-    } else if (this.context.admin.isLibraryManagerOfSomeLibrary()) {
-      tabNames = this.LIBRARY_MANAGER_TABS;
-    } else {
-      tabNames = this.LIBRARIAN_TABS;
+    const enabledTabClasses = this.getEnabledTabClasses(this.context.admin);
+
+    const tabComponents = {};
+    Object.entries(enabledTabClasses).forEach(([key, ComponentClass]) => {
+      tabComponents[key] = (
+        <ComponentClass
+          store={this.props.store}
+          csrfToken={this.props.csrfToken}
+          editOrCreate={this.props.editOrCreate}
+          identifier={this.props.identifier}
+        />
+      );
+    });
+    return tabComponents;
+  }
+
+  getEnabledTabClasses(admin: Admin) {
+    if (admin.isSystemAdmin()) {
+      return admin.isEkirjastoUser()
+        ? EKIRJASTO_SYSTEM_ADMIN_TABS
+        : SYSTEM_ADMIN_TABS;
     }
 
-    // Finland, remove all tabs for non system admins
-    if (
-      this.context.admin.isEkirjastoUser() &&
-      !this.context.admin.isSystemAdmin()
-    ) {
-      tabNames = [];
+    if (admin.isLibraryManagerOfSomeLibrary()) {
+      return admin.isEkirjastoUser()
+        ? EKIRJASTO_LIBRARY_MANAGER_TABS
+        : LIBRARY_MANAGER_TABS;
     }
 
-    makeTabs(tabNames);
-    return tabs;
+    return COMMON_TABS;
   }
 
   handleSelect(event) {
@@ -106,8 +109,8 @@ export default class ConfigTabContainer extends TabContainer<
   }
 
   tabDisplayName(name) {
-    if (this.DISPLAY_NAMES[name]) {
-      return this.DISPLAY_NAMES[name];
+    if (DISPLAY_NAMES[name]) {
+      return DISPLAY_NAMES[name];
     } else {
       return super.tabDisplayName(name);
     }
