@@ -1,19 +1,22 @@
 import { expect } from "chai";
 import { spy } from "sinon";
 
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import ReactDOM from "react-dom";
 import { mount } from "enzyme";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const CirculationAdmin = require("../index");
+import CirculationAdmin from "../index";
 import SetupPage from "../components/SetupPage";
 import { Router } from "react-router";
 
 describe("CirculationAdmin", () => {
   it("renders Setup", () => {
     const renderSpy = spy(ReactDOM, "render");
-    new CirculationAdmin({ settingUp: true });
+    new CirculationAdmin({
+      settingUp: true,
+      csrfToken: "my-csrf-token",
+      showCircEventsDownload: true,
+    });
     expect(renderSpy.callCount).to.equal(1);
     const component = renderSpy.args[0][0];
     const wrapper = mount(component);
@@ -24,7 +27,11 @@ describe("CirculationAdmin", () => {
 
   it("renders Router", () => {
     const renderSpy = spy(ReactDOM, "render");
-    new CirculationAdmin({});
+    new CirculationAdmin({
+      settingUp: false,
+      csrfToken: "my-csrf-token",
+      showCircEventsDownload: true,
+    });
     expect(renderSpy.callCount).to.equal(1);
     const component = renderSpy.args[0][0];
     const wrapper = mount(component);

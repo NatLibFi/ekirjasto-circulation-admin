@@ -11,7 +11,9 @@
     // erroring when it sees duplicate variable declarations with different types.
     "skipLibCheck": true,
     "types": ["mocha", "node", "jest", "@testing-library/jest-dom"],
-    "jsx": "react"
+    "jsx": "react",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "exclude": [
     "lib",
