@@ -2,12 +2,14 @@ import { expect } from "chai";
 import { stub } from "sinon";
 
 import * as React from "react";
-import { shallow, mount } from "enzyme";
+import { mount } from "./test-utils";
 import { Button } from "library-simplified-reusable-components";
-import LaneEditor from "../LaneEditor";
+import { LaneEditor } from "../LaneEditor";
 import TextWithEditMode from "../TextWithEditMode";
 import EditableInput from "../EditableInput";
 import LaneCustomListsEditor from "../LaneCustomListsEditor";
+import "../../i18n/config";
+import { ReactWrapper } from "enzyme";
 
 describe("LaneEditor", () => {
   let wrapper;
@@ -54,7 +56,7 @@ describe("LaneEditor", () => {
     );
     findParentOfLane = stub().returns(laneData);
     toggleLaneVisibility = stub();
-    wrapper = shallow(
+    wrapper = mount(
       <LaneEditor
         library="library"
         lane={laneData}
@@ -132,7 +134,9 @@ describe("LaneEditor", () => {
 
   it("doesn't show the inherit parent restrictions setting on a new lane", () => {
     wrapper.setProps({ findParentOfLane: stub().returns(null) });
-    const input = wrapper.find(EditableInput);
+    const input = (wrapper as ReactWrapper)
+      .find(EditableInput)
+      .filter({ name: "inherit_parent_restrictions" });
     expect(input.length).to.equal(0);
   });
 
@@ -287,7 +291,6 @@ describe("LaneEditor", () => {
       })
     );
     wrapper.setProps({ toggleLaneVisibility: toggle });
-
     let hideButton = wrapper.find(Button).at(2);
     expect(hideButton.hasClass("hide-lane")).to.be.true;
 

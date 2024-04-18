@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { stub } from "sinon";
 import * as PropTypes from "prop-types";
 import * as React from "react";
-import { shallow, mount } from "enzyme";
+import { shallow, mount } from "./test-utils";
 
 import { Header } from "../Header";
 import EditableInput from "../EditableInput";

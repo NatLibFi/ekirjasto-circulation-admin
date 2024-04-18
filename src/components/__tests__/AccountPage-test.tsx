@@ -1,9 +1,9 @@
 import { expect } from "chai";
 
 import * as React from "react";
-import { shallow } from "enzyme";
+import { shallow } from "./test-utils";
 
-import AccountPage from "../AccountPage";
+import { AccountPage } from "../AccountPage";
 import Header from "../Header";
 import Footer from "../Footer";
 import ChangePasswordForm from "../ChangePasswordForm";
