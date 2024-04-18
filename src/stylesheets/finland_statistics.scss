@@ -103,8 +103,13 @@
     background: var(--highlight-background);
     border: solid 1px hsl(142, 25%, 42%);
   }
+  .recharts-legend-item {
+    user-select: none;
+  }
 
   .recharts-legend-item.inactive .recharts-legend-item-text {
+    text-decoration: line-through;
+    text-decoration-color: #666;
     opacity: 0.8;
   }
   .chart-prefix {

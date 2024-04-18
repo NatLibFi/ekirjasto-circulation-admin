@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -33,6 +33,10 @@ import { useOpenSearchAnalytics } from "../hooks/useOpenSearchAnalytics";
 export function Histogram() {
   const [interval, setInterval] = useState<Interval>("hour");
   const [inactiveGroups, setInactiveGroups] = useState<string[]>([]);
+  const lastLegendClick: React.MutableRefObject<{
+    key: string | null;
+    time: number | null;
+  }> = useRef({ key: null, time: null });
 
   const {
     facetData,
@@ -105,6 +109,10 @@ export function Histogram() {
     });
   }, [histogramData]);
 
+  if (!timeData || !facetData) return null;
+
+  const dateRangeLength = daysBetween(startDate, endDate);
+
   function toggleGroup(key: string) {
     setInactiveGroups(
       inactiveGroups.includes(key)
@@ -113,9 +121,24 @@ export function Histogram() {
     );
   }
 
-  if (!timeData || !facetData) return null;
+  function toggleGroupSolo(key: string) {
+    setInactiveGroups(
+      inactiveGroups.length <= 1 ? eventKeys.filter((item) => item !== key) : []
+    );
+  }
 
-  const dateRangeLength = daysBetween(startDate, endDate);
+  function handleLegendClick(key: string) {
+    const now = Date.now();
+    if (
+      lastLegendClick.current.key === key &&
+      now - lastLegendClick.current.time < 300
+    ) {
+      toggleGroupSolo(key);
+    } else {
+      toggleGroup(key);
+    }
+    lastLegendClick.current = { key, time: now };
+  }
 
   return (
     <div>
@@ -173,7 +196,7 @@ export function Histogram() {
                     timeStampToLabel(unixTime as number, interval)
                   }
                 />
-                <Legend onClick={(item) => toggleGroup(item.dataKey)} />
+                <Legend onClick={(item) => handleLegendClick(item.dataKey)} />
                 {eventKeys.map((item, idx) => (
                   <Line
                     isAnimationActive={!prefersReducedMotion()}
