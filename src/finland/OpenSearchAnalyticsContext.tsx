@@ -1,9 +1,10 @@
 import * as React from "react";
 import { createContext, useEffect, useState } from "react";
-import { KeyValuePair } from "./finlandUtils";
+import { KeyValuePair, NameValuePair, readable } from "./finlandUtils";
 const termsEndpoint = "/admin/events/terms";
 const histogramEndpoint = "/admin/events/histogram";
 const facetsEndpoint = "/admin/events/facets";
+const municipalityEndpoint = "/admin/municipalities";
 
 type BucketItem = {
   key: string;
@@ -28,12 +29,19 @@ type HistogramData = {
 
 export type FacetData = Record<string, { buckets: BucketItem[] }>;
 
+export type FilterToOptionsFunc = (
+  filterKey: string,
+  buckets: BucketItem[]
+) => NameValuePair[];
+
 export type OpenSearchAnalyticsContextType = {
   facetData?: FacetData;
   eventData?: TermBucketData;
   fetchEventData?: (params: KeyValuePair[]) => void;
   histogramData?: HistogramData;
   fetchHistogramData?: (params: KeyValuePair[]) => void;
+  filterToOptions?: FilterToOptionsFunc;
+  labelizeFilterChip: (item: KeyValuePair) => string;
   isReady?: boolean;
 };
 
@@ -55,6 +63,9 @@ export function OpenSearchAnalyticsContextProvider({
   const [isReady, setIsReady] = useState(false);
   const [eventData, setEventData] = useState<TermBucketData>(null);
   const [histogramData, setHistogramData] = useState<HistogramData>(null);
+  const [municipalityMapping, setMunicipalityMapping] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     async function fetchFacets() {
@@ -70,7 +81,22 @@ export function OpenSearchAnalyticsContextProvider({
         console.error("Error while fetching facets for statistics", err);
       }
     }
+    async function fetchMunicipalityMappings() {
+      try {
+        const response = await fetch(`${municipalityEndpoint}`);
+        const data = await response.json();
+        if (data) {
+          setMunicipalityMapping(data);
+        }
+      } catch (err) {
+        console.error(
+          "Error while fetching municipality mapping for statistics",
+          err
+        );
+      }
+    }
     fetchFacets();
+    fetchMunicipalityMappings();
   }, [library]);
 
   async function fetchEventData(selections?: KeyValuePair[]) {
@@ -105,6 +131,31 @@ export function OpenSearchAnalyticsContextProvider({
     }
   }
 
+  function filterToOptions(filterKey: string, buckets?: BucketItem[]) {
+    if (!buckets?.length) {
+      return [];
+    }
+    if (filterKey === "location") {
+      return buckets.map((item) => ({
+        value: item.key,
+        name: municipalityMapping[item.key] || item.key,
+      }));
+    }
+    return buckets
+      .map((item) => ({
+        value: item.key,
+        name: item.key,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  function labelizeFilterChip({ key, value }: KeyValuePair) {
+    if (key === "location") {
+      return `${readable(key)}: ${municipalityMapping[value] || value}`;
+    }
+    return `${readable(key)}: ${value}`;
+  }
+
   return (
     <OpenSearchAnalyticsContext.Provider
       value={{
@@ -114,6 +165,8 @@ export function OpenSearchAnalyticsContextProvider({
         fetchEventData,
         histogramData,
         fetchHistogramData,
+        filterToOptions,
+        labelizeFilterChip,
       }}
     >
       {children}

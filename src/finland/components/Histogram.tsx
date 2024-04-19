@@ -42,6 +42,8 @@ export function Histogram() {
     facetData,
     histogramData,
     fetchHistogramData,
+    filterToOptions,
+    labelizeFilterChip,
   } = useOpenSearchAnalytics();
 
   const {
@@ -149,12 +151,14 @@ export function Histogram() {
         setStartDate={setStartDate}
         endDate={endDate}
         setEndDate={setEndDate}
+        filterToOptions={filterToOptions}
       />
 
       <FilterChips
         activeFilters={activeFilters}
         toggleFilter={toggleFilter}
         clearFilters={clearFilters}
+        labelize={labelizeFilterChip}
       />
 
       <div className="chart-prefix">

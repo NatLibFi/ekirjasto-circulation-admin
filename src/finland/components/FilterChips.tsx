@@ -1,16 +1,18 @@
 import * as React from "react";
-import { KeyValuePair, readable } from "../finlandUtils";
+import { KeyValuePair } from "../finlandUtils";
 
 type FilterChipsProps = {
   activeFilters: KeyValuePair[];
   toggleFilter: (selection: KeyValuePair) => void;
   clearFilters: () => void;
+  labelize: (item: KeyValuePair) => string;
 };
 
 export function FilterChips({
   activeFilters,
   toggleFilter,
   clearFilters,
+  labelize,
 }: FilterChipsProps) {
   return (
     <div className="chip-container">
@@ -22,7 +24,7 @@ export function FilterChips({
               onClick={() => toggleFilter(item)}
               isSingle
             >
-              {readable(item.key)}: {item.value}
+              {labelize(item)}
             </Chip>
           ))}
           <Chip

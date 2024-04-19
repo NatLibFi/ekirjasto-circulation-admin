@@ -22,6 +22,7 @@ describe("FilterChips", () => {
         activeFilters={activeFilters}
         toggleFilter={doNothing}
         clearFilters={doNothing}
+        labelize={(item) => `${item.key}: ${item.value}`}
       />
     );
 
@@ -39,6 +40,7 @@ describe("FilterChips", () => {
         activeFilters={activeFilters}
         toggleFilter={toggleFilterMock}
         clearFilters={doNothing}
+        labelize={(item) => `${item.key}: ${item.value}`}
       />
     );
 
@@ -57,6 +59,7 @@ describe("FilterChips", () => {
         activeFilters={activeFilters}
         toggleFilter={doNothing}
         clearFilters={clearFiltersMock}
+        labelize={(item) => `${item.key}: ${item.value}`}
       />
     );
 

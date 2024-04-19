@@ -27,12 +27,15 @@ export type EventKey = keyof IEvent;
 
 export type KeyValuePair = { key: string; value: string };
 
+export type NameValuePair = { name: string; value: string };
+
 export const eventTypes = {
   circulation_manager_check_out: "circulation_manager_check_out",
   circulation_manager_check_in: "circulation_manager_check_in",
   circulation_manager_fulfill: "circulation_manager_fulfill",
   circulation_manager_hold_place: "circulation_manager_hold_place",
   circulation_manager_hold_release: "circulation_manager_hold_release",
+  circulation_manager_new_patron: "circulation_manager_new_patron",
   distributor_check_out: "distributor_check_out",
   distributor_check_in: "distributor_check_in",
   distributor_hold_place: "distributor_hold_place",
@@ -52,6 +55,7 @@ export const readableNames: Record<string, string> = {
   [eventTypes.circulation_manager_fulfill]: "Toimitukset",
   [eventTypes.circulation_manager_hold_place]: "Varaukset, pyyntö",
   [eventTypes.circulation_manager_hold_release]: "Varaukset, nouto",
+  [eventTypes.circulation_manager_new_patron]: "Uudet asiakkaat",
   [eventTypes.distributor_check_out]: "Lainaukset",
   [eventTypes.distributor_check_in]: "Palautukset",
   [eventTypes.distributor_hold_place]: "Varaukset, pyyntö",
@@ -71,6 +75,7 @@ export const readableNames: Record<string, string> = {
   fiction: "Fiktio",
   genres: "Genre",
   audience: "Kohderyhmä",
+  location: "Sijainti",
   // Time intervals
   hour: "Tunti",
   day: "Päivä",
@@ -80,7 +85,13 @@ export const readableNames: Record<string, string> = {
 export const readable = (input: string): string =>
   readableNames[input] || input;
 
-export const filterKeys = ["publisher", "language", "audience", "genres"];
+export const filterKeys = [
+  "publisher",
+  "language",
+  "audience",
+  "genres",
+  "location",
+];
 
 export const intervals = ["hour", "day", "month"];
 export type Interval = "hour" | "day" | "month";

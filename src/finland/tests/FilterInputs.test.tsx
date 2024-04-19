@@ -24,6 +24,7 @@ describe("FilterInputs", () => {
         setStartDate={doNothing}
         endDate=""
         setEndDate={doNothing}
+        filterToOptions={() => []}
       />
     );
 
@@ -47,6 +48,12 @@ describe("FilterInputs", () => {
         setStartDate={doNothing}
         endDate=""
         setEndDate={doNothing}
+        filterToOptions={(_, buckets) =>
+          buckets.map((item) => ({
+            value: item.key,
+            name: item.key,
+          }))
+        }
       />
     );
 
@@ -80,6 +87,7 @@ describe("FilterInputs", () => {
         setStartDate={setStartDateMock}
         endDate="2023-12-31"
         setEndDate={setEndDateMock}
+        filterToOptions={() => []}
       />
     );
 

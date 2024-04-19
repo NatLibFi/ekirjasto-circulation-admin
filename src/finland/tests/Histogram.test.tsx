@@ -2,8 +2,8 @@ import * as React from "react";
 import { render } from "@testing-library/react";
 import { Histogram } from "../components/Histogram";
 import {
-  facetDataFixture,
   eventDataFixture,
+  facetDataFixture,
   histogramDataFixture,
 } from "./fixtures";
 
@@ -57,6 +57,12 @@ jest.mock("../hooks/useOpenSearchAnalytics", () => ({
     histogramData: histogramDataFixture.data,
     fetchHistogramData: jest.fn(() => null),
     isReady: true,
+    filterToOptions: jest.fn((_, buckets) =>
+      buckets.map((item) => ({
+        value: item.key,
+        name: item.key,
+      }))
+    ),
   })),
 }));
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { KeyValuePair, filterKeys, readable, EventKey } from "../finlandUtils";
-import { FacetData } from "../OpenSearchAnalyticsContext";
+import { FacetData, FilterToOptionsFunc } from "../OpenSearchAnalyticsContext";
 import SelectSearch from "react-select-search";
 import { fuzzySearch } from "react-select-search";
 
@@ -11,6 +11,7 @@ type FilterInputsProps = {
   setStartDate: (newDate: string) => void;
   endDate: string;
   setEndDate: (newDate: string) => void;
+  filterToOptions: FilterToOptionsFunc;
 };
 
 export function FilterInputs({
@@ -20,15 +21,12 @@ export function FilterInputs({
   setStartDate,
   endDate,
   setEndDate,
+  filterToOptions,
 }: FilterInputsProps) {
   return (
     <div className="input-wrapper">
       {filterKeys.map((key) => {
-        const options =
-          facetData[key]?.buckets.map((item) => ({
-            value: item.key,
-            name: item.key,
-          })) || [];
+        const options = filterToOptions(key, facetData[key]?.buckets);
         const label = readable(key);
         return (
           <div key={key} className="flex-col">

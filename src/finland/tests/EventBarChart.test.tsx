@@ -57,6 +57,12 @@ jest.mock("../hooks/useOpenSearchAnalytics", () => ({
     histogramData: histogramDataFixture.data,
     fetchHistogramData: jest.fn(() => null),
     isReady: true,
+    filterToOptions: jest.fn((_, buckets) =>
+      buckets.map((item) => ({
+        value: item.key,
+        name: item.key,
+      }))
+    ),
   })),
 }));
 
