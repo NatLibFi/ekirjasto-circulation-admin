@@ -1,12 +1,17 @@
 import * as React from "react";
 import { createContext, useEffect, useState } from "react";
-import { KeyValuePair, NameValuePair, readable } from "./finlandUtils";
+import {
+  KeyValuePair,
+  NameValuePair,
+  loanDurationOptions,
+  readable,
+} from "./finlandUtils";
 const termsEndpoint = "/admin/events/terms";
 const histogramEndpoint = "/admin/events/histogram";
 const facetsEndpoint = "/admin/events/facets";
 const municipalityEndpoint = "/admin/municipalities";
 
-type BucketItem = {
+export type BucketItem = {
   key: string;
   doc_count: number;
 };
@@ -132,14 +137,19 @@ export function OpenSearchAnalyticsContextProvider({
   }
 
   function filterToOptions(filterKey: string, buckets?: BucketItem[]) {
+    if (filterKey === "duration") {
+      return [...loanDurationOptions]; // Spread to trigger SelectSearch re-render
+    }
     if (!buckets?.length) {
       return [];
     }
     if (filterKey === "location") {
-      return buckets.map((item) => ({
-        value: item.key,
-        name: municipalityMapping[item.key] || item.key,
-      }));
+      return buckets
+        .map((item) => ({
+          value: item.key,
+          name: municipalityMapping[item.key] || item.key,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
     }
     return buckets
       .map((item) => ({
@@ -152,6 +162,9 @@ export function OpenSearchAnalyticsContextProvider({
   function labelizeFilterChip({ key, value }: KeyValuePair) {
     if (key === "location") {
       return `${readable(key)}: ${municipalityMapping[value] || value}`;
+    }
+    if (key === "duration") {
+      return `${readable(key)}: ${readable(value) || value}`;
     }
     return `${readable(key)}: ${value}`;
   }

@@ -6,6 +6,7 @@ import {
   eventDataFixture,
   histogramDataFixture,
 } from "./fixtures";
+import { mockFilterToOptions } from "./mocks";
 
 /* Mock globals and dependencies */
 
@@ -57,16 +58,11 @@ jest.mock("../hooks/useOpenSearchAnalytics", () => ({
     histogramData: histogramDataFixture.data,
     fetchHistogramData: jest.fn(() => null),
     isReady: true,
-    filterToOptions: jest.fn((_, buckets) =>
-      buckets.map((item) => ({
-        value: item.key,
-        name: item.key,
-      }))
-    ),
+    filterToOptions: jest.fn(mockFilterToOptions),
   })),
 }));
 
-const eventTypesLenght = eventDataFixture.data.type.length;
+const eventTypesLength = eventDataFixture.data.type.length;
 
 afterAll(() => {
   jest.resetAllMocks();
@@ -79,6 +75,6 @@ describe("EventBarChart", () => {
     const bars = document.querySelectorAll(".recharts-bar-rectangle");
 
     // Check that there's as many bars as event types
-    expect(bars.length === eventTypesLenght).toBeTruthy();
+    expect(bars.length === eventTypesLength).toBeTruthy();
   });
 });

@@ -20,6 +20,7 @@ export interface IEvent {
   time: string;
   contributors: string[] | null;
   start: string;
+  duration: string | null;
   date?: string;
 }
 
@@ -76,10 +77,14 @@ export const readableNames: Record<string, string> = {
   genres: "Genre",
   audience: "Kohderyhmä",
   location: "Sijainti",
+  duration: "Laina-aika (palautukset)",
   // Time intervals
   hour: "Tunti",
   day: "Päivä",
   month: "Kuukausi",
+  // Loan duration options:
+  under_2h: "Alle 2h",
+  over_2h: "Yli 2h",
 };
 
 export const readable = (input: string): string =>
@@ -91,6 +96,7 @@ export const filterKeys = [
   "audience",
   "genres",
   "location",
+  "duration",
 ];
 
 export const intervals = ["hour", "day", "month"];
@@ -133,6 +139,13 @@ export const timeframeOptions: Record<Timeframe, TimeframeOption> = {
       getNumericDateWithYearAndWeekday(new Date(startDate)),
   },
 };
+
+const loanDurations = ["under_2h", "over_2h"];
+
+export const loanDurationOptions = loanDurations.map((key) => ({
+  value: key,
+  name: readable(key),
+}));
 
 /*
  * General helper functions

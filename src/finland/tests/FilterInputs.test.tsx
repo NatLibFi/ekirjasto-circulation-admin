@@ -3,6 +3,7 @@ import { render, fireEvent, screen } from "@testing-library/react";
 import { FilterInputs } from "../components/FilterInputs";
 import { facetDataFixture } from "./fixtures";
 import { filterKeys } from "../finlandUtils";
+import { mockFilterToOptions } from "./mocks";
 
 function doNothing() {
   /* do nothing */
@@ -24,7 +25,7 @@ describe("FilterInputs", () => {
         setStartDate={doNothing}
         endDate=""
         setEndDate={doNothing}
-        filterToOptions={() => []}
+        filterToOptions={mockFilterToOptions}
       />
     );
 
@@ -48,12 +49,7 @@ describe("FilterInputs", () => {
         setStartDate={doNothing}
         endDate=""
         setEndDate={doNothing}
-        filterToOptions={(_, buckets) =>
-          buckets.map((item) => ({
-            value: item.key,
-            name: item.key,
-          }))
-        }
+        filterToOptions={mockFilterToOptions}
       />
     );
 
@@ -87,7 +83,7 @@ describe("FilterInputs", () => {
         setStartDate={setStartDateMock}
         endDate="2023-12-31"
         setEndDate={setEndDateMock}
-        filterToOptions={() => []}
+        filterToOptions={mockFilterToOptions}
       />
     );
 
