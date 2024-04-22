@@ -2,10 +2,11 @@ import * as React from "react";
 import { render } from "@testing-library/react";
 import { Histogram } from "../components/Histogram";
 import {
-  facetDataFixture,
   eventDataFixture,
+  facetDataFixture,
   histogramDataFixture,
 } from "./fixtures";
+import { mockFilterToOptions } from "./mocks";
 
 /* Mock globals and dependencies */
 
@@ -57,10 +58,11 @@ jest.mock("../hooks/useOpenSearchAnalytics", () => ({
     histogramData: histogramDataFixture.data,
     fetchHistogramData: jest.fn(() => null),
     isReady: true,
+    filterToOptions: jest.fn(mockFilterToOptions),
   })),
 }));
 
-const eventTypesLenght = eventDataFixture.data.type.length;
+const eventTypesLength = eventDataFixture.data.type.length;
 
 afterAll(() => {
   jest.resetAllMocks();
@@ -73,11 +75,11 @@ describe("Histogram", () => {
     const lines = document.querySelectorAll(".recharts-line");
 
     // Check that there's as many bars as event types
-    for (let i = 0; i < eventTypesLenght; i++) {
+    for (let i = 0; i < eventTypesLength; i++) {
       expect(lines[i]).toBeInTheDocument();
     }
     // ... but no more than that
-    expect(lines[eventTypesLenght]).toBeFalsy();
+    expect(lines[eventTypesLength]).toBeFalsy();
   });
 
   it("toggles a line when clicking a legend", () => {
@@ -86,6 +88,6 @@ describe("Histogram", () => {
     const lines = document.querySelectorAll(".recharts-legend-item");
 
     // Check that there's as many lines as event types
-    expect(lines.length === eventTypesLenght).toBeTruthy();
+    expect(lines.length === eventTypesLength).toBeTruthy();
   });
 });

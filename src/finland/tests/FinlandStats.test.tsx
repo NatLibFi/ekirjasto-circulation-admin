@@ -7,6 +7,7 @@ import {
   facetDataFixture,
   histogramDataFixture,
 } from "./fixtures";
+import { mockFilterToOptions } from "./mocks";
 
 /* Mock globals and dependencies */
 
@@ -42,6 +43,7 @@ jest.mock("../hooks/useOpenSearchAnalytics", () => ({
     histogramData: histogramDataFixture.data,
     fetchHistogramData: jest.fn(() => null),
     isReady: true,
+    filterToOptions: jest.fn(mockFilterToOptions),
   })),
 }));
 

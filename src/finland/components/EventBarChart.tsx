@@ -36,7 +36,13 @@ export function EventBarChart() {
     setTimeframeOffset,
   } = useFilters();
 
-  const { facetData, eventData, fetchEventData } = useOpenSearchAnalytics();
+  const {
+    facetData,
+    eventData,
+    fetchEventData,
+    filterToOptions,
+    labelizeFilterChip,
+  } = useOpenSearchAnalytics();
 
   useEffect(() => {
     const selections: KeyValuePair[] = [...activeFilters];
@@ -67,12 +73,14 @@ export function EventBarChart() {
         setStartDate={setStartDate}
         endDate={endDate}
         setEndDate={setEndDate}
+        filterToOptions={filterToOptions}
       />
 
       <FilterChips
         activeFilters={activeFilters}
         toggleFilter={toggleFilter}
         clearFilters={clearFilters}
+        labelize={labelizeFilterChip}
       />
 
       <div className="chart-prefix">
