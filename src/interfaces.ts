@@ -250,6 +250,8 @@ export interface SettingData {
   capitalize?: boolean;
   skip?: boolean;
   level?: number;
+  defaultLibraryOnly?: boolean;
+  nonDefaultLibraryOnly?: boolean;
 }
 
 export interface ProtocolData {
