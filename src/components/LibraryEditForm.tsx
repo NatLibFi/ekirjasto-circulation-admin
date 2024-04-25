@@ -31,7 +31,7 @@ export interface LibraryEditFormProps {
     system configuration page. */
 export default class LibraryEditForm extends React.Component<
   LibraryEditFormProps,
-  {}
+  object
 > {
   private nameRef = React.createRef<EditableInput>();
   private shortNameRef = React.createRef<EditableInput>();
@@ -40,6 +40,7 @@ export default class LibraryEditForm extends React.Component<
   constructor(props: LibraryEditFormProps) {
     super(props);
     this.submit = this.submit.bind(this);
+    this.isEnabledForThisLibrary = this.isEnabledForThisLibrary.bind(this);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -60,6 +61,13 @@ export default class LibraryEditForm extends React.Component<
     return setting.level && setting.level > this.props.adminLevel;
   }
 
+  isEnabledForThisLibrary(setting: SettingData): boolean {
+    if (this.props.item?.is_default) {
+      return !setting.nonDefaultLibraryOnly;
+    }
+    return !setting.defaultLibraryOnly;
+  }
+
   render(): JSX.Element {
     let basicInfo = [];
     let otherFields = [];
@@ -75,7 +83,6 @@ export default class LibraryEditForm extends React.Component<
     }
 
     const categories = this.separateCategories(otherFields);
-    const requiresSystemAdmin = 3;
     const ref = (setting) => {
       if (setting.key === "name") {
         return this.nameRef;
@@ -85,6 +92,19 @@ export default class LibraryEditForm extends React.Component<
         return this.settingRef;
       }
     };
+
+    const librarySettingInheritanceInfo = this.props.item?.is_default ? (
+      <p>
+        This is the default library. The values set for this library will be
+        used as defaults for other libraries.
+      </p>
+    ) : (
+      <p>
+        This library inherits settings from the default library. If a setting is
+        left empty, the default library value will be used.
+      </p>
+    );
+
     const basicInfoPanel = (
       <Panel
         id="library-basic-info"
@@ -94,7 +114,7 @@ export default class LibraryEditForm extends React.Component<
         content={
           <fieldset>
             <legend className="visuallyHidden">Basic Information</legend>
-            {basicInfo.map((setting) => (
+            {basicInfo.filter(this.isEnabledForThisLibrary).map((setting) => (
               <ProtocolFormField
                 key={setting.key}
                 ref={ref(setting) as any}
@@ -122,7 +142,11 @@ export default class LibraryEditForm extends React.Component<
         className="edit-form"
         disableButton={this.props.disabled}
         onSubmit={this.submit}
-        content={[basicInfoPanel, this.renderForms(categories)]}
+        content={[
+          librarySettingInheritanceInfo,
+          basicInfoPanel,
+          this.renderForms(categories),
+        ]}
       />
     );
   }
@@ -140,14 +164,19 @@ export default class LibraryEditForm extends React.Component<
   renderForms(categories: { [key: string]: LibrarySettingField[] }) {
     const forms = [];
     const categoryNames = Object.keys(categories);
+
     categoryNames.forEach((name) => {
+      const fields = categories[name].filter(this.isEnabledForThisLibrary);
+      if (fields.length === 0) {
+        return forms;
+      }
       const form = (
         <Panel
           id={`library-form-${name.replace(/\s/g, "-")}`}
           headerText={`${name} (Optional)`}
           onEnter={this.submit}
           key={name}
-          content={this.renderFieldset(categories[name])}
+          content={this.renderFieldset(fields)}
         />
       );
       forms.push(form);
