@@ -182,8 +182,8 @@ export default class EditableInput extends React.Component<
 
   handleChange() {
     if (
-      !this.props.readOnly &&
-      (!this.props.onChange || this.props.onChange(this.getValue()) !== false)
+      !this.props.onChange ||
+      this.props.onChange(this.getValue()) !== false
     ) {
       let value = this.state.value;
       let checked = this.state.checked;

@@ -93,15 +93,11 @@ export default class LibraryEditForm extends React.Component<
       }
     };
 
-    const librarySettingInheritanceInfo = this.props.item?.is_default ? (
-      <p>
-        This is the default library. The values set for this library will be
-        used as defaults for other libraries.
-      </p>
-    ) : (
-      <p>
-        This library inherits settings from the default library. If a setting is
-        left empty, the default library value will be used.
+    const librarySettingInheritanceInfo = (
+      <p key="inheritance-info">
+        {this.props.item?.is_default
+          ? "This is the default library. The values set for this library will be used as defaults for other libraries."
+          : "This library inherits settings from the default library. If a setting is left empty, the default library value will be used."}
       </p>
     );
 
@@ -187,6 +183,7 @@ export default class LibraryEditForm extends React.Component<
   renderAnnouncements(setting: SettingData, value) {
     return (
       <AnnouncementsSection
+        key={setting.key}
         setting={{ ...setting, ...{ format: "date-range" } }}
         value={value && JSON.parse(value)}
         ref={this.announcementsRef}
@@ -200,6 +197,7 @@ export default class LibraryEditForm extends React.Component<
     // when the iterator in renderFieldset gets to them, they'll get skipped over, not rendered a second time.
     return (
       <PairedMenus
+        key={setting.key}
         inputListSetting={setting}
         dropdownSetting={dropdownSetting}
         item={this.props.item}
