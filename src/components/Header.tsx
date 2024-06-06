@@ -15,6 +15,7 @@ import { Button } from "library-simplified-reusable-components";
 import { GenericWedgeIcon } from "@nypl/dgx-svg-icons";
 import title from "../utils/title";
 import { withTranslation, WithTranslation } from "react-i18next";
+import { LanguageSwitcher } from "../finland/components/LanguageSwitcher";
 
 const palaceLogoUrl = require("../images/PalaceCollectionManagerLogo.svg")
   .default;
@@ -189,6 +190,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       <Navbar fluid={true}>
         <Navbar.Header>
           <img src={palaceLogoUrl} alt={title()} />
+          <LanguageSwitcher />
           {this.props.libraries && this.props.libraries.length > 0 && (
             <EditableInput
               elementType="select"
