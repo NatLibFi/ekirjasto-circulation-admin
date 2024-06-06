@@ -7,7 +7,7 @@ export interface SaveButtonProps {
   type?: "submit" | "reset" | "button";
 }
 
-export default class SaveButton extends React.Component<SaveButtonProps, {}> {
+export default class SaveButton extends React.Component<SaveButtonProps> {
   constructor(props) {
     super(props);
   }

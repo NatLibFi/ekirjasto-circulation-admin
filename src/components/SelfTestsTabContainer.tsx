@@ -6,9 +6,9 @@ import { connect } from "react-redux";
 import ActionCreator from "../actions";
 import { CollectionsData, PatronAuthServicesData } from "../interfaces";
 import { RootState } from "../store";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 import ErrorMessage from "./ErrorMessage";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import {
   TabContainer,
   TabContainerProps,

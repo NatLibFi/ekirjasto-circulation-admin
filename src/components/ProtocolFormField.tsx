@@ -4,7 +4,7 @@ import ColorPicker from "./ColorPicker";
 import { Button } from "library-simplified-reusable-components";
 import InputList from "./InputList";
 import { SettingData, CustomListsSetting } from "../interfaces";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 
 export interface ProtocolFormFieldProps {
   setting: SettingData | CustomListsSetting;
@@ -12,8 +12,8 @@ export interface ProtocolFormFieldProps {
   value?:
     | string
     | string[]
-    | {}[]
-    | Array<string | {} | JSX.Element>
+    | Array<object>
+    | Array<string | object | JSX.Element>
     | JSX.Element;
   altValue?: string;
   default?: any;
@@ -30,8 +30,7 @@ export interface ProtocolFormFieldProps {
 /** Shows a form field for editing a single setting, based on setting information
     from the server. */
 export default class ProtocolFormField extends React.Component<
-  ProtocolFormFieldProps,
-  {}
+  ProtocolFormFieldProps
 > {
   private inputListRef = React.createRef<InputList>();
   private colorPickerRef = React.createRef<ColorPicker>();

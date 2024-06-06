@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");
 
-$fontfamily: 'Open Sans', sans-serif;
+$fontfamily: "Open Sans", sans-serif;
 
 @import "~bootstrap/dist/css/bootstrap.css";
-@import "~@thepalaceproject/web-opds-client/lib/stylesheets/app.scss";
+@import "~@natlibfi/ekirjasto-web-opds-client/lib/stylesheets/app.scss";
 @import "~library-simplified-reusable-components/dist/reusable-components.css";
 
 @import "mixins";

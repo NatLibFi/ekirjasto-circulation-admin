@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 
 let descriptonIdCounter = 0;
 

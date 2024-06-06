@@ -4,17 +4,29 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import fiTranslation from "./fi/translation.json";
 import svTranslation from "./sv/translation.json";
 import enTranslation from "./en/translation.json";
+import fiOpdsClientTranslation from "@natlibfi/ekirjasto-web-opds-client/lib/i18n/en/translation.json";
+import svOpdsClientTranslation from "@natlibfi/ekirjasto-web-opds-client/lib/i18n/sv/translation.json";
+import enOpdsClientTranslation from "@natlibfi/ekirjasto-web-opds-client/lib/i18n/en/translation.json";
 
 export const defaultNS = "translation";
 export const resources = {
   fi: {
-    translation: fiTranslation,
+    translation: {
+      ...fiOpdsClientTranslation,
+      ...fiTranslation,
+    },
   },
   sv: {
-    translation: svTranslation,
+    translation: {
+      ...svOpdsClientTranslation,
+      ...svTranslation,
+    },
   },
   en: {
-    translation: enTranslation,
+    translation: {
+      ...enOpdsClientTranslation,
+      ...enTranslation,
+    },
   },
 } as const;
 
@@ -22,7 +34,6 @@ i18n
   .use(initReactI18next)
   .use(LanguageDetector)
   .init({
-    debug: true,
     fallbackLng: "en",
     defaultNS: defaultNS,
     returnEmptyString: false,

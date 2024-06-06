@@ -10,3 +10,6 @@ tests/browser/reports/*
 selenium-server.log
 docs
 .eslintcache
+.vscode/settings.json
+.DS_Store
+transifex/*.pot

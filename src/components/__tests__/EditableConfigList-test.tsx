@@ -14,7 +14,7 @@ import {
 import ErrorMessage from "../ErrorMessage";
 import EditableInput from "../EditableInput";
 import { Alert } from "react-bootstrap";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 
 describe("EditableConfigList", () => {
   interface Thing {
@@ -26,18 +26,14 @@ describe("EditableConfigList", () => {
     things: Thing[];
   }
 
-  class ThingEditForm extends React.Component<
-    EditFormProps<Things, Thing>,
-    {}
-  > {
+  class ThingEditForm extends React.Component<EditFormProps<Things, Thing>> {
     render(): JSX.Element {
       return <div>Test</div>;
     }
   }
 
   class ThingEditFormWithInputs extends React.Component<
-    EditFormProps<Things, Thing>,
-    {}
+    EditFormProps<Things, Thing>
   > {
     render(): JSX.Element {
       return (
@@ -54,8 +50,7 @@ describe("EditableConfigList", () => {
   }
 
   class AdditionalContent extends React.Component<
-    AdditionalContentProps<Things, Thing>,
-    {}
+    AdditionalContentProps<Things, Thing>
   > {
     render(): JSX.Element {
       return <div>Test Additional Content</div>;

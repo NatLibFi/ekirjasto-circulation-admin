@@ -10,7 +10,7 @@ import Admin from "../models/Admin";
 import EditableInput from "./EditableInput";
 import { Link } from "react-router";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
-import { Router } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { Router } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { Button } from "library-simplified-reusable-components";
 import { GenericWedgeIcon } from "@nypl/dgx-svg-icons";
 import title from "../utils/title";
@@ -190,7 +190,9 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       <Navbar fluid={true}>
         <Navbar.Header>
           <img src={palaceLogoUrl} alt={title()} />
-          <LanguageSwitcher />
+
+          {this.isEkirjasto && <LanguageSwitcher />}
+
           {this.props.libraries && this.props.libraries.length > 0 && (
             <EditableInput
               elementType="select"

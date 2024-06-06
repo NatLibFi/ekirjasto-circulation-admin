@@ -1,4 +1,4 @@
-import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { CollectionData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import ActionCreator from "../actions";
 import createFetchEditReducer, {
   FetchEditState,

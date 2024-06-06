@@ -16,20 +16,20 @@ export interface InputListProps {
   labelAndDescription?: (setting: SettingData) => JSX.Element[];
   setting: SettingData | CustomListsSetting;
   disabled: boolean;
-  value: Array<string | {} | JSX.Element>;
+  value: Array<string | object | JSX.Element>;
   altValue?: string;
   additionalData?: any;
   onSubmit?: any;
   onEmpty?: string;
   title?: string;
   capitalize?: boolean;
-  onChange?: (value: any) => {};
+  onChange?: (value: any) => any;
   readOnly?: boolean;
   disableButton?: boolean;
 }
 
 export interface InputListState {
-  listItems: Array<string | {}>;
+  listItems: Array<string | object>;
   newItem?: string;
   options?: JSX.Element[];
 }
@@ -225,7 +225,7 @@ export default class InputList extends React.Component<
     }
   }
 
-  renderToolTip(item: {} | string, format: string) {
+  renderToolTip(item: object | string, format: string) {
     const icons = {
       geographic: <LocatorIcon />,
     };
@@ -280,7 +280,7 @@ export default class InputList extends React.Component<
     this.setState({ ...this.state, ...{ newItem: (ref as any).getValue() } });
   }
 
-  async removeListItem(listItem: string | {}) {
+  async removeListItem(listItem: string | object) {
     await this.setState({
       listItems: this.state.listItems.filter(
         (stateListItem) => stateListItem !== listItem

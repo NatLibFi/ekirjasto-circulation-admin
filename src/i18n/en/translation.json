@@ -1,6 +1,8 @@
 {
   "accountPage.documentTitle": "Account",
   "advancedSearchFilter.noFiltersConfigured": "No filters configured.",
+  "bookDetails.audience": "Audience",
+  "bookDetails.distributedBy": "Distributed by",
   "common.labelRelevance": "Relevance",
   "common.labelTitle": "Title",
   "common.labelAuthor": "Author",
