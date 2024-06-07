@@ -40,8 +40,8 @@
     "prod": "webpack --progress --config webpack.prod.config",
     "build-docs": "typedoc --tsconfig tsconfig.json src",
     "i18n-extract": "i18next",
-    "transifex-export": "i18next-conv -l en -s src/i18n/en/translation.json -t transifex/ekirjasto-circulation-admin.pot",
-    "transifex-import": "i18next-conv -l en -s transifex/ekirjasto-circulation-admin_en.pot -t src/i18n/en/translation.json"
+    "transifex-export": "i18next-conv -l en -s src/i18n/en/translation.json -t transifex/ekirjasto-circulation-admin_export.pot",
+    "transifex-import": "i18next-conv -l en -s transifex/ekirjasto-circulation-admin_en.pot -t src/i18n/en/translation.json && i18next-conv -l fi -s transifex/ekirjasto-circulation-admin_fi.pot -t src/i18n/fi/translation.json && i18next-conv -l sv -s transifex/ekirjasto-circulation-admin_sv.pot -t src/i18n/sv/translation.json"
   },
   "dependencies": {
     "@natlibfi/ekirjasto-web-opds-client": "^0.0.3",
