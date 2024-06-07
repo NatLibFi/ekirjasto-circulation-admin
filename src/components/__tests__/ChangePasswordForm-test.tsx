@@ -5,7 +5,7 @@ import * as React from "react";
 import { mount } from "enzyme";
 
 import { ChangePasswordForm } from "../ChangePasswordForm";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 import ErrorMessage from "../ErrorMessage";
 import EditableInput from "../EditableInput";
 

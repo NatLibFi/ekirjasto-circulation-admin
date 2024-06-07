@@ -5,8 +5,8 @@ import { connect } from "react-redux";
 import * as PropTypes from "prop-types";
 import { RootState } from "../store";
 import ActionCreator from "../actions";
-import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
-import { adapter } from "@thepalaceproject/web-opds-client/lib/OPDSDataAdapter";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
+import { adapter } from "@natlibfi/ekirjasto-web-opds-client/lib/OPDSDataAdapter";
 import {
   AdvancedSearchQuery,
   CustomListData,
@@ -27,9 +27,9 @@ import {
 import {
   FetchErrorData,
   CollectionData,
-} from "@thepalaceproject/web-opds-client/lib/interfaces";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import CustomListEditor from "./CustomListEditor";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 import ErrorMessage from "./ErrorMessage";
 import CustomListsSidebar from "./CustomListsSidebar";
 

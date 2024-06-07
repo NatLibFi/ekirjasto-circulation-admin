@@ -5,9 +5,9 @@ import ActionCreator from "../actions";
 import { DiagnosticsData } from "../interfaces";
 import { RootState } from "../store";
 import DiagnosticsServiceType from "./DiagnosticsServiceType";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 import ErrorMessage from "./ErrorMessage";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { TabContainer, TabContainerProps } from "./TabContainer";
 
 export interface DiagnosticsTabContainerDispatchProps {

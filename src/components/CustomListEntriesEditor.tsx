@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Button } from "library-simplified-reusable-components";
-import CatalogLink from "@thepalaceproject/web-opds-client/lib/components/CatalogLink";
-import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import CatalogLink from "@natlibfi/ekirjasto-web-opds-client/lib/components/CatalogLink";
+import { CollectionData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import {
   getMedium,
   getMediumSVG,
-} from "@thepalaceproject/web-opds-client/lib/utils/book";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/utils/book";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Entry } from "../reducers/customListEditor";
 import ApplyIcon from "./icons/ApplyIcon";

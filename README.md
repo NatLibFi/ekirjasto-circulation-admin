@@ -131,6 +131,24 @@ To set up credentials and run the tests, check out the [README](/tests/README.md
 
 The [Redux DevTools browser extension](https://github.com/reduxjs/redux-devtools/tree/main/extension) may be used to easily inspect app states and state transitions.
 
+## I18n
+
+### Create new translations strings
+
+Replace hard-coded UI texts with t-function calls (https://react.i18next.com/).
+
+`npm run i18n-extract` goes through all the files and parses out all existing translations into `translations.json` files in `src/i18n`. It adds new strings and removes deleted ones. NOTE: parser does not spots translations that are created with variables, like `` t(`book.${item.label}`) ``. In that case add all variant as comment _inside the components or hooks scope_ so that the parser can find and extract them.
+
+English is used as a source language, so add the translation texts to corresponding translation keys in `src/i18n/en/translation.json`.
+
+### Export .json to .pot
+
+For Transifex we need translations in a .pot file. to do that, run `npm run transifex-export`. This creates `transifex/ekirjasto-circulation-admin_export.pot` file from the english `translation.json` for the transfer.
+
+### Import .pot to .json
+
+To transfer translations back to json, place files `transifex/ekirjasto-circulation-admin_en.pot`, `transifex/ekirjasto-circulation-admin_fi.pot` and `transifex/ekirjasto-circulation-admin_sv.pot` to `transifex` folder and run `npm run transifex-import`.
+
 ## License
 
 ```

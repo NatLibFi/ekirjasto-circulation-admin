@@ -13,7 +13,7 @@ import {
   SettingData,
 } from "../interfaces";
 import { clearForm } from "../utils/sharedFunctions";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 
 export interface ServiceEditFormProps<T> {
   data: T;

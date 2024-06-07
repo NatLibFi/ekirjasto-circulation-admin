@@ -4,7 +4,7 @@ import * as PropTypes from "prop-types";
 import buildStore, { RootState } from "../store";
 import { AdminAuthType, FeatureFlags, PathFor } from "../interfaces";
 import Admin from "../models/Admin";
-import PathForProvider from "@thepalaceproject/web-opds-client/lib/components/context/PathForContext";
+import PathForProvider from "@natlibfi/ekirjasto-web-opds-client/lib/components/context/PathForContext";
 import ActionCreator from "../actions";
 
 export interface ContextProviderProps extends React.Props<ContextProvider> {

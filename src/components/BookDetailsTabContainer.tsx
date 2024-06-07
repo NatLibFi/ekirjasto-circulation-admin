@@ -1,6 +1,6 @@
 import * as React from "react";
 import editorAdapter from "../editorAdapter";
-import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import ActionCreator from "../actions";
 import { connect } from "react-redux";
 import BookDetailsEditor from "./BookDetailsEditor";

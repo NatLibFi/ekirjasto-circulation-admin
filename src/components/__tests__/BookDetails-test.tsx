@@ -2,10 +2,12 @@ import { expect } from "chai";
 import { stub } from "sinon";
 
 import * as React from "react";
-import { shallow } from "enzyme";
+import { mount } from "./test-utils";
 
 import BookDetails from "../BookDetails";
-import { BookData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import { I18nextProvider } from "react-i18next";
+import i18n from "../../i18n/config";
 
 const book: BookData = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
@@ -91,7 +93,11 @@ describe("BookDetails", () => {
   );
 
   beforeEach(() => {
-    wrapper = shallow(<BookDetails book={book} updateBook={noop} />);
+    wrapper = mount(
+      <I18nextProvider i18n={i18n}>
+        <BookDetails book={book} updateBook={noop} />
+      </I18nextProvider>
+    );
   });
 
   it("shows audience and target age", () => {
@@ -104,22 +110,26 @@ describe("BookDetails", () => {
     expect(categories.text()).to.equal("Categories: Adventure, Fantasy");
   });
 
-  it("doesn't show categories when there aren't any", () => {
-    const bookCopy = Object.assign({}, book, {
-      raw: { category: [], link: [] },
-    });
-    wrapper.setProps({ book: bookCopy });
-    const categories = wrapper.find(".categories");
-    expect(categories.length).to.equal(0);
-  });
-
   it("shows distributor", () => {
     const distributor = wrapper.find(".distributed-by");
-    expect(distributor.text()).to.equal("Distributed By: Overdrive");
+    expect(distributor.text()).to.equal("Distributed by: Overdrive");
   });
 
   it("doesn't render any circulation link content", () => {
     const circulationLinks = wrapper.find(".circulation-links");
     expect(circulationLinks.text()).to.equal("");
+  });
+
+  it("doesn't show categories when there aren't any", () => {
+    const bookCopy = Object.assign({}, book, {
+      raw: { category: [], link: [] },
+    });
+    wrapper = mount(
+      <I18nextProvider i18n={i18n}>
+        <BookDetails book={bookCopy} updateBook={noop} />
+      </I18nextProvider>
+    );
+    const categories = wrapper.find(".categories");
+    expect(categories.length).to.equal(0);
   });
 });

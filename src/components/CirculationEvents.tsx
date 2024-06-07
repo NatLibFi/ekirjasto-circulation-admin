@@ -3,12 +3,12 @@ import { Store } from "redux";
 import { connect } from "react-redux";
 import ActionCreator from "../actions";
 import ErrorMessage from "./ErrorMessage";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
-import CatalogLink from "@thepalaceproject/web-opds-client/lib/components/CatalogLink";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
+import CatalogLink from "@natlibfi/ekirjasto-web-opds-client/lib/components/CatalogLink";
 import * as PropTypes from "prop-types";
 import CirculationEventsDownloadForm from "./CirculationEventsDownloadForm";
 import { CirculationEventData } from "../interfaces";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { RootState } from "../store";
 import { Button } from "library-simplified-reusable-components";
 

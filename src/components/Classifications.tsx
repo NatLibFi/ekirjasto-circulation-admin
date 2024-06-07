@@ -2,13 +2,13 @@ import * as React from "react";
 import { Store } from "redux";
 import { connect } from "react-redux";
 import editorAdapter from "../editorAdapter";
-import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import ActionCreator from "../actions";
 import ErrorMessage from "./ErrorMessage";
 import ClassificationsForm from "./ClassificationsForm";
 import ClassificationsTable from "./ClassificationsTable";
 import { BookData, GenreTree, ClassificationData } from "../interfaces";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { RootState } from "../store";
 import UpdatingLoader from "./UpdatingLoader";
 

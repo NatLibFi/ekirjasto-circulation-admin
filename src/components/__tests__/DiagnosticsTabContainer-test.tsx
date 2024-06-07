@@ -7,7 +7,7 @@ import buildStore from "../../store";
 
 import { DiagnosticsTabContainer } from "../DiagnosticsTabContainer";
 import DiagnosticsServiceType from "../DiagnosticsServiceType";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 import ErrorMessage from "../ErrorMessage";
 
 describe("DiagnosticsTabContainer", () => {

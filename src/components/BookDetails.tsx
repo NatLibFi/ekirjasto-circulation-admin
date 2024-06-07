@@ -1,11 +1,15 @@
 import * as React from "react";
-import DefaultBookDetails, {
+import { withTranslation } from "react-i18next";
+import {
+  BookDetails as DefaultBookDetails,
   BookDetailsProps as DefaultBookDetailsProps,
-} from "@thepalaceproject/web-opds-client/lib/components/BookDetails";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/components/BookDetails";
 
-export default class BookDetails extends DefaultBookDetails<
-  DefaultBookDetailsProps
-> {
+export class BookDetails extends DefaultBookDetails<DefaultBookDetailsProps> {
+  constructor(props: DefaultBookDetailsProps) {
+    super(props);
+  }
+
   fieldNames() {
     return [
       "Published",
@@ -17,6 +21,7 @@ export default class BookDetails extends DefaultBookDetails<
   }
 
   fields() {
+    const t = this.props.t;
     const fields = super.fields();
     const categoriesIndex = fields.findIndex(
       (field) => field.name === "Categories"
@@ -24,10 +29,12 @@ export default class BookDetails extends DefaultBookDetails<
     fields[categoriesIndex].value = this.categories();
     fields.push({
       name: "Audience",
+      label: t("bookDetails.audience"),
       value: this.audience(),
     });
     fields.push({
       name: "Distributed By",
+      label: t("bookDetails.distributedBy"),
       value: this.distributor(),
     });
     return fields;
@@ -134,3 +141,5 @@ export default class BookDetails extends DefaultBookDetails<
     return null;
   }
 }
+
+export default withTranslation()(BookDetails);

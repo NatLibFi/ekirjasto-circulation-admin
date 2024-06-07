@@ -1,6 +1,6 @@
 import * as React from "react";
-import CatalogLink from "@thepalaceproject/web-opds-client/lib/components/CatalogLink";
-import { FacetData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import CatalogLink from "@natlibfi/ekirjasto-web-opds-client/lib/components/CatalogLink";
+import { FacetData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import * as PropTypes from "prop-types";
 import { PathFor } from "../interfaces";
 import { AudioHeadphoneIcon, BookIcon } from "@nypl/dgx-svg-icons";
@@ -14,7 +14,7 @@ export interface EntryPointsTabsProps {
 }
 
 /** This component renders a library's entrypoints as linked tabs. */
-export class EntryPointsTabs extends React.Component<EntryPointsTabsProps, {}> {
+export class EntryPointsTabs extends React.Component<EntryPointsTabsProps> {
   context: EntryPointsTabsContext;
 
   constructor(props) {

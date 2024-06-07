@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Store } from "redux";
 import { connect } from "react-redux";
-import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import ActionCreator from "../actions";
 import ErrorMessage from "./ErrorMessage";
 import ComplaintForm from "./ComplaintForm";
 import { Button } from "library-simplified-reusable-components";
 import { BookData, PostComplaint } from "../interfaces";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { RootState } from "../store";
 import { formatString } from "../utils/sharedFunctions";
 import UpdatingLoader from "./UpdatingLoader";

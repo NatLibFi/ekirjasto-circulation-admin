@@ -4,7 +4,7 @@ import * as PropTypes from "prop-types";
 
 import BookDetailsTabContainer from "./BookDetailsTabContainer";
 import BookDetails from "./BookDetails";
-import { BookDetailsContainerProps } from "@thepalaceproject/web-opds-client/lib/components/Root";
+import { BookDetailsContainerProps } from "@natlibfi/ekirjasto-web-opds-client/lib/components/Root";
 import { RootState } from "../store";
 
 export interface BookDetailsContainerContext {
@@ -30,10 +30,11 @@ export default class BookDetailsContainer extends React.Component<
   };
 
   render(): JSX.Element {
-    const child = React.Children.only(
-      this.props.children
-    ) as React.ReactElement<BookDetails>;
-    const book = React.createElement(BookDetails, child.props);
+    const child = React.Children.only(this.props.children);
+    const book = React.createElement(
+      BookDetails,
+      (child as React.ReactElement).props || {}
+    );
 
     return (
       <div className="book-details-container">

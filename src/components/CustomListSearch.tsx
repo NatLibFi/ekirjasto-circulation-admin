@@ -5,6 +5,7 @@ import { CustomListEditorSearchParams } from "../reducers/customListEditor";
 import AdvancedSearchBuilder from "./AdvancedSearchBuilder";
 import CustomListSearchQueryViewer from "./CustomListSearchQueryViewer";
 import EditableInput from "./EditableInput";
+import { useTranslation } from "react-i18next";
 
 export interface CustomListSearchProps {
   autoUpdate?: boolean;
@@ -34,12 +35,6 @@ export interface CustomListSearchProps {
   removeAdvSearchQuery?: (builderName: string, id: string) => void;
   selectAdvSearchQuery?: (builderName: string, id: string) => void;
 }
-
-const sorts = [
-  { value: null, label: "Relevance" },
-  { value: "title", label: "Title" },
-  { value: "author", label: "Author" },
-];
 
 const CustomListSearch = ({
   autoUpdate,
@@ -72,6 +67,14 @@ const CustomListSearch = ({
     }
   }, []);
 
+  const { t } = useTranslation();
+
+  const sorts = [
+    { value: null, label: t("common.labelRelevance") },
+    { value: "title", label: t("common.labelTitle") },
+    { value: "author", label: t("common.labelAuthor") },
+  ];
+
   const readOnly = !isOwner;
 
   const entryPointsWithAll = entryPoints.includes("All")
@@ -102,7 +105,7 @@ const CustomListSearch = ({
   const searchForm = (
     <div className="search-titles">
       <div className="entry-points">
-        <span>Search for:</span>
+        <span>{t("customListSearch.searchFor")}</span>
 
         <div className="entry-points-selection">
           {entryPointsWithAll.map((entryPoint) => (
@@ -121,7 +124,7 @@ const CustomListSearch = ({
       </div>
 
       <div className="search-options">
-        <span>Sort by:</span>
+        <span>{t("customListSearch.sortByLabel")}</span>
 
         <div className="search-options-selection">
           {sorts.map(({ value, label }) => (
@@ -138,23 +141,19 @@ const CustomListSearch = ({
           ))}
         </div>
 
-        <aside>
-          Results can be sorted by attributes that are enabled in this library's
-          Lanes &amp; Filters configuration. Selecting "Title" or "Author" will
-          automatically filter out less relevant results.
-        </aside>
+        <aside>{t("customListSearch.sortByDescription")}</aside>
       </div>
 
       <div className="search-builders">
         <Panel
-          headerText="Works to include"
+          headerText={t("customListSearch.worksToInclude")}
           id="search-filters-include"
           openByDefault={true}
           content={renderAdvancedSearchBuilder("include")}
         />
 
         <Panel
-          headerText="Works to exclude"
+          headerText={t("customListSearch.worksToExclude")}
           id="search-filters-exclude"
           openByDefault={false}
           content={renderAdvancedSearchBuilder("exclude")}
@@ -170,7 +169,7 @@ const CustomListSearch = ({
 
       {showAutoUpdate && (
         <div className="auto-update">
-          <span>Use search to:</span>
+          <span>{t("customListSearch.useSearchTo")}</span>
 
           <div className="auto-update-selection">
             <div>
@@ -179,15 +178,14 @@ const CustomListSearch = ({
                 type="radio"
                 name="auto-update"
                 checked={autoUpdate}
-                label={"Automatically update this list"}
+                label={t("customListSearch.automaticUpdateLabel")}
                 onChange={() => updateAutoUpdate?.(true)}
               />
 
               <aside>
-                The system will periodically execute this search and
-                automatically update the list with the results.
+                {t("customListSearch.automaticUpdateDescription")}{" "}
                 {!readOnly &&
-                  "The search results below represent the titles that would be in the list if it were updated now, but the actual contents of the list will change over time."}
+                  t("customListSearch.automaticUpdateDescriptionExtra")}
               </aside>
             </div>
 
@@ -197,16 +195,14 @@ const CustomListSearch = ({
                 type="radio"
                 name="auto-update"
                 checked={!autoUpdate}
-                label={"Manually select titles"}
+                label={t("customListSearch.manualSelectLabel")}
                 onChange={() => updateAutoUpdate?.(false)}
               />
 
               <aside>
-                The list entries are manually selected.{" "}
+                {t("customListSearch.manualSelectDescription")}{" "}
                 {!readOnly &&
-                  "Move the desired titles from the search results column on the left to the column on the right to add them to the list. "}
-                Titles may be removed from the list automatically if they become
-                unavailable, but the list is otherwise fixed.
+                  t("customListSearch.manualSelectDescriptionExtra")}
               </aside>
             </div>
           </div>
@@ -217,7 +213,7 @@ const CustomListSearch = ({
 
   return (
     <Panel
-      headerText="Search for titles"
+      headerText={t("customListSearch.searchForTitles")}
       id="search-titles"
       openByDefault={true}
       onEnter={search}

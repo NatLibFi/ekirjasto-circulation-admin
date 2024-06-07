@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import {
   ConnectDragPreview,
   ConnectDragSource,
@@ -30,15 +30,14 @@ function getOpSymbol(value) {
 
   return op?.symbol || value;
 }
-
-export default ({
+export default function AdvancedSearchValueFilter({
   query,
   readOnly,
   selected,
   onMove,
   onRemove,
   onSelect,
-}: AdvancedSearchValueFilterProps) => {
+}: AdvancedSearchValueFilterProps): JSX.Element {
   if (!query) {
     return null;
   }
@@ -66,7 +65,7 @@ export default ({
     onRemove?.(query.id);
   };
 
-  const [, drag]: [{}, ConnectDragSource, ConnectDragPreview] = useDrag(
+  const [, drag]: [object, ConnectDragSource, ConnectDragPreview] = useDrag(
     {
       type: "filter",
       item: {
@@ -126,4 +125,4 @@ export default ({
       {!readOnly && <button onClick={handleRemoveButtonClick}>×</button>}
     </div>
   );
-};
+}

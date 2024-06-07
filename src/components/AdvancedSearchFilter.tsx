@@ -2,6 +2,7 @@ import * as React from "react";
 import { AdvancedSearchQuery } from "../interfaces";
 import AdvancedSearchBooleanFilter from "./AdvancedSearchBooleanFilter";
 import AdvancedSearchValueFilter from "./AdvancedSearchValueFilter";
+import { Translation } from "react-i18next";
 
 export interface AdvancedSearchFilterProps {
   onBooleanChange: (id: string, bool: string) => void;
@@ -49,5 +50,9 @@ export default function AdvancedSearchFilter({
     );
   }
 
-  return <span>No filters configured.</span>;
+  return (
+    <Translation>
+      {(t) => <span>{t("advancedSearchFilter.noFiltersConfigured")}</span>}
+    </Translation>
+  );
 }
