@@ -130,6 +130,23 @@ export default class BookDetails extends DefaultBookDetails<
     return distributor.value;
   }
 
+  isbn() {
+    if (!this.props.book) {
+      return null;
+    }
+    const bookId = this.props.book.id;
+    if (!bookId) {
+      return null;
+    }
+
+    const isbnPrefix = "urn:isbn:";
+    if (bookId.startsWith(isbnPrefix)) {
+      return bookId.substring(isbnPrefix.length);
+    }
+    
+    return null;
+  }
+
   circulationLinks() {
     return null;
   }
