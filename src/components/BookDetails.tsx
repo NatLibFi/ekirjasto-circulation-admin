@@ -13,6 +13,7 @@ export default class BookDetails extends DefaultBookDetails<
       "Audience",
       "Categories",
       "Distributed By",
+      "ISBN"
     ];
   }
 
@@ -30,6 +31,10 @@ export default class BookDetails extends DefaultBookDetails<
       name: "Distributed By",
       value: this.distributor(),
     });
+    fields.push({
+      name: "ISBN",
+      value: this.isbn(),
+    })
     return fields;
   }
 
