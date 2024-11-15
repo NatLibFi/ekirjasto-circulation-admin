@@ -13,6 +13,7 @@ export default class BookDetails extends DefaultBookDetails<
       "Audience",
       "Categories",
       "Distributed By",
+      "ISBN",
     ];
   }
 
@@ -29,6 +30,10 @@ export default class BookDetails extends DefaultBookDetails<
     fields.push({
       name: "Distributed By",
       value: this.distributor(),
+    });
+    fields.push({
+      name: "ISBN",
+      value: this.isbn(),
     });
     return fields;
   }
@@ -128,6 +133,28 @@ export default class BookDetails extends DefaultBookDetails<
     }
 
     return distributor.value;
+  }
+
+  /**
+   * Extracts the ISBN from the book's identifier if it follows the "urn:isbn:" format.
+   * Returns null if the book or its identifier is not available, or if the identifier does not start
+   * with the "urn:isbn:" prefix.
+   */
+  isbn() {
+    if (!this.props.book) {
+      return null;
+    }
+    const bookId = this.props.book.id;
+    if (!bookId) {
+      return null;
+    }
+
+    const isbnPrefix = "urn:isbn:";
+    if (bookId.startsWith(isbnPrefix)) {
+      return bookId.substring(isbnPrefix.length);
+    }
+
+    return null;
   }
 
   circulationLinks() {
