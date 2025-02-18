@@ -20,9 +20,16 @@ describe("LoanReport", () => {
     expect(endDateInput).toHaveValue("2023-03-31");
   });
 
-  it("does not crash when clicking download button", () => {
+  it("does not crash when clicking download excel button", () => {
     const { getByTestId } = render(<LoanReport library="test-library" />);
-    const downloadButton = getByTestId("download-button");
+    const downloadButton = getByTestId("download-excel-button");
+
+    fireEvent.click(downloadButton);
+  });
+
+  it("does not crash when clicking download csv button", () => {
+    const { getByTestId } = render(<LoanReport library="test-library" />);
+    const downloadButton = getByTestId("download-csv-button");
 
     fireEvent.click(downloadButton);
   });
