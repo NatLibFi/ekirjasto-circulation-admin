@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "library-simplified-reusable-components";
 
 const DOWNLOAD_EXCEL_SLUG = "/admin/circulation_loan_statistics_excel";
+const DOWNLOAD_CSV_SLUG = "/admin/circulation_loan_statistics_csv";
 
 interface LoanReportProps {
   library?: string;
@@ -22,6 +23,23 @@ export function LoanReport({ library }: LoanReportProps) {
     const queryString = new URLSearchParams(params).toString();
 
     const url = `/${library}${DOWNLOAD_EXCEL_SLUG}?${queryString}`;
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  function downloadLoanCSV() {
+    const params = {
+      date: startDate,
+      dateEnd: endDate,
+    };
+    const queryString = new URLSearchParams(params).toString();
+
+    const url = `/${library}${DOWNLOAD_CSV_SLUG}?${queryString}`;
 
     const link = document.createElement("a");
     link.href = url;
@@ -57,12 +75,20 @@ export function LoanReport({ library }: LoanReportProps) {
           />
         </div>
       </div>
-      <Button
-        data-testid="download-button"
-        className="inverted left-align"
-        callback={downloadLoanExcel}
-        content="Lataa Excel-taulukkona"
-      />
+      <div>
+        <Button
+          data-testid="download-excel-button"
+          className="inverted left-align"
+          callback={downloadLoanExcel}
+          content="Lataa Excel-taulukkona"
+        />
+        <Button
+          data-testid="download-csv-button"
+          className="inverted left-align"
+          callback={downloadLoanCSV}
+          content="Lataa CSV-tiedostona"
+        />
+      </div>
     </div>
   );
 }

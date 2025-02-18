@@ -35,7 +35,7 @@ export const statTabs: TabOption[] = [
   },
   {
     key: "loan-stats",
-    label: "Lainausmäärät (Excel)",
+    label: "Lainausmäärät (Excel/CSV)",
     narrowLabel: "Lainaukset",
   },
 ];
