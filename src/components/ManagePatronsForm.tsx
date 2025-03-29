@@ -3,7 +3,7 @@ import { Store } from "redux";
 import { connect } from "react-redux";
 import { RootState } from "../store";
 import ActionCreator from "../actions";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { PatronData } from "../interfaces";
 import { Button, Form } from "library-simplified-reusable-components";
 import EditableInput from "./EditableInput";

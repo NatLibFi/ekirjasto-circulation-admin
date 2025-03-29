@@ -9,7 +9,7 @@ import { Link } from "react-router";
 import { Button } from "library-simplified-reusable-components";
 
 describe("CustomListsSidebar", () => {
-  let wrapper: Enzyme.CommonWrapper<any, any, {}>;
+  let wrapper: Enzyme.CommonWrapper<any, any, object>;
   let lists;
   const deleteCustomList = stub();
   const changeSort = stub();

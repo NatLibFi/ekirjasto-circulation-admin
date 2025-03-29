@@ -4,7 +4,7 @@ import ProtocolFormField from "./ProtocolFormField";
 import InputList from "./InputList";
 import EditableInput from "./EditableInput";
 import { findDefault } from "../utils/sharedFunctions";
-import { FetchErrorData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 
 export interface PairedMenusProps {
   inputListSetting: SettingData;

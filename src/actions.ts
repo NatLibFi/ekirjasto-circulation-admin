@@ -28,17 +28,18 @@ import {
   StatisticsData,
   QuickSightEmbeddedURLData,
 } from "./interfaces";
-import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
-import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
+import { CollectionData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import {
   RequestError,
   RequestRejector,
-} from "@thepalaceproject/web-opds-client/lib/DataFetcher";
-import BaseActionCreator from "@thepalaceproject/web-opds-client/lib/actions";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
+import BaseActionCreator from "@natlibfi/ekirjasto-web-opds-client/lib/actions";
 import {
   getCustomListEditorFormData,
   getCustomListEditorSearchUrl,
 } from "./reducers/customListEditor";
+import i18n from "./i18n/config";
 
 /** Create redux actions to be dispatched by connected components, mostly
     to make requests to the server. */
@@ -214,6 +215,7 @@ export default class ActionCreator extends BaseActionCreator {
       return new Promise((resolve, reject: RequestRejector) => {
         dispatch(this.request(type));
         const headers = new Headers();
+        headers.append("Accept-language", i18n.language);
         if (this.csrfToken) {
           headers.append("X-CSRF-Token", this.csrfToken);
         }

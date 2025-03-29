@@ -6,7 +6,7 @@ export interface TimestampProps {
   timestamp: TimestampData;
 }
 
-export default class Timestamp extends React.Component<TimestampProps, {}> {
+export default class Timestamp extends React.Component<TimestampProps> {
   render(): JSX.Element {
     const { timestamp } = this.props;
     const exception = (

@@ -1,4 +1,4 @@
-import { RequestError } from "@thepalaceproject/web-opds-client/lib/DataFetcher";
+import { RequestError } from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import ActionCreator from "../actions";
 
 export interface BookCoverPreviewState {

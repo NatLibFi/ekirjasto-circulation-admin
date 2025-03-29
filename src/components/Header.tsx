@@ -10,10 +10,12 @@ import Admin from "../models/Admin";
 import EditableInput from "./EditableInput";
 import { Link } from "react-router";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
-import { Router } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { Router } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { Button } from "library-simplified-reusable-components";
 import { GenericWedgeIcon } from "@nypl/dgx-svg-icons";
 import title from "../utils/title";
+import { withTranslation, WithTranslation } from "react-i18next";
+import { LanguageSwitcher } from "../finland/components/LanguageSwitcher";
 
 const palaceLogoUrl = require("../images/PalaceCollectionManagerLogo.svg")
   .default;
@@ -41,7 +43,8 @@ export interface HeaderProps
   extends React.Props<Header>,
     HeaderStateProps,
     HeaderDispatchProps,
-    HeaderOwnProps {}
+    HeaderOwnProps,
+    Partial<WithTranslation> {}
 
 export interface HeaderState {
   showAccountDropdown: boolean;
@@ -112,30 +115,42 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     let isSiteWide = !this.context.library || !currentLibrary;
     let isSomeLibraryManager = this.context.admin.isLibraryManagerOfSomeLibrary();
 
+    const { t } = this.props;
+
     // Dashboard link that will be rendered in a Link router component.
     const dashboardLinkItem = {
-      label: "Dashboard",
+      label: t("header.menuLabelDashboard"),
       href: "dashboard/",
       hidden: this.isEkirjasto,
     };
 
     const finlandStatisticsLinkItem = {
-      label: "Tilastot",
+      label: t("header.menuLabelStatistics"),
       href: "statistics/",
       hidden: !this.isEkirjasto || !isSystemAdmin,
     };
 
     // Links that will be rendered in a NavItem Bootstrap component.
     const libraryNavItems = [
-      { label: "Catalog", href: "%2Fgroups?max_cache_age=0" },
-      { label: "Hidden Books", href: "%2Fadmin%2Fsuppressed" },
+      {
+        label: t("header.menuLabelCatalog"),
+        href: "%2Fgroups?max_cache_age=0",
+      },
+      {
+        label: t("header.menuLabelHiddenBooks"),
+        href: "%2Fadmin%2Fsuppressed",
+      },
     ];
     // Other links that will be rendered in a Link router component and are library specific.
     const libraryLinkItems = [
-      { label: "Lists", href: "lists/" },
-      { label: "Lanes", href: "lanes/", auth: isLibraryManager },
+      { label: t("header.menuLabelLists"), href: "lists/" },
       {
-        label: "Patrons",
+        label: t("header.menuLabelLanes"),
+        href: "lanes/",
+        auth: isLibraryManager,
+      },
+      {
+        label: t("header.menuLabelPatrons"),
         href: "patrons/",
         auth: isSystemAdmin,
         hidden: this.isEkirjasto,
@@ -144,7 +159,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     // Links that will be rendered in a Link router component and are sitewide.
     const sitewideLinkItems = [
       {
-        label: "Dashboard",
+        label: t("header.menuLabelDashboard"),
         href: "dashboard/",
         auth:
           // Finland: Palace shows dashboard for all roles
@@ -153,20 +168,20 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           (this.isEkirjasto && isSiteWide && isSystemAdmin),
       },
       {
-        label: "System Configuration",
+        label: t("header.menuLabelSystemConfiguration"),
         href: "config/",
         // Finland: Palace shows system config for all roles.
         // For E-kirjasto limit to system admins only.
         auth: !this.isEkirjasto || isSystemAdmin,
       },
       {
-        label: "Troubleshooting",
+        label: t("header.menuLabelTroubleshooting"),
         href: "troubleshooting/",
         auth: isSystemAdmin,
       },
     ];
     const accountLink = {
-      label: "Change password",
+      label: t("header.menuLabelChangePassword"),
       href: "account/",
       hidden: this.context.admin.isEkirjastoUser(),
     };
@@ -175,16 +190,21 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       <Navbar fluid={true}>
         <Navbar.Header>
           <img src={palaceLogoUrl} alt={title()} />
+
+          {this.isEkirjasto && <LanguageSwitcher />}
+
           {this.props.libraries && this.props.libraries.length > 0 && (
             <EditableInput
               elementType="select"
               ref={this.libraryRef}
               value={currentLibrary}
               onChange={this.changeLibrary}
-              aria-label="Select a library"
+              aria-label={t("header.aria.libraryDropdownLabel")}
             >
               {(!this.context.library || !currentLibrary) && (
-                <option aria-selected={false}>Select a library</option>
+                <option aria-selected={false}>
+                  {t("header.libraryDropdownFirstOption")}
+                </option>
               )}
               {this.props.libraries.map((library) => (
                 <option
@@ -192,8 +212,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
                   value={library.short_name}
                   aria-selected={currentLibrary === library.short_name}
                 >
-                  {library.name || library.short_name}
-                  {library.is_default && " (default)"}
+                  {library.is_default
+                    ? t("header.libraryDropdownDefaultLibrary", {
+                        libraryName: library.name || library.short_name,
+                      })
+                    : library.name || library.short_name}
                 </option>
               ))}
             </EditableInput>
@@ -246,7 +269,9 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
                     {this.displayPermissions(isSystemAdmin, isLibraryManager)}
                     {this.renderLinkItem(accountLink, currentPathname)}
                     <li>
-                      <a href="/admin/sign_out">Sign out</a>
+                      <a href="/admin/sign_out">
+                        {t("header.accountDropdownSignout")}
+                      </a>
                     </li>
                   </ul>
                 )}
@@ -373,6 +398,8 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
+export const HeaderWithTranslation = withTranslation()(Header);
+
 const ConnectedHeader = connect<
   HeaderStateProps,
   HeaderDispatchProps,
@@ -380,7 +407,7 @@ const ConnectedHeader = connect<
 >(
   mapStateToProps,
   mapDispatchToProps
-)(Header);
+)(HeaderWithTranslation);
 
 /** HeaderWithStore is a wrapper component to pass the store as a prop to the
     ConnectedHeader, since it's not in the regular place in the context. */
@@ -392,6 +419,6 @@ export default class HeaderWithStore extends React.Component<{}, {}> {
   };
 
   render(): JSX.Element {
-    return <ConnectedHeader store={this.context.editorStore} />;
+    return <ConnectedHeader store={this.context.editorStore} {...this.props} />;
   }
 }

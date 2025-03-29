@@ -6,6 +6,7 @@ import { RootState } from "../store";
 import Header from "./Header";
 import Footer from "./Footer";
 import title from "../utils/title";
+import { WithTranslation, withTranslation } from "react-i18next";
 
 export interface AccountPageContext {
   editorStore: Store<RootState>;
@@ -13,7 +14,10 @@ export interface AccountPageContext {
 }
 
 /** Page for configuring account settings. */
-export default class AccountPage extends React.Component<object, object> {
+export class AccountPage extends React.Component<
+  object & Partial<WithTranslation>,
+  object
+> {
   context: AccountPageContext;
 
   static contextTypes: React.ValidationMap<AccountPageContext> = {
@@ -35,6 +39,8 @@ export default class AccountPage extends React.Component<object, object> {
   }
 
   UNSAFE_componentWillMount() {
-    document.title = title("Account");
+    document.title = title(this.props.t("accountPage.documentTitle"));
   }
 }
+
+export default withTranslation()(AccountPage);

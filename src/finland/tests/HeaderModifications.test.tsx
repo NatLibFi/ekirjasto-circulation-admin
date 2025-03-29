@@ -1,9 +1,11 @@
 import * as React from "react";
 import * as PropTypes from "prop-types";
+import i18n from "../../i18n/config";
 
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { Header } from "../../components/Header";
+import { HeaderWithTranslation as Header } from "../../components/Header";
+import { mount } from "../../components/__tests__/test-utils";
 
 // This test set is for testing E-kirjasto modifications in Header component.
 // The component itself is tested in src/components/__tests__/Header-test.tsx
@@ -59,17 +61,17 @@ describe("Header Modifications", () => {
         <Header />
       </ContextWrapper>
     );
-    const linkElement = screen.queryByText("Tilastot");
+    const linkElement = screen.queryByText("Statistics");
     expect(linkElement).toBeInTheDocument();
   });
 
-  it("does not render the 'Tilastot' link if library is not selected", () => {
+  it("does not render the 'Statistics' link if library is not selected", () => {
     render(
       <ContextWrapper hasLibrary={false} isEkirjastoUser={false}>
         <Header />
       </ContextWrapper>
     );
-    const linkElement = screen.queryByText("Tilastot");
+    const linkElement = screen.queryByText("Statistics");
     expect(linkElement).not.toBeInTheDocument();
   });
 
@@ -95,7 +97,7 @@ describe("Header Modifications", () => {
 
     fireEvent.click(screen.queryByText("test@example.com"));
     expect(screen.queryByText("Sign out")).toBeInTheDocument();
-    expect(screen.queryByText("Change password")).not.toBeInTheDocument();
+    expect(screen.queryByText("Change Password")).not.toBeInTheDocument();
   });
 
   it("renders 'Change password' link for password based user", () => {
@@ -106,7 +108,7 @@ describe("Header Modifications", () => {
     );
 
     fireEvent.click(screen.queryByText("test@example.com"));
-    expect(screen.queryByText("Change password")).toBeVisible();
+    expect(screen.queryByText("Change Password")).toBeVisible();
   });
 
   it("renders Dashboard and Patrons links if not in E-kirjasto", () => {
