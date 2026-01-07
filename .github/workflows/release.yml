@@ -1,7 +1,6 @@
 name: Publish Release
 
 on:
-  # The build will be triggered when we publish a release
   release:
     types: [published]
 
@@ -9,28 +8,29 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write  # required for npm Trusted Publishing (OIDC)
+
     steps:
+      - uses: actions/checkout@v4
 
-    - uses: actions/checkout@v3
+      - name: Install Node.js 💻
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
 
-    - name: Install Node.js 💻
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
-        registry-url: https://registry.npmjs.org/
+      - name: Install locked dependencies 🔧
+        run: npm ci
 
-    - name: Install locked dependencies 🔧
-      run: npm ci
+      - name: Version ✅
+        run: npm version --no-git-tag-version ${{ github.event.release.tag_name }}
 
-    - name: Version ✅
-      run: npm version --no-git-tag-version ${{ github.event.release.tag_name }}
+      - name: Test 🧪
+        env:
+          TZ: Europe/Helsinki
+        run: npm test
 
-    - name: Test 🧪
-      env:
-        TZ: Europe/Helsinki
-      run: npm test
-
-    - name: Publish 📚
-      run: npm publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.CIRC_ADMIN_NPM_TOKEN }}
+      - name: Publish 📚
+        run: npm publish --access public --provenance
