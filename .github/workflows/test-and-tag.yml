@@ -11,44 +11,10 @@ concurrency:
 
 jobs:
   test-and-tag:
-    runs-on: ubuntu-latest
-
-    # Required for npm OIDC Trusted Publishing
+    uses: ./.github/workflows/npm-publish.yml
     permissions:
       contents: read
       id-token: write
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-
-      - name: Install Node.js 💻
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
-          cache: npm
-
-      - name: Set up Python 🐍
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: Set up Dunamai 🪄
-        run: pip install -r requirements-ci.txt
-
-      - name: Install locked dependencies 🔧
-        run: npm ci
-
-      - name: Version ✅
-        run: npm version --no-git-tag-version $(dunamai from git --style semver)
-
-      - name: Test 🧪
-        env:
-          TZ: Europe/Helsinki
-        run: npm test
-
-      - name: Publish 📚 (OIDC Trusted Publishing)
-        run: npm publish --tag next --access public --provenance
+    with:
+      version-source: dunamai
+      publish-tag: next
