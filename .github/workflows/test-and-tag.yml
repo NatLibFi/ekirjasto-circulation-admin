@@ -1,7 +1,6 @@
 name: Test & Publish Next
 
 on:
-  # The build will be triggered on push to main
   push:
     branches:
       - main
@@ -14,21 +13,26 @@ jobs:
   test-and-tag:
     runs-on: ubuntu-latest
 
-    steps:
+    # Required for npm OIDC Trusted Publishing
+    permissions:
+      contents: read
+      id-token: write
 
-      - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
 
       - name: Install Node.js 💻
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
+          cache: npm
 
       - name: Set up Python 🐍
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -46,7 +50,5 @@ jobs:
           TZ: Europe/Helsinki
         run: npm test
 
-      - name: Publish 📚
-        run: npm publish --tag next --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.CIRC_ADMIN_NPM_TOKEN }}
+      - name: Publish 📚 (OIDC Trusted Publishing)
+        run: npm publish --tag next --access public --provenance
