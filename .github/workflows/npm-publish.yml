@@ -1,0 +1,72 @@
+name: npm Publish
+
+on:
+  workflow_call:
+    inputs:
+      version-source:
+        description: "Set to 'dunamai' to compute from git, or 'release-tag' to use a provided tag."
+        required: true
+        type: string
+      release-tag:
+        description: "Release tag to use when version-source is release-tag."
+        required: false
+        type: string
+      publish-tag:
+        description: "npm dist-tag to publish with."
+        required: false
+        type: string
+        default: latest
+
+jobs:
+  npm-publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install Node.js 💻
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+          cache: npm
+
+      - name: Set up Python 🐍
+        if: inputs.version-source == 'dunamai'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Set up Dunamai 🪄
+        if: inputs.version-source == 'dunamai'
+        run: pip install -r requirements-ci.txt
+
+      - name: Install locked dependencies 🔧
+        run: npm ci
+
+      - name: Version ✅
+        run: |
+          if [ "${{ inputs.version-source }}" = "dunamai" ]; then
+            npm version --no-git-tag-version $(dunamai from git --style semver)
+          else
+            if [ -z "${{ inputs.release-tag }}" ]; then
+              echo "release-tag input is required when version-source is not 'dunamai'." 1>&2
+              exit 1
+            fi
+            npm version --no-git-tag-version "${{ inputs.release-tag }}"
+          fi
+
+      - name: Test 🧪
+        env:
+          TZ: Europe/Helsinki
+        run: npm test
+
+      - name: Publish 📚 (OIDC Trusted Publishing)
+        run: npm publish --tag "${{ inputs.publish-tag }}" --access public --provenance
