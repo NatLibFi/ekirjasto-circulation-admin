@@ -1,6 +1,11 @@
 name: npm Publish
 
 on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
   workflow_call:
     inputs:
       version-source:
@@ -17,6 +22,10 @@ on:
         type: string
         default: latest
 
+concurrency:
+  group: npm-publish-${{ github.ref_name }}-${{ github.event_name }}
+  cancel-in-progress: true
+
 jobs:
   npm-publish:
     runs-on: ubuntu-latest
@@ -26,6 +35,26 @@ jobs:
       id-token: write
 
     steps:
+      - name: Resolve publish parameters (push)
+        if: github.event_name == 'push'
+        run: |
+          echo "VERSION_SOURCE=dunamai" >> "$GITHUB_ENV"
+          echo "PUBLISH_TAG=next" >> "$GITHUB_ENV"
+
+      - name: Resolve publish parameters (release)
+        if: github.event_name == 'release'
+        run: |
+          echo "VERSION_SOURCE=release-tag" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
+          echo "PUBLISH_TAG=latest" >> "$GITHUB_ENV"
+
+      - name: Resolve publish parameters (workflow_call)
+        if: github.event_name == 'workflow_call'
+        run: |
+          echo "VERSION_SOURCE=${{ inputs.version-source }}" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=${{ inputs.release-tag }}" >> "$GITHUB_ENV"
+          echo "PUBLISH_TAG=${{ inputs.publish-tag }}" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -39,13 +68,13 @@ jobs:
           cache: npm
 
       - name: Set up Python 🐍
-        if: inputs.version-source == 'dunamai'
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_call' && inputs.version-source == 'dunamai') }}
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Set up Dunamai 🪄
-        if: inputs.version-source == 'dunamai'
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_call' && inputs.version-source == 'dunamai') }}
         run: pip install -r requirements-ci.txt
 
       - name: Install locked dependencies 🔧
@@ -53,14 +82,14 @@ jobs:
 
       - name: Version ✅
         run: |
-          if [ "${{ inputs.version-source }}" = "dunamai" ]; then
+          if [ "${VERSION_SOURCE}" = "dunamai" ]; then
             npm version --no-git-tag-version $(dunamai from git --style semver)
           else
-            if [ -z "${{ inputs.release-tag }}" ]; then
+            if [ -z "${RELEASE_TAG}" ]; then
               echo "release-tag input is required when version-source is not 'dunamai'." 1>&2
               exit 1
             fi
-            npm version --no-git-tag-version "${{ inputs.release-tag }}"
+            npm version --no-git-tag-version "${RELEASE_TAG}"
           fi
 
       - name: Test 🧪
@@ -69,4 +98,4 @@ jobs:
         run: npm test
 
       - name: Publish 📚 (OIDC Trusted Publishing)
-        run: npm publish --tag "${{ inputs.publish-tag }}" --access public --provenance
+        run: npm publish --tag "${PUBLISH_TAG}" --access public --provenance

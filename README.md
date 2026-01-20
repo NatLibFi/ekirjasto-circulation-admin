@@ -97,7 +97,16 @@ The Circulation Manager administrative interface relies on the [OPDS Web Catalog
 
 ## Publishing a New Release
 
-This package is [published to NPM](https://www.npmjs.com/package/@natlibfi/ekirjasto-circulation-admin). To publish a new version, create a new release in GitHub. For new version numbers, you can refer to [Semantic Versioning](https://semver.org/) (major.minor.patch). The NPM build and publish will be done by GitHub Actions.
+This package is [published to NPM](https://www.npmjs.com/package/@natlibfi/ekirjasto-circulation-admin) via GitHub Actions using npm OIDC Trusted Publishing.
+
+Publishing behavior:
+
+- Pushes to `main` publish a prerelease build to npm with the dist-tag `next` (version computed from git using Dunamai).
+- Publishing a GitHub Release publishes the release version to npm with the dist-tag `latest` (version taken from the release tag).
+
+The single publishing entrypoint workflow is `.github/workflows/npm-publish.yml`.
+
+To publish a new stable version, create a new GitHub Release with a tag following [Semantic Versioning](https://semver.org/) (major.minor.patch). The build/test and `npm publish` steps run in GitHub Actions.
 
 ## Accessibility
 
