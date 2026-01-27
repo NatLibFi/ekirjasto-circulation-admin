@@ -64,9 +64,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          npm-version: latest
           cache: npm
 
+      - name: Upgrade npm (required for OIDC) ⬆️
+        run: npm install -g npm@latest
+        
       - name: Set up Python 🐍
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_call' && inputs.version-source == 'dunamai') }}
         uses: actions/setup-python@v5
