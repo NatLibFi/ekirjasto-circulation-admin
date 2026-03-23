@@ -20,3 +20,4 @@
 
 - [ ] I have updated the documentation accordingly.
 - [ ] All new and existing tests passed.
+- [ ] AI was used during the process and I have described above how.
