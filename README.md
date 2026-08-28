@@ -23,22 +23,22 @@ Install nvm using Homebrew:
 brew install nvm
 ```
 
-Install and use the latest version of Node.js 18, e.g. 18.14.2 with nvm:
+Install and use Node.js 20.18 with nvm:
 
 ```
-nvm install 18.14.2
-nvm use 18.14.2
+nvm install 20.18.1
+nvm use 20.18.1
 ```
 
 Alternatively, you can use `nodenv` on macOS:
 
 ```
 brew install nodenv
-nodenv install 18.14.2
-nodenv global 18.14.2
+nodenv install 20.18.1
+nodenv global 20.18.1
 ```
 
-If you have different projects requiring different Node.js versions, you can use nodenv to set a local version for the project by navigating to the root directory of ekirjasto-circulation-admin and executing `nodenv local 18.14.2`.
+If you have different projects requiring different Node.js versions, you can use nodenv to set a local version for the project by navigating to the root directory of ekirjasto-circulation-admin and executing `nodenv local 20.18.1`.
 
 You can also use the `n` npm package to manage Node.js versions, or simply install the Node.js binary directly.
 
@@ -67,10 +67,9 @@ If you're working on the administrative interface and want to test local changes
 
 1. Run `npm link` in this `ekirjasto-circulation-admin` repository,
 2. run `npm link @natlibfi/ekirjasto-circulation-admin` from `api/admin` in the `ekirjasto-circulation` repository (which is where package.json is located),
-3. run the circulation manager using `python app.py` at the root in the `ekirjasto-circulation` repository,
-4. run the web interface using `npm run dev` at the root of this `ekirjasto-circulation-admin` repository,
-5. use docker-compose in the `ekirjasto-circulation` repository to run PostgreSQL, OpenSearch etc.
-6. visit `localhost:6500/admin/`.
+3. use docker-compose in the `ekirjasto-circulation` repository to run webapp, PostgreSQL, OpenSearch etc.
+4. run the web interface using `npm run dev-server -- --env=backend=http://localhost:6500` at the root of this `ekirjasto-circulation-admin` repository,
+6. visit `localhost:8080/admin/`.
 
 Webpack will take care of compiling and updating any new changes made locally for development. Just hard refresh the page (command + shift + R) to see updates without having to restart either the `ekirjasto-circulation` or `ekirjasto-circulation-admin` servers.
 
