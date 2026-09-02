@@ -41,6 +41,7 @@
     "build-docs": "typedoc --tsconfig tsconfig.json src"
   },
   "dependencies": {
+    "@natlibfi/ekirjasto-opds-feed-parser": "^2.1.0",
     "@nypl/dgx-svg-icons": "0.3.4",
     "@thepalaceproject/web-opds-client": "^1.1.0",
     "bootstrap": "^3.3.6",
@@ -52,7 +53,6 @@
     "isomorphic-fetch": "^3.0.0",
     "library-simplified-reusable-components": "1.3.18",
     "numeral": "^2.0.6",
-    "opds-feed-parser": "0.0.17",
     "prop-types": "^15.7.2",
     "qs": "^6.2.0",
     "react": "^16.8.6",

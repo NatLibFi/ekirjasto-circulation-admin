@@ -1,5 +1,5 @@
 import { BookData } from "./interfaces";
-import { OPDSEntry } from "opds-feed-parser";
+import { OPDSEntry } from "@natlibfi/ekirjasto-opds-feed-parser";
 
 /** Extract metadata and links from an OPDS entry for use on the
     book details page. */
