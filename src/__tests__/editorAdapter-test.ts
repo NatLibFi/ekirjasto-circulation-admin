@@ -99,8 +99,14 @@ describe("editorAdapter", () => {
       publisher: "publisher",
       published: "published",
       summary: new Summary({ content: "content", link: "link" }),
-      accessibility: new Accessibility({}),
-      unparsed: {
+      accessibility: {
+              conformance: {
+                conformsTo: undefined,
+              },
+              waysOfReading: {
+                features: undefined,
+              },
+            },      unparsed: {
         "schema:alternativeHeadline": [{ _: "subtitle" }],
         $: {
           "schema:additionalType": { value: "medium" },
@@ -175,7 +181,14 @@ describe("editorAdapter", () => {
       published: "published",
       summary: new Summary({ content: "content", link: "link" }),
       unparsed: {},
-      accessibility: new Accessibility({}),
+      accessibility: {
+        conformance: {
+          conformsTo: undefined,
+        },
+        waysOfReading: {
+          features: undefined,
+        },
+      },
     });
 
     const adapted = adapter(entry);
