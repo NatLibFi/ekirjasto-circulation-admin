@@ -117,11 +117,7 @@ function CirculationInfo({ book }: { book: BookData }) {
             {availableCopies} of {totalCopies} copies available
           </div>
         )}
-      {holds && availableCopies === 0 && (
-        <React.Fragment>
           <div className="holds-info">{holds} patrons in hold queue</div>
-        </React.Fragment>
-      )}
     </div>
   );
 }
@@ -235,14 +231,6 @@ function label(category: any): string | null {
 
 function isOpenAccess(book: BookData): boolean {
   return !!(book.openAccessLinks && book.openAccessLinks.length);
-}
-
-function isBorrowed(book: BookData): boolean {
-  return !!(book.fulfillmentLinks && book.fulfillmentLinks.length);
-}
-
-function isReserved(book: BookData): boolean {
-  return !!book.availability && book.availability.status === "reserved";
 }
 
 function formatDate(value: string): string {
