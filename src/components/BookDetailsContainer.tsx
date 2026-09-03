@@ -33,7 +33,7 @@ export default class BookDetailsContainer extends React.Component<
     const child = React.Children.only(
       this.props.children
     ) as React.ReactElement<BookDetails>;
-    const book = React.createElement(BookDetails, child.props);
+    const book = React.createElement(BookDetails, child.props as any);
 
     return (
       <div className="book-details-container">

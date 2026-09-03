@@ -1,0 +1,83 @@
+.custom-book-details {
+  padding-top: 2em;
+
+  .custom-book-details-top {
+    display: flex;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .custom-book-cover {
+    flex: 0 0 180px;
+    margin-right: 20px;
+  }
+
+  .custom-book-cover-image,
+  .custom-book-cover-fallback {
+    width: 180px;
+    min-height: 260px;
+  }
+
+  .custom-book-cover-image {
+    display: block;
+    object-fit: contain;
+  }
+
+  .custom-book-cover-fallback {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 20px;
+    color: $white;
+    background: $blue-dark;
+    text-align: center;
+    overflow-wrap: break-word;
+
+    small {
+      margin-top: 1em;
+    }
+  }
+
+  .custom-book-details-metadata {
+    flex: 1;
+
+    h1 {
+      margin: 0;
+    }
+
+    .subtitle,
+    .series {
+      margin-top: .5em;
+      font-size: 1.5em;
+    }
+
+    .authors,
+    .contributors {
+      margin-top: .5em;
+      font-size: 1.2em;
+    }
+  }
+
+  .custom-book-fields {
+    margin-top: 1em;
+    padding-left: 0;
+    color: $pagetextcolor;
+    list-style: none;
+  }
+
+  .custom-book-details-main {
+    margin-top: 1em;
+    padding-top: 2em;
+    border-top: 1px solid #ccc;
+  }
+
+  .circulation-info {
+    margin-bottom: 2em;
+    text-align: center;
+  }
+
+  .summary {
+    text-align: left;
+  }
+}
