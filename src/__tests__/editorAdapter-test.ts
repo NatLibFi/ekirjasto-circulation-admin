@@ -8,7 +8,8 @@ import {
   Series,
   Category,
   Summary,
-} from "opds-feed-parser";
+} from "@natlibfi/ekirjasto-opds-feed-parser";
+import Accessibility from "@natlibfi/ekirjasto-opds-feed-parser/lib/src/accessibility";
 
 describe("editorAdapter", () => {
   it("adapts valid OPDS entry", () => {
@@ -98,7 +99,14 @@ describe("editorAdapter", () => {
       publisher: "publisher",
       published: "published",
       summary: new Summary({ content: "content", link: "link" }),
-      unparsed: {
+      accessibility: {
+              conformance: {
+                conformsTo: undefined,
+              },
+              waysOfReading: {
+                features: undefined,
+              },
+            },      unparsed: {
         "schema:alternativeHeadline": [{ _: "subtitle" }],
         $: {
           "schema:additionalType": { value: "medium" },
@@ -173,6 +181,14 @@ describe("editorAdapter", () => {
       published: "published",
       summary: new Summary({ content: "content", link: "link" }),
       unparsed: {},
+      accessibility: {
+        conformance: {
+          conformsTo: undefined,
+        },
+        waysOfReading: {
+          features: undefined,
+        },
+      },
     });
 
     const adapted = adapter(entry);
