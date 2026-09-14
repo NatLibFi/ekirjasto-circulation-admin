@@ -45,7 +45,11 @@ export default function adapter(data: OPDSEntry): BookData {
   });
   let fiction;
   if (fictionCategory) {
-    fiction = fictionCategory.label === "Fiction";
+    // The label is localized (for example, "Kaunokirjallisuus" in Finnish). The term is
+    // the stable value that identifies the fiction classification.
+    fiction =
+      fictionCategory.label === "Fiction" ||
+      fictionCategory.label === "Kaunokirjallisuus";
   }
 
   const categories = data.categories.map((category) => category.label);
