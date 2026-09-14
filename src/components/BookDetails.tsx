@@ -2,10 +2,54 @@ import * as React from "react";
 import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 
 export interface BookDetailsProps {
-  book: BookData & { updated?: string };
+  book: BookData & {
+    updated?: string;
+    issued?: string;
+    targetAgeRange?: string[];
+  };
   // Kept for compatibility with the props supplied by OPDSCatalog.
   updateBook?: (...args: any[]) => any;
 }
+
+interface SummaryCellProps {
+  summary: string;
+  language?: string;
+}
+
+class SummaryCell extends React.Component<SummaryCellProps> {
+  state = { expanded: false };
+
+  render(): JSX.Element {
+    const { summary, language } = this.props;
+    const plainSummary = stripMarkup(summary);
+    const isLong = plainSummary.length > SUMMARY_PREVIEW_LENGTH;
+    const displayedSummary = isLong
+      ? plainSummary.substring(0, SUMMARY_PREVIEW_LENGTH).trimEnd() + "…"
+      : plainSummary;
+
+    return (
+      <div className="summary" lang={language}>
+        {this.state.expanded || !isLong ? (
+          <div dangerouslySetInnerHTML={{ __html: summary }} />
+        ) : (
+          <span>{displayedSummary}</span>
+        )}
+        {isLong && (
+          <button
+            type="button"
+            className="summary-toggle"
+            aria-expanded={this.state.expanded}
+            onClick={() => this.setState({ expanded: !this.state.expanded })}
+          >
+            {this.state.expanded ? "Show less" : "Show more"}
+          </button>
+        )}
+      </div>
+    );
+  }
+}
+
+const SUMMARY_PREVIEW_LENGTH = 50;
 
 /** Renders the book details page without using web-opds-client's UI components. */
 export default class BookDetails extends React.Component<BookDetailsProps> {
@@ -23,7 +67,7 @@ export default class BookDetails extends React.Component<BookDetailsProps> {
             {book.series && book.series.name && (
               <p className="series">{book.series.name}</p>
             )}
-            {renderBookFields(book)}
+            {renderBookTables(book)}
           </div>
         </div>
 
@@ -99,49 +143,107 @@ function BookCover({ book }: { book: BookData }) {
   );
 }
 
-// Builds the metadata grid, keeping multi-value fields such as authors,
-// contributors, and genres as separate rows.
-function renderBookFields(book: BookData) {
-  const fields = [
-    { name: "ISBN", value: isbn(book) },
-    { name: "Language", value: book.language },
-    { name: "Published", value: book.published },
-    { name: "Updated", value: updated(book) },
-    { name: "Publisher", value: book.publisher },
-    { name: "Distributor", value: distributor(book) },
-    { name: "Audience", value: audience(book) },
-    { name: "Fiction/Nonfiction", value: fictionType(book) },
-    { name: "Genres", value: genres(book) },
-    { name: "Medium", value: medium(book) },
-    { name: "Delivery Mechanisms (DRM)", value: drm(book) },
-    { name: "Formats", value: formats(book) },
-  ];
-
+function renderBookTables(book: BookDetailsProps["book"]) {
   return (
-    <dl className="custom-book-fields" lang="en">
-      {renderBookField("Author", book.authors)}
-      {renderBookField(
-        "Contributors",
-        book.contributors && book.contributors.map(formatContributor)
-      )}
-      {fields.map((field) => renderBookField(field.name, field.value))}
-      {renderCirculationFields(book)}
-      <div className="summary-row">
-        <dt>Summary: </dt>
-        <dd>
-          {book.summary ? (
-            <div
-              className="summary"
-              lang={book.language}
-              dangerouslySetInnerHTML={{ __html: book.summary }}
-            />
-          ) : (
-            "—"
-          )}
-        </dd>
-      </div>
-    </dl>
+    <div className="custom-book-tables" lang="en">
+      <BookDetailsTable
+        title="Basic information"
+        rows={[
+          ["ISBN", isbn(book)],
+          ["Language", book.language],
+          ["Updated", updated(book)],
+          ["Issued", issued(book)],
+          ["Title", book.title],
+          ["Subtitle", book.subtitle],
+          ["Distributor", distributor(book)],
+          ["Medium", medium(book)],
+          ["Published", book.published],
+          ["Summary", book.summary ? renderSummary(book) : null],
+        ]}
+      />
+      <BookDetailsTable
+        title="Authors and Contributors"
+        rows={[
+          ["Authors", book.authors],
+          [
+            "Contributors",
+            book.contributors && book.contributors.map(formatContributor),
+          ],
+        ]}
+      />
+      <BookDetailsTable
+        title="Classifications"
+        rows={[
+          ["Genres", genres(book)],
+          ["Audience", audience(book)],
+          ["Target age", targetAge(book)],
+          ["Fiction", fictionType(book)],
+        ]}
+      />
+      <BookDetailsTable
+        title="Availability"
+        rows={[
+          ["Copies owned", copiesOwned(book)],
+          ["Copies available", copiesAvailable(book)],
+          ["Patrons in queue", patronsInQueue(book)],
+        ]}
+      />
+      <BookDetailsTable
+        title="DRMs and formats"
+        rows={[["DRM", drm(book)], ["Formats", formats(book)]]}
+      />
+    </div>
   );
+}
+
+function BookDetailsTable({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: Array<[string, string | number | string[] | null | undefined | JSX.Element]>;
+}) {
+  return (
+    <section className="custom-book-table-section">
+      <h2>{title}</h2>
+      <table className="custom-book-table">
+        <tbody>
+          {rows.map(([name, value]) => renderBookTableRow(name, value))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function renderBookTableRow(
+  name: string,
+  value: string | number | string[] | null | undefined | JSX.Element
+) {
+  const values = Array.isArray(value) ? value : [value];
+  const displayValues = values.length && values.some(Boolean) ? values : ["—"];
+  const className = name.toLowerCase().replace(/\s/g, "-");
+
+  return displayValues.map((item, index) => (
+    <tr key={`${name}-${index}`} className={className}>
+      <th scope="row">{index === 0 ? name : null}</th>
+      <td>{item || "—"}</td>
+    </tr>
+  ));
+}
+
+function renderSummary(book: BookData): JSX.Element {
+  return <SummaryCell summary={book.summary as string} language={book.language} />;
+}
+
+function stripMarkup(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'");
 }
 
 function updated(book: BookData & { updated?: string }): string | null {
@@ -158,61 +260,54 @@ function rawUpdatedValue(book: BookData): string | null {
   return typeof value === "string" ? value : value._ || value.value || null;
 }
 
-// Renders one metadata field. Array values become one row per item; the label
-// is shown only on the first row so the following rows stay visually grouped.
-function renderBookField(
-  name: string,
-  value: string | string[] | null | undefined
-) {
-  const values = Array.isArray(value) ? value : [value];
-  const displayValues = values.length && values.some(Boolean) ? values : ["—"];
-  const className = name.toLowerCase().replace(" ", "");
-
-  return displayValues.map((item, index) => (
-    <div key={`${name}-${index}`} className={className}>
-      <dt>{index === 0 ? `${name}: ` : null}</dt>
-      <dd>{item || "—"}</dd>
-    </div>
-  ));
+function issued(book: BookDetailsProps["book"]): string | null {
+  return (
+    book.issued || rawValue(book, "issued") || rawValue(book, "atom:issued")
+  );
 }
 
-function renderCirculationFields(book: BookData) {
-  if (isOpenAccess(book)) {
-    return (
-      <div className="open-access-info">
-        <dt>Availability: </dt>
-        <dd>This open-access book is available to keep.</dd>
-      </div>
-    );
-  }
-
-  const availableCopies = book.copies && book.copies.available;
-  const totalCopies = book.copies && book.copies.total;
-  const holds = book.holds && book.holds.total;
-
+function targetAge(book: BookDetailsProps["book"]): string | string[] | null {
   return (
-    <React.Fragment>
-      <div className="circulation-info copies-row">
-        <dt>Copies available: </dt>
-        <dd className="copies-info">
-          {availableCopies !== undefined &&
-          availableCopies !== null &&
-          totalCopies !== undefined &&
-          totalCopies !== null
-            ? `${availableCopies} of ${totalCopies} copies available`
-            : "—"}
-        </dd>
-      </div>
-      <div className="circulation-info holds-row">
-        <dt>Hold queue: </dt>
-        <dd className="holds-info">
-          {holds !== undefined && holds !== null
-            ? `${holds} patrons in hold queue`
-            : "—"}
-        </dd>
-      </div>
-    </React.Fragment>
+    book.targetAgeRange ||
+    categoryLabel(book, "http://schema.org/typicalAgeRange")
   );
+}
+
+function copiesOwned(book: BookData): number | string | null {
+  return book.copies && book.copies.total !== undefined
+    ? book.copies.total
+    : null;
+}
+
+function copiesAvailable(book: BookData): number | string | null {
+  return book.copies && book.copies.available !== undefined
+    ? book.copies.available
+    : isOpenAccess(book)
+    ? "Open access"
+    : null;
+}
+
+function patronsInQueue(book: BookData): number | string | null {
+  return book.holds && book.holds.total !== undefined ? book.holds.total : null;
+}
+
+function rawValue(book: BookData, key: string): string | null {
+  const value = book.raw && book.raw[key];
+  const firstValue = Array.isArray(value) ? value[0] : value;
+  return firstValue && typeof firstValue === "object"
+    ? firstValue._ || firstValue.value || null
+    : firstValue || null;
+}
+
+function categoryLabel(book: BookData, scheme: string): string | null {
+  const category = rawCategories(book).find(
+    (candidate) =>
+      candidate["$"] &&
+      candidate["$"]["scheme"] &&
+      normalizeCategoryScheme(candidate["$"]["scheme"].value) ===
+        normalizeCategoryScheme(scheme)
+  );
+  return label(category);
 }
 
 function audience(book: BookData): string | null {
@@ -228,18 +323,7 @@ function audience(book: BookData): string | null {
   if (!audienceValue) {
     return null;
   }
-  if (audienceValue === "Adult" || audienceValue === "Adults Only") {
-    return audienceValue;
-  }
-
-  const ageCategory = raw.find(
-    (category) =>
-      category["$"] &&
-      category["$"]["scheme"] &&
-      category["$"]["scheme"].value === "http://schema.org/typicalAgeRange"
-  );
-  const age = label(ageCategory);
-  return age ? `${audienceValue} (age ${age})` : audienceValue;
+  return audienceValue;
 }
 
 function fictionType(book: BookData): string | null {
