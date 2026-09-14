@@ -23,26 +23,12 @@ export default class BookDetails extends React.Component<BookDetailsProps> {
             {book.series && book.series.name && (
               <p className="series">{book.series.name}</p>
             )}
-            {book.authors && book.authors.length > 0 && (
-              <p className="authors">By {book.authors.join(", ")}</p>
-            )}
-            {book.contributors && book.contributors.length > 0 && (
-              <p className="contributors">
-                Contributors:{" "}
-                {book.contributors.map(formatContributor).join(", ")}
-              </p>
-            )}
             {renderBookFields(book)}
           </div>
         </div>
 
         <div className="custom-book-details-main">
           <div className="circulation-links" />
-          <CirculationInfo book={book} />
-          <section className="summary" lang={book.language}>
-            <h2>Summary</h2>
-            <div dangerouslySetInnerHTML={{ __html: book.summary || "" }} />
-          </section>
         </div>
       </div>
     );
@@ -54,7 +40,6 @@ function formatContributor(contributor: {
   role?: string;
 }): string {
   const role = contributor.role && mapContributorRole(contributor.role);
-  console.log("Contributor role:", contributor.role);
   return role ? `${contributor.name} (${role})` : contributor.name;
 }
 
@@ -116,6 +101,20 @@ function BookCover({ book }: { book: BookData }) {
 
 function renderBookFields(book: BookData) {
   const fields = [
+    {
+      name: "Author",
+      value:
+        book.authors && book.authors.length
+          ? book.authors.join(", ")
+          : null,
+    },
+    {
+      name: "Contributors",
+      value:
+        book.contributors && book.contributors.length
+          ? book.contributors.map(formatContributor).join(", ")
+          : null,
+    },
     { name: "Published", value: book.published },
     { name: "Publisher", value: book.publisher },
     { name: "Audience", value: audience(book) },
@@ -126,26 +125,41 @@ function renderBookFields(book: BookData) {
   ];
 
   return (
-    <ul className="custom-book-fields" lang="en">
+    <dl className="custom-book-fields" lang="en">
       {fields.map((field) =>
-        field.value ? (
-          <li
-            key={field.name}
-            className={field.name.toLowerCase().replace(" ", "-")}
-          >
-            {field.name}: {field.value}
-          </li>
-        ) : null
+        <div
+          key={field.name}
+          className={field.name.toLowerCase().replace(" ", "-")}
+        >
+          <dt>{field.name}: </dt>
+          <dd>{field.value || "—"}</dd>
+        </div>
       )}
-    </ul>
+      {renderCirculationFields(book)}
+      <div className="summary-row">
+        <dt>Summary: </dt>
+        <dd>
+          {book.summary ? (
+            <div
+              className="summary"
+              lang={book.language}
+              dangerouslySetInnerHTML={{ __html: book.summary }}
+            />
+          ) : (
+            "—"
+          )}
+        </dd>
+      </div>
+    </dl>
   );
 }
 
-function CirculationInfo({ book }: { book: BookData }) {
+function renderCirculationFields(book: BookData) {
   if (isOpenAccess(book)) {
     return (
       <div className="open-access-info">
-        This open-access book is available to keep.
+        <dt>Availability: </dt>
+        <dd>This open-access book is available to keep.</dd>
       </div>
     );
   }
@@ -155,17 +169,27 @@ function CirculationInfo({ book }: { book: BookData }) {
   const holds = book.holds && book.holds.total;
 
   return (
-    <div className="circulation-info">
-      {availableCopies !== undefined &&
-        availableCopies !== null &&
-        totalCopies !== undefined &&
-        totalCopies !== null && (
-          <div className="copies-info">
-            {availableCopies} of {totalCopies} copies available
-          </div>
-        )}
-      <div className="holds-info">{holds} patrons in hold queue</div>
-    </div>
+    <React.Fragment>
+      <div className="circulation-info copies-row">
+        <dt>Copies available: </dt>
+        <dd className="copies-info">
+          {availableCopies !== undefined &&
+          availableCopies !== null &&
+          totalCopies !== undefined &&
+          totalCopies !== null
+            ? `${availableCopies} of ${totalCopies} copies available`
+            : "—"}
+        </dd>
+      </div>
+      <div className="circulation-info holds-row">
+        <dt>Hold queue: </dt>
+        <dd className="holds-info">
+          {holds !== undefined && holds !== null
+            ? `${holds} patrons in hold queue`
+            : "—"}
+        </dd>
+      </div>
+    </React.Fragment>
   );
 }
 
