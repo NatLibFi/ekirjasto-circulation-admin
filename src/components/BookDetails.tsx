@@ -110,6 +110,8 @@ function renderBookFields(book: BookData) {
     { name: "Distributed By", value: distributor(book) },
     { name: "ISBN", value: isbn(book) },
     { name: "Medium", value: medium(book) },
+    { name: "Delivery Mechanisms (DRM)", value: drm(book) },
+    { name: "Formats", value: formats(book) },
   ];
 
   return (
@@ -291,6 +293,127 @@ function medium(book: BookData): string | null {
     return "eBook";
   }
   return null;
+}
+
+// The deepest indirect-acquisition type is the actual deliverable format
+// (for example, application/epub+zip), not an outer DRM/license type.
+function formats(book: BookData): string[] | null {
+  const acquisitionTypes = rawAcquisitionTypes(book);
+  if (acquisitionTypes.formats.length) {
+    return acquisitionTypes.formats;
+  }
+
+  const links = ([] as Array<{
+    type: string;
+    indirectType?: string;
+  }>).concat(
+    book.openAccessLinks || [],
+    book.allBorrowLinks || [],
+    book.fulfillmentLinks || []
+  );
+  const values = links
+    .filter((link) => !link.indirectType)
+    .map((link) => link.type)
+    .filter(Boolean)
+    .filter((format, index, all) => all.indexOf(format) === index);
+
+  return values.length ? values : null;
+}
+
+// Any indirect-acquisition types before the deepest type describe the
+// intermediary protection or delivery layers, such as an LCP license.
+function drm(book: BookData): string[] | null {
+  const acquisitionTypes = rawAcquisitionTypes(book);
+  if (acquisitionTypes.drm.length) {
+    return acquisitionTypes.drm;
+  }
+
+  const links = ([] as Array<{ indirectType?: string }>).concat(
+    book.allBorrowLinks || [],
+    book.fulfillmentLinks || []
+  );
+  const values = links
+    .map((link) => link.indirectType)
+    .filter(Boolean)
+    .filter((format, index, all) => all.indexOf(format) === index);
+
+  return values.length ? values : null;
+}
+
+function rawAcquisitionTypes(book: BookData): {
+  drm: string[];
+  formats: string[];
+} {
+  // The adapted BookData keeps only the first indirect type. Use the raw OPDS
+  // links here so nested indirectAcquisition elements are not lost.
+  const links = (book.raw && book.raw.link) || [];
+  const types = links.reduce(
+    (types: { drm: string[]; formats: string[] }, link: any) => {
+      const rel = link && link["$"] && link["$"]["rel"];
+      if (!rel || !rel.value || rel.value.indexOf("/acquisition/") === -1) {
+        return types;
+      }
+
+      const indirectAcquisitions = Object.keys(link)
+        .filter(
+          (key) =>
+            key === "opds:indirectAcquisition" ||
+            key === "indirectAcquisition"
+        )
+        .reduce(
+          (acquisitions: any[], key) => acquisitions.concat(link[key]),
+          []
+        );
+    if (!indirectAcquisitions.length) {
+      const type = link["$"]["type"] && link["$"]["type"].value;
+      if (type) {
+        types.formats.push(type);
+      }
+        return types;
+      }
+
+    indirectAcquisitions.forEach((acquisition) => {
+      const chain = indirectAcquisitionTypeChain(acquisition);
+      if (chain.length > 1) {
+        types.drm.push(...chain.slice(0, -1));
+      }
+      const format = chain[chain.length - 1];
+      if (format) {
+        types.formats.push(format);
+      }
+      });
+
+      return types;
+    },
+    { drm: [], formats: [] }
+  );
+  return {
+    drm: uniqueValues(types.drm),
+    formats: uniqueValues(types.formats),
+  };
+}
+
+function uniqueValues(values: string[]): string[] {
+  return values.filter((value, index) => values.indexOf(value) === index);
+}
+
+function indirectAcquisitionTypeChain(acquisition: any): string[] {
+  const type =
+    acquisition && acquisition["$"] && acquisition["$"]["type"]
+      ? acquisition["$"]["type"].value
+      : acquisition && acquisition.type;
+  const nested = Object.keys(acquisition || {})
+    .filter(
+      (key) =>
+        key === "opds:indirectAcquisition" || key === "indirectAcquisition"
+    )
+    .reduce((acquisitions: any[], key) => acquisitions.concat(acquisition[key]), []);
+  const nestedChain = nested.length
+    ? indirectAcquisitionTypeChain(nested[nested.length - 1])
+    : [];
+  // Keep the chain ordered from outermost to innermost so callers can split
+  // DRM layers from the final, actual format.
+  return (type ? [type] : []).concat(nestedChain);
 }
 
 function rawCategories(book: BookData): any[] {
