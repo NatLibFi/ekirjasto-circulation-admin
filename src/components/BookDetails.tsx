@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BookData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 
 export interface BookDetailsProps {
   book: BookData;

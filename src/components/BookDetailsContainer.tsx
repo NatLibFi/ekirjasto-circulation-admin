@@ -4,7 +4,7 @@ import * as PropTypes from "prop-types";
 
 import BookDetailsTabContainer from "./BookDetailsTabContainer";
 import BookDetails from "./BookDetails";
-import { BookDetailsContainerProps } from "@thepalaceproject/web-opds-client/lib/components/Root";
+import { BookDetailsContainerProps } from "@natlibfi/ekirjasto-web-opds-client/lib/components/Root";
 import { RootState } from "../store";
 
 export interface BookDetailsContainerContext {

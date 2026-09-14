@@ -28,13 +28,13 @@ import {
   StatisticsData,
   QuickSightEmbeddedURLData,
 } from "./interfaces";
-import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
-import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
+import { CollectionData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import {
   RequestError,
   RequestRejector,
-} from "@thepalaceproject/web-opds-client/lib/DataFetcher";
-import BaseActionCreator from "@thepalaceproject/web-opds-client/lib/actions";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
+import BaseActionCreator from "@natlibfi/ekirjasto-web-opds-client/lib/actions";
 import {
   getCustomListEditorFormData,
   getCustomListEditorSearchUrl,

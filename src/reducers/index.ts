@@ -35,8 +35,8 @@ import languages from "./languages";
 import rightsStatuses from "./rightsStatuses";
 import collection, {
   CollectionState,
-} from "@thepalaceproject/web-opds-client/lib/reducers/collection";
-import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/reducers/collection";
+import { CollectionData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import changePassword from "./changePassword";
 import { FetchEditState } from "./createFetchEditReducer";
 import { RegisterLibraryState } from "./createRegisterLibraryReducer";
