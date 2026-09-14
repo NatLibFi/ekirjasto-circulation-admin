@@ -117,6 +117,7 @@ export default function adapter(data: OPDSEntry): BookData {
     publisher: data.publisher,
     imprint: imprint,
     issued: data.issued,
+    updated: data.updated,
     rating: rating,
     coverUrl: coverUrl,
   };

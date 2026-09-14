@@ -2,7 +2,7 @@ import * as React from "react";
 import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 
 export interface BookDetailsProps {
-  book: BookData;
+  book: BookData & { updated?: string };
   // Kept for compatibility with the props supplied by OPDSCatalog.
   updateBook?: (...args: any[]) => any;
 }
@@ -99,16 +99,17 @@ function BookCover({ book }: { book: BookData }) {
   );
 }
 
-// Builds the metadata grid, keeping multi-value fields such as authors and
-// contributors as separate rows.
+// Builds the metadata grid, keeping multi-value fields such as authors,
+// contributors, and genres as separate rows.
 function renderBookFields(book: BookData) {
   const fields = [
-    { name: "Published", value: book.published },
-    { name: "Publisher", value: book.publisher },
-    { name: "Audience", value: audience(book) },
-    { name: "Categories", value: categories(book) },
-    { name: "Distributed By", value: distributor(book) },
     { name: "ISBN", value: isbn(book) },
+    { name: "Published", value: book.published },
+    { name: "Updated", value: updated(book) },
+    { name: "Publisher", value: book.publisher },
+    { name: "Distributor", value: distributor(book) },
+    { name: "Audience", value: audience(book) },
+    { name: "Genres", value: genres(book) },
     { name: "Medium", value: medium(book) },
     { name: "Delivery Mechanisms (DRM)", value: drm(book) },
     { name: "Formats", value: formats(book) },
@@ -139,6 +140,20 @@ function renderBookFields(book: BookData) {
       </div>
     </dl>
   );
+}
+
+function updated(book: BookData & { updated?: string }): string | null {
+  const value = book.updated || rawUpdatedValue(book);
+  return value ? formatDate(value) : null;
+}
+
+function rawUpdatedValue(book: BookData): string | null {
+  const rawUpdated = book.raw && (book.raw.updated || book.raw["atom:updated"]);
+  const value = Array.isArray(rawUpdated) ? rawUpdated[0] : rawUpdated;
+  if (!value) {
+    return null;
+  }
+  return typeof value === "string" ? value : value._ || value.value || null;
 }
 
 // Renders one metadata field. Array values become one row per item; the label
@@ -225,7 +240,7 @@ function audience(book: BookData): string | null {
   return age ? `${audienceValue} (age ${age})` : audienceValue;
 }
 
-function categories(book: BookData): string | null {
+function genres(book: BookData): string[] | null {
   const excluded = [
     "http://schema.org/audience",
     "http://schema.org/typicalAgeRange",
@@ -257,7 +272,7 @@ function categories(book: BookData): string | null {
       .filter(Boolean);
   }
 
-  return values.length ? values.join(", ") : null;
+  return values.length ? values : null;
 }
 
 function distributor(book: BookData): string | null {
@@ -432,5 +447,12 @@ function isOpenAccess(book: BookData): boolean {
 
 function formatDate(value: string): string {
   const date = new Date(value);
-  return isNaN(date.getTime()) ? value : date.toLocaleDateString();
+  return isNaN(date.getTime())
+    ? value
+    : date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      });
 }

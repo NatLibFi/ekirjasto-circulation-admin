@@ -37,6 +37,7 @@ export interface BookData {
   publisher?: string;
   imprint?: string;
   summary?: string;
+  updated?: string;
   hideLink?: LinkData;
   restoreLink?: LinkData;
   refreshLink?: LinkData;
