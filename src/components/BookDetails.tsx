@@ -99,22 +99,10 @@ function BookCover({ book }: { book: BookData }) {
   );
 }
 
+// Builds the metadata grid, keeping multi-value fields such as authors and
+// contributors as separate rows.
 function renderBookFields(book: BookData) {
   const fields = [
-    {
-      name: "Author",
-      value:
-        book.authors && book.authors.length
-          ? book.authors.join(", ")
-          : null,
-    },
-    {
-      name: "Contributors",
-      value:
-        book.contributors && book.contributors.length
-          ? book.contributors.map(formatContributor).join(", ")
-          : null,
-    },
     { name: "Published", value: book.published },
     { name: "Publisher", value: book.publisher },
     { name: "Audience", value: audience(book) },
@@ -126,15 +114,12 @@ function renderBookFields(book: BookData) {
 
   return (
     <dl className="custom-book-fields" lang="en">
-      {fields.map((field) =>
-        <div
-          key={field.name}
-          className={field.name.toLowerCase().replace(" ", "-")}
-        >
-          <dt>{field.name}: </dt>
-          <dd>{field.value || "—"}</dd>
-        </div>
+      {renderBookField("Author", book.authors)}
+      {renderBookField(
+        "Contributors",
+        book.contributors && book.contributors.map(formatContributor)
       )}
+      {fields.map((field) => renderBookField(field.name, field.value))}
       {renderCirculationFields(book)}
       <div className="summary-row">
         <dt>Summary: </dt>
@@ -152,6 +137,24 @@ function renderBookFields(book: BookData) {
       </div>
     </dl>
   );
+}
+
+// Renders one metadata field. Array values become one row per item; the label
+// is shown only on the first row so the following rows stay visually grouped.
+function renderBookField(
+  name: string,
+  value: string | string[] | null | undefined
+) {
+  const values = Array.isArray(value) ? value : [value];
+  const displayValues = values.length && values.some(Boolean) ? values : ["—"];
+  const className = name.toLowerCase().replace(" ", "");
+
+  return displayValues.map((item, index) => (
+    <div key={`${name}-${index}`} className={className}>
+      <dt>{index === 0 ? `${name}: ` : null}</dt>
+      <dd>{item || "—"}</dd>
+    </div>
+  ));
 }
 
 function renderCirculationFields(book: BookData) {
