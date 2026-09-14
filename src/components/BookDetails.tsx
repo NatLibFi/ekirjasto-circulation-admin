@@ -109,6 +109,7 @@ function renderBookFields(book: BookData) {
     { name: "Publisher", value: book.publisher },
     { name: "Distributor", value: distributor(book) },
     { name: "Audience", value: audience(book) },
+    { name: "Fiction/Nonfiction", value: fictionType(book) },
     { name: "Genres", value: genres(book) },
     { name: "Medium", value: medium(book) },
     { name: "Delivery Mechanisms (DRM)", value: drm(book) },
@@ -238,6 +239,23 @@ function audience(book: BookData): string | null {
   );
   const age = label(ageCategory);
   return age ? `${audienceValue} (age ${age})` : audienceValue;
+}
+
+function fictionType(book: BookData): string | null {
+  const category = rawCategories(book).find((candidate) => {
+    const scheme = candidate["$"] && candidate["$"]["scheme"];
+    return (
+      scheme &&
+      normalizeCategoryScheme(scheme.value) ===
+        "http://librarysimplified.org/terms/fiction"
+    );
+  });
+
+  return categoryValue(category, "label");
+}
+
+function normalizeCategoryScheme(scheme: string): string {
+  return scheme.replace(/\/$/, "");
 }
 
 function genres(book: BookData): string[] | null {
@@ -436,9 +454,12 @@ function rawCategories(book: BookData): any[] {
 }
 
 function label(category: any): string | null {
-  return category && category["$"] && category["$"]["label"]
-    ? category["$"]["label"].value
-    : null;
+  return categoryValue(category, "label");
+}
+
+function categoryValue(category: any, attribute: string): string | null {
+  const value = category && category["$"] && category["$"][attribute];
+  return value && value.value ? value.value : null;
 }
 
 function isOpenAccess(book: BookData): boolean {
