@@ -112,6 +112,8 @@ export interface ClassificationData {
   name: string;
   source: string;
   weight: number;
+  genre?: string;
+  mapping?: string;
 }
 
 export interface CirculationEventData {
