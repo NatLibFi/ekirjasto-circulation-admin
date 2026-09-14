@@ -104,6 +104,7 @@ function BookCover({ book }: { book: BookData }) {
 function renderBookFields(book: BookData) {
   const fields = [
     { name: "ISBN", value: isbn(book) },
+    { name: "Language", value: book.language },
     { name: "Published", value: book.published },
     { name: "Updated", value: updated(book) },
     { name: "Publisher", value: book.publisher },
