@@ -12,7 +12,7 @@ const book: BookData = {
   url: "http://circulation.librarysimplified.org/works/3M/crrmnr9",
   title: "The Mayan Secrets",
   authors: ["Clive Cussler", "Thomas Perry"],
-  contributors: ["contributor 1"],
+  contributors: [{ name: "contributor 1", role: "nrt" }],
   summary:
     "&lt;b&gt;Sam and Remi Fargo race for treasure&#8212;and survival&#8212;in this lightning-paced new adventure from #1&lt;i&gt; New York Times&lt;/i&gt; bestselling author Clive Cussler.&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Husband-and-wife team Sam and Remi Fargo are in Mexico when they come upon a remarkable discovery&#8212;the mummified remainsof a man clutching an ancient sealed pot. Within the pot is a Mayan book larger than any known before.&lt;br /&gt;&lt;br /&gt;The book contains astonishing information about the Mayans, their cities, and about mankind itself. The secrets are so powerful that some people would do anything to possess them&#8212;as the Fargos are about to find out. Many men and women are going to die for that book.",
   imageUrl: "https://dlotdqc6pnwqb.cloudfront.net/3M/crrmnr9/cover.jpg",
@@ -116,6 +116,13 @@ describe("BookDetails", () => {
   it("shows distributor", () => {
     const distributor = wrapper.find(".distributed-by");
     expect(distributor.text()).to.equal("Distributed By: Overdrive");
+  });
+
+  it("shows contributors with mapped roles", () => {
+    const contributors = wrapper.find(".contributors");
+    expect(contributors.text()).to.equal(
+      "Contributors: contributor 1 (Narrator)"
+    );
   });
 
   it("doesn't render any circulation link content", () => {

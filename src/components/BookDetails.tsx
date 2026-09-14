@@ -28,7 +28,8 @@ export default class BookDetails extends React.Component<BookDetailsProps> {
             )}
             {book.contributors && book.contributors.length > 0 && (
               <p className="contributors">
-                Contributors: {book.contributors.join(", ")}
+                Contributors:{" "}
+                {book.contributors.map(formatContributor).join(", ")}
               </p>
             )}
             {renderBookFields(book)}
@@ -48,6 +49,49 @@ export default class BookDetails extends React.Component<BookDetailsProps> {
   }
 }
 
+function formatContributor(contributor: {
+  name: string;
+  role?: string;
+}): string {
+  const role = contributor.role && mapContributorRole(contributor.role);
+  console.log("Contributor role:", contributor.role);
+  return role ? `${contributor.name} (${role})` : contributor.name;
+}
+
+function mapContributorRole(role: string): string {
+  const normalizedRole = role.trim().toLowerCase();
+  return CONTRIBUTOR_ROLE_NAMES[normalizedRole] || role;
+}
+
+const CONTRIBUTOR_ROLE_NAMES: { [role: string]: string } = {
+  act: "Actor",
+  adp: "Adapter",
+  aft: "Afterword Author",
+  art: "Artist",
+  asn: "Associated Author",
+  aut: "Author",
+  ctb: "Contributor",
+  com: "Compiler",
+  cmp: "Composer",
+  cph: "Copyright Holder",
+  dsr: "Designer",
+  drt: "Director",
+  edt: "Editor",
+  eng: "Engineer",
+  pro: "Producer",
+  wpr: "Foreword Author",
+  ill: "Illustrator",
+  win: "Introduction Author",
+  lyr: "Lyricist",
+  mus: "Musician",
+  nrt: "Narrator",
+  prf: "Performer",
+  pht: "Photographer",
+  trc: "Transcriber",
+  trl: "Translator",
+  clr: "Colorist",
+};
+
 function BookCover({ book }: { book: BookData }) {
   if (book.imageUrl) {
     return (
@@ -58,7 +102,10 @@ function BookCover({ book }: { book: BookData }) {
   }
 
   return (
-    <div className="custom-book-cover custom-book-cover-fallback" aria-hidden="true">
+    <div
+      className="custom-book-cover custom-book-cover-fallback"
+      aria-hidden="true"
+    >
       <span>{book.title}</span>
       {book.authors && book.authors.length > 0 && (
         <small>By {book.authors.join(", ")}</small>
@@ -117,7 +164,7 @@ function CirculationInfo({ book }: { book: BookData }) {
             {availableCopies} of {totalCopies} copies available
           </div>
         )}
-          <div className="holds-info">{holds} patrons in hold queue</div>
+      <div className="holds-info">{holds} patrons in hold queue</div>
     </div>
   );
 }
@@ -162,9 +209,9 @@ function categories(book: BookData): string | null {
         label(category) &&
         category["$"] &&
         category["$"]["scheme"] &&
-        excluded.concat([fictionScheme]).indexOf(
-          category["$"]["scheme"].value
-        ) === -1
+        excluded
+          .concat([fictionScheme])
+          .indexOf(category["$"]["scheme"].value) === -1
     )
     .map(label)
     .filter(Boolean);
