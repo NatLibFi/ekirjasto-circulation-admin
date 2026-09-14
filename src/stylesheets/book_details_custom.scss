@@ -123,15 +123,8 @@
     table-layout: fixed;
 
     tr {
-      border-top: 1px solid rgba($gray-border, .65);
-
-      &:first-child {
-        border-top: 0;
-      }
-
-      &:nth-child(even) {
-        background: rgba($gray-tint, .3);
-      }
+      border: 0;
+      background: $white;
     }
 
     th,
