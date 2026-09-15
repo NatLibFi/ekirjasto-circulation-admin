@@ -149,15 +149,15 @@ function renderBookTables(book: BookDetailsProps["book"]) {
       <BookDetailsTable
         title="Basic information"
         rows={[
-          ["ISBN", isbn(book)],
-          ["Language", book.language],
-          ["Updated", updated(book)],
-          ["Issued", issued(book)],
           ["Title", book.title],
           ["Subtitle", book.subtitle],
-          ["Distributor", distributor(book)],
+          ["ISBN", isbn(book)],
+          ["Language", book.language],
           ["Medium", medium(book)],
           ["Published", book.published],
+          ["Issued", issued(book)],
+          ["Updated", updated(book)],
+          ["Distributor", distributor(book)],
           ["Summary", book.summary ? renderSummary(book) : null],
         ]}
       />
