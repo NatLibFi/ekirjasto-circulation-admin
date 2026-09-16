@@ -48,7 +48,7 @@ export class LicensePool extends React.Component<LicensePoolProps> {
           </table>
         ) : data && data.license_pools.length ? (
           data.license_pools.map((pool) => (
-            <LicensePoolTable key={pool.id} pool={pool} />
+            <LicensePoolTables key={pool.id} pool={pool} />
           ))
         ) : (
           <table className="custom-book-table">
@@ -60,9 +60,20 @@ export class LicensePool extends React.Component<LicensePoolProps> {
   }
 }
 
+function LicensePoolTables({ pool }: { pool: LicensePoolData }): JSX.Element {
+  return (
+    <div className="license-pool-tables">
+      <LicensePoolTable pool={pool} />
+      <LicenseInformationSection licenses={pool.licenses} />
+      <LoanInformationSection loans={pool.loans} />
+      <HoldInformationSection holds={pool.holds} />
+    </div>
+  );
+}
+
 function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
   return (
-    <table className="custom-book-table" key={pool.id}>
+    <table className="custom-book-table">
       <tbody>
         {renderBookTableRow(
           "Licensepool created",
@@ -78,15 +89,106 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
           "Patrons in hold queue",
           pool.patrons_in_hold_queue
         )}
-        {pool.licenses.map((license) => (
-          <LicenseTableRows key={license.id} license={license} />
-        ))}
-        {pool.loans.map((loan) => (
-          <LoanTableRows key={loan.id} loan={loan} />
-        ))}
-        {pool.holds.map((hold) => (
-          <HoldTableRows key={hold.id} hold={hold} />
-        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function LicenseInformationSection({
+  licenses,
+}: {
+  licenses: CirculationLicense[];
+}): JSX.Element {
+  return (
+    <section className="license-pool-data-section">
+      <h3>License information</h3>
+      <div className="license-pool-record-tables">
+        {licenses.length ? (
+          licenses.map((license) => (
+            <LicenseInformationTable key={license.id} license={license} />
+          ))
+        ) : (
+          <table className="custom-book-table">
+            <tbody>{renderBookTableRow("Licenses", "—")}</tbody>
+          </table>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function LoanInformationSection({
+  loans,
+}: {
+  loans: CirculationLoan[];
+}): JSX.Element {
+  return (
+    <section className="license-pool-data-section">
+      <h3>Loan information</h3>
+      <div className="license-pool-record-tables">
+        {loans.length ? (
+          loans.map((loan) => <LoanInformationTable key={loan.id} loan={loan} />)
+        ) : (
+          <table className="custom-book-table">
+            <tbody>{renderBookTableRow("Loans", "—")}</tbody>
+          </table>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function HoldInformationSection({
+  holds,
+}: {
+  holds: CirculationHold[];
+}): JSX.Element {
+  return (
+    <section className="license-pool-data-section">
+      <h3>Hold information</h3>
+      <div className="license-pool-record-tables">
+        {holds.length ? (
+          holds.map((hold) => <HoldInformationTable key={hold.id} hold={hold} />)
+        ) : (
+          <table className="custom-book-table">
+            <tbody>{renderBookTableRow("Holds", "—")}</tbody>
+          </table>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function LicenseInformationTable({
+  license,
+}: LicenseTableRowsProps): JSX.Element {
+  return (
+    <table className="custom-book-table">
+      <caption>License {license.identifier}</caption>
+      <tbody>
+        <LicenseTableRows license={license} />
+      </tbody>
+    </table>
+  );
+}
+
+function LoanInformationTable({ loan }: LoanTableRowsProps): JSX.Element {
+  return (
+    <table className="custom-book-table">
+      <caption>Loan {loan.id}</caption>
+      <tbody>
+        <LoanTableRows loan={loan} />
+      </tbody>
+    </table>
+  );
+}
+
+function HoldInformationTable({ hold }: HoldTableRowsProps): JSX.Element {
+  return (
+    <table className="custom-book-table">
+      <caption>Hold {hold.id}</caption>
+      <tbody>
+        <HoldTableRows hold={hold} />
       </tbody>
     </table>
   );
@@ -95,13 +197,13 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
 function LicenseTableRows({ license }: LicenseTableRowsProps): JSX.Element {
   return (
     <React.Fragment key={license.id}>
-      {renderBookTableRow("License ID", license.id)}
+      {renderBookTableRow("License identifier (datasource)", license.identifier)}
+      {renderBookTableRow("License ID (database)", license.id)}
       {renderBookTableRow("License status", license.status)}
       {renderBookTableRow(
         "License status document",
         <a href={license.status_url}>{license.status_url}</a>
       )}
-      {renderBookTableRow("License identifier", license.identifier)}
       {renderBookTableRow("Checkout URL", license.checkout_url)}
       {renderBookTableRow("Concurrency", license.terms_concurrency)}
       {renderBookTableRow("Checkouts available", license.checkouts_available)}
