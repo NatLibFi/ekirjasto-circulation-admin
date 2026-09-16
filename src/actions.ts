@@ -4,6 +4,7 @@ import {
   ComplaintsData,
   GenreTree,
   ClassificationData,
+  CirculationData,
   CirculationEventData,
   LibrariesData,
   CollectionsData,
@@ -165,6 +166,12 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly CLASSIFICATIONS_SUCCESS = "CLASSIFICATIONS_SUCCESS";
   static readonly CLASSIFICATIONS_FAILURE = "CLASSIFICATIONS_FAILURE";
   static readonly CLASSIFICATIONS_LOAD = "CLASSIFICATIONS_LOAD";
+
+  static readonly CIRCULATION = "CIRCULATION";
+  static readonly CIRCULATION_REQUEST = "CIRCULATION_REQUEST";
+  static readonly CIRCULATION_SUCCESS = "CIRCULATION_SUCCESS";
+  static readonly CIRCULATION_FAILURE = "CIRCULATION_FAILURE";
+  static readonly CIRCULATION_LOAD = "CIRCULATION_LOAD";
 
   static readonly EDIT_CLASSIFICATIONS_REQUEST = "EDIT_CLASSIFICATIONS_REQUEST";
   static readonly EDIT_CLASSIFICATIONS_SUCCESS = "EDIT_CLASSIFICATIONS_SUCCESS";
@@ -401,6 +408,12 @@ export default class ActionCreator extends BaseActionCreator {
       ActionCreator.CLASSIFICATIONS,
       url
     ).bind(this);
+  }
+
+  fetchCirculation(url: string) {
+    return this.fetchJSON<CirculationData>(ActionCreator.CIRCULATION, url).bind(
+      this
+    );
   }
 
   editBookCover(url: string, data: FormData) {

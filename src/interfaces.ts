@@ -82,9 +82,8 @@ export interface CirculationLoan {
   external_identifier: string;
   id: number;
   license_id: number;
-  patron_database_id: number;
-  patron_id: string;
   start: string;
+  loan_status_document: string;
 }
 
 export interface CirculationHold extends CirculationLoan {

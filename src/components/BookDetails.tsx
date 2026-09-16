@@ -1,5 +1,12 @@
 import * as React from "react";
-import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import { Store } from "redux";
+import { connect } from "react-redux";
+import editorAdapter from "../editorAdapter";
+import ActionCreator from "../actions";
+import {
+  BookData,
+  FetchErrorData,
+} from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import {
   CirculationData,
@@ -8,7 +15,7 @@ import {
   CirculationLoan,
   LicensePoolData,
 } from "../interfaces";
-import { render } from "@testing-library/react";
+import { RootState } from "../store";
 
 export interface BookDetailsProps {
   book: BookData & {
@@ -20,53 +27,23 @@ export interface BookDetailsProps {
   updateBook?: (...args: any[]) => any;
   bookUrl?: string;
   library?: string;
+  store?: Store<RootState>;
+  circulationData?: CirculationData;
+  circulationIsFetching?: boolean;
+  circulationFetchError?: FetchErrorData;
+  fetchCirculation?: (url: string) => Promise<any>;
 }
 
 interface LicensePoolInformationProps {
-  bookUrl?: string;
-  library?: string;
-}
-
-interface LicensePoolInformationState {
-  data: CirculationData | null;
-  isFetching: boolean;
-  hasFetchError: boolean;
+  data?: CirculationData;
+  isFetching?: boolean;
+  fetchError?: FetchErrorData;
 }
 
 /** Fetches and displays circulation information for the current work. */
-class LicensePoolInformation extends React.Component<
-  LicensePoolInformationProps,
-  LicensePoolInformationState
-> {
-  state: LicensePoolInformationState = {
-    data: null,
-    isFetching: false,
-    hasFetchError: false,
-  };
-
-  componentDidMount() {
-    console.debug("[LicensePoolInformation] mounted", {
-      library: this.props.library,
-      bookUrl: this.props.bookUrl,
-    });
-    this.fetchCirculation();
-  }
-
-  componentDidUpdate(previousProps: LicensePoolInformationProps) {
-    if (
-      previousProps.bookUrl !== this.props.bookUrl ||
-      previousProps.library !== this.props.library
-    ) {
-      console.debug("[LicensePoolInformation] props changed", {
-        library: this.props.library,
-        bookUrl: this.props.bookUrl,
-      });
-      this.fetchCirculation();
-    }
-  }
-
+class LicensePoolInformationSection extends React.Component<LicensePoolInformationProps> {
   render(): JSX.Element {
-    const { data, isFetching, hasFetchError } = this.state;
+    const { data, isFetching, fetchError } = this.props;
     return (
       <section className="custom-book-table-section license-pool-information">
         <h2>License pool information</h2>
@@ -74,7 +51,7 @@ class LicensePoolInformation extends React.Component<
           <table className="custom-book-table">
             <tbody>{renderBookTableRow("Status", "Loading…")}</tbody>
           </table>
-        ) : hasFetchError ? (
+        ) : fetchError ? (
           <table className="custom-book-table">
             <tbody>
               {renderBookTableRow(
@@ -92,60 +69,6 @@ class LicensePoolInformation extends React.Component<
         )}
       </section>
     );
-  }
-
-  private fetchCirculation() {
-    const url = circulationUrl(this.props.library, this.props.bookUrl);
-    console.debug("[LicensePoolInformation] circulation URL", {
-      library: this.props.library,
-      bookUrl: this.props.bookUrl,
-      url: url,
-    });
-    if (!url) {
-      console.warn(
-        "[LicensePoolInformation] no circulation URL could be derived"
-      );
-      return;
-    }
-
-    console.debug("[LicensePoolInformation] fetching", url);
-    this.setState({ isFetching: true, hasFetchError: false });
-    const fetcher = new DataFetcher();
-    fetcher
-      .fetch(url)
-      .then((response) => {
-        console.debug("[LicensePoolInformation] response", {
-          url: url,
-          status: response.status,
-          ok: response.ok,
-        });
-        if (!response.ok) {
-          throw new Error(`Circulation request failed: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data: CirculationData) => {
-        console.debug("[LicensePoolInformation] data received", {
-          identifier: data && data.identifier,
-          licensePools: data && data.license_pools
-            ? data.license_pools.length
-            : 0,
-          licenses: data && data.license_pools
-            ? data.license_pools.reduce(
-                (count, pool) => count + (pool.licenses || []).length,
-                0
-              )
-            : 0,
-        });
-        this.setState({ data, isFetching: false, hasFetchError: false });
-      })
-      .catch((error) => {
-        console.error("[LicensePoolInformation] fetch failed", {
-          url: url,
-          error: error,
-        });
-        this.setState({ isFetching: false, hasFetchError: true });
-      });
   }
 }
 
@@ -190,7 +113,32 @@ class SummaryCell extends React.Component<SummaryCellProps> {
 const SUMMARY_PREVIEW_LENGTH = 50;
 
 /** Renders the book details page without using web-opds-client's UI components. */
-export default class BookDetails extends React.Component<BookDetailsProps> {
+export class BookDetails extends React.Component<BookDetailsProps> {
+  componentDidMount() {
+    this.fetchCirculation();
+  }
+
+  componentDidUpdate(previousProps: BookDetailsProps) {
+    if (this.circulationUrl(previousProps) !== this.circulationUrl(this.props)) {
+      this.fetchCirculation();
+    }
+  }
+
+  private fetchCirculation() {
+    const url = circulationUrl(
+      this.props.book,
+      this.props.library,
+      this.props.bookUrl
+    );
+    if (url && this.props.fetchCirculation) {
+      this.props.fetchCirculation(url);
+    }
+  }
+
+  private circulationUrl(props: BookDetailsProps) {
+    return circulationUrl(props.book, props.library, props.bookUrl);
+  }
+
   render(): JSX.Element {
     const { book } = this.props;
 
@@ -216,6 +164,29 @@ export default class BookDetails extends React.Component<BookDetailsProps> {
     );
   }
 }
+
+function mapStateToProps(state): Partial<BookDetailsProps> {
+  return {
+    circulationData: state.editor.circulation.data,
+    circulationIsFetching: state.editor.circulation.isFetching,
+    circulationFetchError: state.editor.circulation.fetchError,
+  };
+}
+
+function mapDispatchToProps(dispatch): Partial<BookDetailsProps> {
+  const fetcher = new DataFetcher({ adapter: editorAdapter });
+  const actions = new ActionCreator(fetcher);
+  return {
+    fetchCirculation: (url: string) => dispatch(actions.fetchCirculation(url)),
+  };
+}
+
+export const ConnectedBookDetails = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(BookDetails);
+
+export default BookDetails;
 
 function formatContributor(contributor: {
   name: string;
@@ -333,30 +304,55 @@ function renderBookTables(
         title="DRMs and formats"
         rows={[["DRM", drm(book)], ["Formats", formats(book)]]}
       />
-      <LicensePoolInformation
-        library={props.library}
-        bookUrl={props.bookUrl}
+      <LicensePoolInformationSection
+        data={props.circulationData}
+        isFetching={props.circulationIsFetching}
+        fetchError={props.circulationFetchError}
       />
     </div>
   );
 }
 
-function circulationUrl(library: string, bookUrl: string): string | null {
+function circulationUrl(
+  book: BookDetailsProps["book"],
+  library?: string,
+  bookUrl?: string
+): string | null {
+  const rawLinkValues = book.raw
+    ? Object.keys(book.raw)
+        .filter((key) => key === "link" || key.endsWith(":link"))
+        .map((key) => book.raw[key])
+    : [];
+  const rawLinks = rawLinkValues.reduce(
+    (links: any[], value: any) =>
+      links.concat(Array.isArray(value) ? value : value ? [value] : []),
+    []
+  );
+  const circulationLink = rawLinks.find(
+    (link: any) =>
+      link &&
+      link["$"] &&
+      link["$"].rel &&
+      rawAttributeValue(link["$"].rel) ===
+        "http://librarysimplified.org/terms/rel/circulation-details"
+  );
+
+  const rawUrl =
+    circulationLink && circulationLink["$"] && circulationLink["$"].href
+      ? rawAttributeValue(circulationLink["$"].href)
+      : null;
+  if (rawUrl) {
+    return rawUrl;
+  }
+
   if (!library || !bookUrl) {
     return null;
   }
 
-  // Catalog collection URLs may include the cache-busting query string
-  // (for example, "test-lib?max_cache_age=0"). The route expects only the
-  // library slug in this position.
   const librarySlug = library.split(/[/?#]/)[0];
-  if (!librarySlug) {
-    return null;
-  }
-
   const worksMarker = "/works/";
   const worksIndex = bookUrl.indexOf(worksMarker);
-  if (worksIndex === -1) {
+  if (!librarySlug || worksIndex === -1) {
     return null;
   }
 
@@ -373,6 +369,12 @@ function circulationUrl(library: string, bookUrl: string): string | null {
     .join("/")}/circulation`;
 }
 
+function rawAttributeValue(attribute: any): string | null {
+  return attribute && typeof attribute === "object"
+    ? attribute.value || attribute._ || null
+    : attribute || null;
+}
+
 function renderLicensePool(pool: LicensePoolData): JSX.Element {
   return (
     <table className="custom-book-table" key={pool.id}>
@@ -383,7 +385,7 @@ function renderLicensePool(pool: LicensePoolData): JSX.Element {
         {renderBookTableRow("Licenses reserved", pool.licenses_reserved)}
         {renderBookTableRow("Open access", String(pool.open_access))}
         {renderBookTableRow("Unlimited access", String(pool.unlimited_access))}
-        {renderBookTableRow("Suppressed", String(pool.suppressed))}
+        {renderBookTableRow("Hidden", String(pool.suppressed))}
         {renderBookTableRow(
           "Patrons in hold queue",
           pool.patrons_in_hold_queue
@@ -401,7 +403,8 @@ function renderLicense(license: CirculationLicense): JSX.Element {
     <React.Fragment key={license.id}>
       {renderBookTableRow("License ID", license.id)}
       {renderBookTableRow("License status", license.status)}
-      {renderBookTableRow("License status source", 
+      {renderBookTableRow(
+        "License status document",
         <a href={license.status_url}>{license.status_url}</a>)}
       {renderBookTableRow("License identifier", license.identifier)}
       {renderBookTableRow(
@@ -415,9 +418,9 @@ function renderLicense(license: CirculationLicense): JSX.Element {
         license.currently_available_loans
       )}
       {renderBookTableRow("Total remaining loans (min(concurrency, checkouts left))", license.total_remaining_loans)}
-      {renderBookTableRow("Expires", formatDateValue(license.expires))}
+      {renderBookTableRow("Expires", formatDateValue(license.expires, true))}
       {renderBookTableRow("Inactive", String(license.is_inactive))}
-      {renderBookTableRow("Loan limited", String(license.is_loan_limited))}
+      {renderBookTableRow("Loan pool", String(license.is_loan_limited))}
       {renderBookTableRow("Time limited", String(license.is_time_limited))}
       {renderBookTableRow("Perpetual", String(license.is_perpetual))}
       {renderBookTableRow("Missing from feed", String(license.is_missing))}
@@ -433,10 +436,11 @@ function renderLoan(loan: CirculationLoan): JSX.Element {
   return (
     <React.Fragment key={loan.id}>
       {renderBookTableRow("Loan ID", loan.id)}
-      {renderBookTableRow("Patron ID", loan.patron_id)}
       {renderBookTableRow("License identifier", loan.license_id)}
       {renderBookTableRow("Loan start", formatDateValue(loan.start, true))}
       {renderBookTableRow("Loan end", formatDateValue(loan.end, true))}
+      {renderBookTableRow("Loan status document (only for viewing)",
+        <a href={loan.loan_status_document}>{loan.loan_status_document}</a>)}
     </React.Fragment>
   );
 }
@@ -445,7 +449,6 @@ function renderHold(hold: CirculationHold): JSX.Element {
   return (
     <React.Fragment key={hold.id}>
       {renderBookTableRow("Hold ID", hold.id)}
-      {renderBookTableRow("Patron ID", hold.patron_id)}
       {renderBookTableRow("Hold position", hold.position)}
       {renderBookTableRow("Hold start", formatDateValue(hold.start, true))}
       {renderBookTableRow("Hold end", formatDateValue(hold.end, true))}
