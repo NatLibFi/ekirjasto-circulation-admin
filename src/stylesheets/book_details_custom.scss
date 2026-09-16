@@ -99,23 +99,25 @@
   .custom-book-tables {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 1em;
     margin-top: 2em;
     max-width: 900px;
   }
 
-  .custom-book-table-section {
+  .custom-book-table-section,
+  .license-pool-data-section {
     min-width: 0;
     overflow: hidden;
-    border: 0;
+    border: 1px solid #ccc;
+    padding: .6em .75em;
     background: transparent;
     box-shadow: none;
 
     h2 {
-      margin: 0;
-      padding: .85em 1em;
+      margin: 0 0 .50em;
+      padding: .5em .4em;
       color: #000;
-      background: transparent;
+      background: #eeeeee;
       font-size: .95em;
       font-weight: bold;
       letter-spacing: .04em;
@@ -137,7 +139,7 @@
 
     th,
     td {
-      padding: .4em .5em;
+      padding: .25em .4em;
       border: 0;
       background: transparent;
       vertical-align: top;
@@ -156,7 +158,7 @@
 
     td {
       color: #000;
-      line-height: 1.45;
+      line-height: 1.25;
     }
 
     tr.subtitle {
@@ -194,31 +196,89 @@
 
   .license-pool-tables {
     display: grid;
-    gap: 1.5em;
+    gap: 1em;
   }
 
   .license-pool-data-section {
-    h3 {
+    &.license-information-section .license-pool-record-tables {
+      grid-template-columns: 1fr;
+    }
+
+    summary {
+      display: flex;
+      align-items: center;
+      gap: .4em;
       margin: 0 0 .5em;
+      cursor: pointer;
       color: #000;
       font-size: .9em;
       font-weight: bold;
       letter-spacing: .03em;
       text-transform: uppercase;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      &::before {
+        content: "▸";
+        display: inline-block;
+        font-size: .9em;
+        transition: transform .15s ease;
+      }
+    }
+
+    &[open] > summary::before {
+      transform: rotate(90deg);
     }
 
     .license-pool-record-tables {
       display: grid;
-      gap: 1em;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: .75em;
     }
 
     .custom-book-table caption {
-      padding: 0 0 .4em;
+      padding: .5em;
       color: #000;
-      font-size: .85em;
+      font-size: .95em;
       font-weight: bold;
       text-align: left;
+      background: #eeeeee;
     }
+
+    .custom-book-table th,
+    .custom-book-table td {
+      padding: .25em .4em;
+    }
+
+    .custom-book-table td {
+      line-height: 1.25;
+    }
+
+    .license-status-document-link {
+      text-decoration: underline;
+
+      &:hover,
+      &:focus {
+        text-decoration-thickness: 2px;
+      }
+    }
+  }
+
+  details.license-pool-data-section {
+    summary {
+      margin: 0;
+    }
+
+    &[open] summary {
+      margin-bottom: .6em;
+    }
+  }
+
+  .license-information {
+    display: grid;
+    gap: .75em;
   }
 
   .custom-book-details-main {
@@ -274,7 +334,7 @@
     .custom-book-table {
       th,
       td {
-        padding: .35em .4em;
+        padding: .25em .4em;
       }
 
       th {

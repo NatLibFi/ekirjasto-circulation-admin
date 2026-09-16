@@ -221,6 +221,11 @@ function renderBookTables(
           ["Title", book.title],
           ["Subtitle", book.subtitle],
           ["ISBN", isbn(book)],
+          ["Authors", book.authors],
+          [
+            "Contributors",
+            book.contributors && book.contributors.map(formatContributor),
+          ],
           ["Language", book.language],
           ["Medium", medium(book)],
           ["Published", book.published],
@@ -231,14 +236,8 @@ function renderBookTables(
         ]}
       />
       <BookDetailsTable
-        title="Authors and Contributors"
-        rows={[
-          ["Authors", book.authors],
-          [
-            "Contributors",
-            book.contributors && book.contributors.map(formatContributor),
-          ],
-        ]}
+        title="DRMs and formats"
+        rows={[["DRM", drm(book)], ["Formats", formats(book)]]}
       />
       <BookDetailsTable
         title="Classifications"
@@ -248,18 +247,6 @@ function renderBookTables(
           ["Target age", targetAge(book)],
           ["Fiction", fictionType(book)],
         ]}
-      />
-      <BookDetailsTable
-        title="Availability"
-        rows={[
-          ["Copies owned", copiesOwned(book)],
-          ["Copies available", copiesAvailable(book)],
-          ["Patrons in queue", patronsInQueue(book)],
-        ]}
-      />
-      <BookDetailsTable
-        title="DRMs and formats"
-        rows={[["DRM", drm(book)], ["Formats", formats(book)]]}
       />
       <LicensePool
         data={props.circulationData}
@@ -356,13 +343,13 @@ function renderBookTableRow(
   value: string | number | string[] | null | undefined | JSX.Element
 ) {
   const values = Array.isArray(value) ? value : [value];
-  const displayValues = values.length && values.some(Boolean) ? values : ["—"];
+  const displayValues = values.length && values.some(Boolean) ? values : [""];
   const className = name.toLowerCase().replace(/\s/g, "-");
 
   return displayValues.map((item, index) => (
     <tr key={`${name}-${index}`} className={className}>
       <th scope="row">{index === 0 ? name : null}</th>
-      <td>{item || "—"}</td>
+      <td>{item || ""}</td>
     </tr>
   ));
 }
@@ -407,24 +394,6 @@ function targetAge(book: BookDetailsProps["book"]): string | string[] | null {
     book.targetAgeRange ||
     categoryLabel(book, "http://schema.org/typicalAgeRange")
   );
-}
-
-function copiesOwned(book: BookData): number | string | null {
-  return book.copies && book.copies.total !== undefined
-    ? book.copies.total
-    : null;
-}
-
-function copiesAvailable(book: BookData): number | string | null {
-  return book.copies && book.copies.available !== undefined
-    ? book.copies.available
-    : isOpenAccess(book)
-    ? "Open access"
-    : null;
-}
-
-function patronsInQueue(book: BookData): number | string | null {
-  return book.holds && book.holds.total !== undefined ? book.holds.total : null;
 }
 
 function rawValue(book: BookData, key: string): string | null {

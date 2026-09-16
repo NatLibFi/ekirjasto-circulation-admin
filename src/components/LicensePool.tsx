@@ -22,11 +22,7 @@ interface LoanTableRowsProps {
   loan: CirculationLoan;
 }
 
-interface HoldTableRowsProps {
-  hold: CirculationHold;
-}
-
-/** Displays license pool, license, loan, and hold information. */
+/** Displays license pool, license, and loan information. */
 export class LicensePool extends React.Component<LicensePoolProps> {
   render(): JSX.Element {
     const { data, isFetching, fetchError } = this.props;
@@ -64,9 +60,10 @@ function LicensePoolTables({ pool }: { pool: LicensePoolData }): JSX.Element {
   return (
     <div className="license-pool-tables">
       <LicensePoolTable pool={pool} />
+      <HoldInformationSection holds={pool.holds || []} />
       <LicenseInformationSection licenses={pool.licenses} />
-      <LoanInformationSection loans={pool.loans} />
-      <HoldInformationSection holds={pool.holds} />
+      {/* We do not have license pool level loans at the moment */}
+      {/* <LoanInformationSection loans={pool.loans || []} /> */}
     </div>
   );
 }
@@ -81,14 +78,19 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
         )}
         {renderBookTableRow("Licenses owned", pool.licenses_owned)}
         {renderBookTableRow("Licenses available", pool.licenses_available)}
-        {renderBookTableRow("Licenses reserved", pool.licenses_reserved)}
+        {renderBookTableRow("Holds", pool.patrons_in_hold_queue ?? 0)}
+        {renderBookTableRow(
+          "Holds ratio",
+          pool.patrons_in_hold_queue !== null &&
+            pool.patrons_in_hold_queue !== undefined &&
+            pool.licenses_owned
+            ? `${((pool.patrons_in_hold_queue / pool.licenses_owned) * 100).toFixed(1)}%`
+            : ""
+        )}
+        {renderBookTableRow("Licenses reserved (ready to checkout)", pool.licenses_reserved)}
         {renderBookTableRow("Open access", String(pool.open_access))}
         {renderBookTableRow("Unlimited access", String(pool.unlimited_access))}
         {renderBookTableRow("Hidden", String(pool.suppressed))}
-        {renderBookTableRow(
-          "Patrons in hold queue",
-          pool.patrons_in_hold_queue
-        )}
       </tbody>
     </table>
   );
@@ -100,12 +102,16 @@ function LicenseInformationSection({
   licenses: CirculationLicense[];
 }): JSX.Element {
   return (
-    <section className="license-pool-data-section">
-      <h3>License information</h3>
+    <section className="license-pool-data-section license-information-section">
+      <h2>Licenses ({licenses.length})</h2>
       <div className="license-pool-record-tables">
         {licenses.length ? (
-          licenses.map((license) => (
-            <LicenseInformationTable key={license.id} license={license} />
+          licenses.map((license, index) => (
+            <LicenseInformation
+              key={license.id}
+              license={license}
+              position={index + 1}
+            />
           ))
         ) : (
           <table className="custom-book-table">
@@ -117,24 +123,50 @@ function LicenseInformationSection({
   );
 }
 
+function LicenseInformation({
+  license,
+  position,
+}: LicenseTableRowsProps & { position: number }): JSX.Element {
+  return (
+    <div className="license-information">
+      <LicenseInformationTable license={license} position={position} />
+      <LoanInformationSection loans={license.loans} />
+    </div>
+  );
+}
+
+function LicenseInformationTable({
+  license,
+  position,
+}: LicenseTableRowsProps & { position: number }): JSX.Element {
+  return (
+    <table className="custom-book-table">
+      <caption>License ({position}) {license.identifier}</caption>
+      <tbody>
+        <LicenseTableRows license={license} />
+      </tbody>
+    </table>
+  );
+}
+
 function LoanInformationSection({
   loans,
 }: {
   loans: CirculationLoan[];
 }): JSX.Element {
   return (
-    <section className="license-pool-data-section">
-      <h3>Loan information</h3>
+    <details className="license-pool-data-section">
+      <summary>Active Loans{loans.length ? ` (${loans.length})` : " (0)"}</summary>
       <div className="license-pool-record-tables">
         {loans.length ? (
           loans.map((loan) => <LoanInformationTable key={loan.id} loan={loan} />)
         ) : (
           <table className="custom-book-table">
-            <tbody>{renderBookTableRow("Loans", "—")}</tbody>
+            <tbody>{renderBookTableRow("Loans", "No loans")}</tbody>
           </table>
         )}
       </div>
-    </section>
+    </details>
   );
 }
 
@@ -144,31 +176,18 @@ function HoldInformationSection({
   holds: CirculationHold[];
 }): JSX.Element {
   return (
-    <section className="license-pool-data-section">
-      <h3>Hold information</h3>
+    <details className="license-pool-data-section">
+      <summary>Holds{holds.length ? ` (${holds.length})` : " (0)"}</summary>
       <div className="license-pool-record-tables">
         {holds.length ? (
           holds.map((hold) => <HoldInformationTable key={hold.id} hold={hold} />)
         ) : (
           <table className="custom-book-table">
-            <tbody>{renderBookTableRow("Holds", "—")}</tbody>
+            <tbody>{renderBookTableRow("Holds", "No holds")}</tbody>
           </table>
         )}
       </div>
-    </section>
-  );
-}
-
-function LicenseInformationTable({
-  license,
-}: LicenseTableRowsProps): JSX.Element {
-  return (
-    <table className="custom-book-table">
-      <caption>License {license.identifier}</caption>
-      <tbody>
-        <LicenseTableRows license={license} />
-      </tbody>
-    </table>
+    </details>
   );
 }
 
@@ -183,7 +202,7 @@ function LoanInformationTable({ loan }: LoanTableRowsProps): JSX.Element {
   );
 }
 
-function HoldInformationTable({ hold }: HoldTableRowsProps): JSX.Element {
+function HoldInformationTable({ hold }: { hold: CirculationHold }): JSX.Element {
   return (
     <table className="custom-book-table">
       <caption>Hold {hold.id}</caption>
@@ -200,14 +219,16 @@ function LicenseTableRows({ license }: LicenseTableRowsProps): JSX.Element {
       {renderBookTableRow("License identifier (datasource)", license.identifier)}
       {renderBookTableRow("License ID (database)", license.id)}
       {renderBookTableRow("License status", license.status)}
-      {renderBookTableRow(
-        "License status document",
-        <a href={license.status_url}>{license.status_url}</a>
-      )}
-      {renderBookTableRow("Checkout URL", license.checkout_url)}
       {renderBookTableRow("Concurrency", license.terms_concurrency)}
       {renderBookTableRow("Checkouts available", license.checkouts_available)}
       {renderBookTableRow("Checkouts left", license.checkouts_left)}
+      {renderBookTableRow(
+        "License status document",
+        <a className="license-status-document-link" href={license.status_url}>
+          {license.status_url}
+        </a>
+      )}
+      {renderBookTableRow("Checkout URL", license.checkout_url)}
       {renderBookTableRow(
         "Currently available loans",
         license.currently_available_loans
@@ -239,13 +260,13 @@ function LoanTableRows({ loan }: LoanTableRowsProps): JSX.Element {
       {renderBookTableRow("Loan end", formatDateValue(loan.end, true))}
       {renderBookTableRow(
         "Loan status document (only for viewing)",
-        <a href={loan.loan_status_document}>{loan.loan_status_document}</a>
+        <a className="license-status-document-link" href={loan.loan_status_document}>{loan.loan_status_document}</a>
       )}
     </React.Fragment>
   );
 }
 
-function HoldTableRows({ hold }: HoldTableRowsProps): JSX.Element {
+function HoldTableRows({ hold }: { hold: CirculationHold }): JSX.Element {
   return (
     <React.Fragment key={hold.id}>
       {renderBookTableRow("Hold ID", hold.id)}
@@ -281,13 +302,17 @@ function renderBookTableRow(
   value: string | number | string[] | null | undefined | JSX.Element
 ) {
   const values = Array.isArray(value) ? value : [value];
-  const displayValues = values.length && values.some(Boolean) ? values : ["—"];
+  const displayValues =
+    values.length &&
+    values.some((item) => item !== null && item !== undefined && item !== "")
+      ? values
+      : [""];
   const className = name.toLowerCase().replace(/\s/g, "-");
 
   return displayValues.map((item, index) => (
     <tr key={`${name}-${index}`} className={className}>
       <th scope="row">{index === 0 ? name : null}</th>
-      <td>{item || "—"}</td>
+      <td>{item ?? ""}</td>
     </tr>
   ));
 }
