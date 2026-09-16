@@ -1,5 +1,14 @@
 import * as React from "react";
 import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
+import {
+  CirculationData,
+  CirculationHold,
+  CirculationLicense,
+  CirculationLoan,
+  LicensePoolData,
+} from "../interfaces";
+import { render } from "@testing-library/react";
 
 export interface BookDetailsProps {
   book: BookData & {
@@ -9,6 +18,135 @@ export interface BookDetailsProps {
   };
   // Kept for compatibility with the props supplied by OPDSCatalog.
   updateBook?: (...args: any[]) => any;
+  bookUrl?: string;
+  library?: string;
+}
+
+interface LicensePoolInformationProps {
+  bookUrl?: string;
+  library?: string;
+}
+
+interface LicensePoolInformationState {
+  data: CirculationData | null;
+  isFetching: boolean;
+  hasFetchError: boolean;
+}
+
+/** Fetches and displays circulation information for the current work. */
+class LicensePoolInformation extends React.Component<
+  LicensePoolInformationProps,
+  LicensePoolInformationState
+> {
+  state: LicensePoolInformationState = {
+    data: null,
+    isFetching: false,
+    hasFetchError: false,
+  };
+
+  componentDidMount() {
+    console.debug("[LicensePoolInformation] mounted", {
+      library: this.props.library,
+      bookUrl: this.props.bookUrl,
+    });
+    this.fetchCirculation();
+  }
+
+  componentDidUpdate(previousProps: LicensePoolInformationProps) {
+    if (
+      previousProps.bookUrl !== this.props.bookUrl ||
+      previousProps.library !== this.props.library
+    ) {
+      console.debug("[LicensePoolInformation] props changed", {
+        library: this.props.library,
+        bookUrl: this.props.bookUrl,
+      });
+      this.fetchCirculation();
+    }
+  }
+
+  render(): JSX.Element {
+    const { data, isFetching, hasFetchError } = this.state;
+    return (
+      <section className="custom-book-table-section license-pool-information">
+        <h2>License pool information</h2>
+        {isFetching && !data ? (
+          <table className="custom-book-table">
+            <tbody>{renderBookTableRow("Status", "Loading…")}</tbody>
+          </table>
+        ) : hasFetchError ? (
+          <table className="custom-book-table">
+            <tbody>
+              {renderBookTableRow(
+                "Status",
+                "License pool information could not be loaded"
+              )}
+            </tbody>
+          </table>
+        ) : data && data.license_pools.length ? (
+          data.license_pools.map(renderLicensePool)
+        ) : (
+          <table className="custom-book-table">
+            <tbody>{renderBookTableRow("License pools", "—")}</tbody>
+          </table>
+        )}
+      </section>
+    );
+  }
+
+  private fetchCirculation() {
+    const url = circulationUrl(this.props.library, this.props.bookUrl);
+    console.debug("[LicensePoolInformation] circulation URL", {
+      library: this.props.library,
+      bookUrl: this.props.bookUrl,
+      url: url,
+    });
+    if (!url) {
+      console.warn(
+        "[LicensePoolInformation] no circulation URL could be derived"
+      );
+      return;
+    }
+
+    console.debug("[LicensePoolInformation] fetching", url);
+    this.setState({ isFetching: true, hasFetchError: false });
+    const fetcher = new DataFetcher();
+    fetcher
+      .fetch(url)
+      .then((response) => {
+        console.debug("[LicensePoolInformation] response", {
+          url: url,
+          status: response.status,
+          ok: response.ok,
+        });
+        if (!response.ok) {
+          throw new Error(`Circulation request failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data: CirculationData) => {
+        console.debug("[LicensePoolInformation] data received", {
+          identifier: data && data.identifier,
+          licensePools: data && data.license_pools
+            ? data.license_pools.length
+            : 0,
+          licenses: data && data.license_pools
+            ? data.license_pools.reduce(
+                (count, pool) => count + (pool.licenses || []).length,
+                0
+              )
+            : 0,
+        });
+        this.setState({ data, isFetching: false, hasFetchError: false });
+      })
+      .catch((error) => {
+        console.error("[LicensePoolInformation] fetch failed", {
+          url: url,
+          error: error,
+        });
+        this.setState({ isFetching: false, hasFetchError: true });
+      });
+  }
 }
 
 interface SummaryCellProps {
@@ -67,7 +205,7 @@ export default class BookDetails extends React.Component<BookDetailsProps> {
             {book.series && book.series.name && (
               <p className="series">{book.series.name}</p>
             )}
-            {renderBookTables(book)}
+            {renderBookTables(book, this.props)}
           </div>
         </div>
 
@@ -143,7 +281,10 @@ function BookCover({ book }: { book: BookData }) {
   );
 }
 
-function renderBookTables(book: BookDetailsProps["book"]) {
+function renderBookTables(
+  book: BookDetailsProps["book"],
+  props: BookDetailsProps
+) {
   return (
     <div className="custom-book-tables" lang="en">
       <BookDetailsTable
@@ -192,8 +333,128 @@ function renderBookTables(book: BookDetailsProps["book"]) {
         title="DRMs and formats"
         rows={[["DRM", drm(book)], ["Formats", formats(book)]]}
       />
+      <LicensePoolInformation
+        library={props.library}
+        bookUrl={props.bookUrl}
+      />
     </div>
   );
+}
+
+function circulationUrl(library: string, bookUrl: string): string | null {
+  if (!library || !bookUrl) {
+    return null;
+  }
+
+  // Catalog collection URLs may include the cache-busting query string
+  // (for example, "test-lib?max_cache_age=0"). The route expects only the
+  // library slug in this position.
+  const librarySlug = library.split(/[/?#]/)[0];
+  if (!librarySlug) {
+    return null;
+  }
+
+  const worksMarker = "/works/";
+  const worksIndex = bookUrl.indexOf(worksMarker);
+  if (worksIndex === -1) {
+    return null;
+  }
+
+  const identifierPath = bookUrl
+    .substring(worksIndex + worksMarker.length)
+    .split(/[?#]/)[0];
+  const parts = identifierPath.split("/");
+  if (parts.length < 2 || !parts[0] || !parts.slice(1).join("/")) {
+    return null;
+  }
+
+  return `/${librarySlug}/admin/works/${parts[0]}/${parts
+    .slice(1)
+    .join("/")}/circulation`;
+}
+
+function renderLicensePool(pool: LicensePoolData): JSX.Element {
+  return (
+    <table className="custom-book-table" key={pool.id}>
+      <tbody>
+        {renderBookTableRow("Licensepool created", formatDateValue(pool.availability_time))}
+        {renderBookTableRow("Licenses owned", pool.licenses_owned)}
+        {renderBookTableRow("Licenses available", pool.licenses_available)}
+        {renderBookTableRow("Licenses reserved", pool.licenses_reserved)}
+        {renderBookTableRow("Open access", String(pool.open_access))}
+        {renderBookTableRow("Unlimited access", String(pool.unlimited_access))}
+        {renderBookTableRow("Suppressed", String(pool.suppressed))}
+        {renderBookTableRow(
+          "Patrons in hold queue",
+          pool.patrons_in_hold_queue
+        )}
+        {pool.licenses.map(renderLicense)}
+        {pool.loans.map(renderLoan)}
+        {pool.holds.map(renderHold)}
+      </tbody>
+    </table>
+  );
+}
+
+function renderLicense(license: CirculationLicense): JSX.Element {
+  return (
+    <React.Fragment key={license.id}>
+      {renderBookTableRow("License ID", license.id)}
+      {renderBookTableRow("License status", license.status)}
+      {renderBookTableRow("License status source", 
+        <a href={license.status_url}>{license.status_url}</a>)}
+      {renderBookTableRow("License identifier", license.identifier)}
+      {renderBookTableRow(
+        "Checkout URL", license.checkout_url
+      )}
+      {renderBookTableRow("Concurrency", license.terms_concurrency)}
+      {renderBookTableRow("Checkouts available", license.checkouts_available)}
+      {renderBookTableRow("Checkouts left", license.checkouts_left)}
+      {renderBookTableRow(
+        "Currently available loans",
+        license.currently_available_loans
+      )}
+      {renderBookTableRow("Total remaining loans (min(concurrency, checkouts left))", license.total_remaining_loans)}
+      {renderBookTableRow("Expires", formatDateValue(license.expires))}
+      {renderBookTableRow("Inactive", String(license.is_inactive))}
+      {renderBookTableRow("Loan limited", String(license.is_loan_limited))}
+      {renderBookTableRow("Time limited", String(license.is_time_limited))}
+      {renderBookTableRow("Perpetual", String(license.is_perpetual))}
+      {renderBookTableRow("Missing from feed", String(license.is_missing))}
+      {renderBookTableRow(
+        "Last checked in feed",
+        formatDateValue(license.last_checked)
+      )}
+    </React.Fragment>
+  );
+}
+
+function renderLoan(loan: CirculationLoan): JSX.Element {
+  return (
+    <React.Fragment key={loan.id}>
+      {renderBookTableRow("Loan ID", loan.id)}
+      {renderBookTableRow("Patron ID", loan.patron_id)}
+      {renderBookTableRow("License identifier", loan.license_id)}
+      {renderBookTableRow("Loan start", formatDateValue(loan.start, true))}
+      {renderBookTableRow("Loan end", formatDateValue(loan.end, true))}
+    </React.Fragment>
+  );
+}
+
+function renderHold(hold: CirculationHold): JSX.Element {
+  return (
+    <React.Fragment key={hold.id}>
+      {renderBookTableRow("Hold ID", hold.id)}
+      {renderBookTableRow("Patron ID", hold.patron_id)}
+      {renderBookTableRow("Hold position", hold.position)}
+      {renderBookTableRow("Hold start", formatDateValue(hold.start, true))}
+      {renderBookTableRow("Hold end", formatDateValue(hold.end, true))}
+    </React.Fragment>
+  );
+}
+
+function formatDateValue(value: string | null, includeTime = false): string | null {
+  return value ? formatDate(value, includeTime) : null;
 }
 
 function BookDetailsTable({
@@ -551,7 +812,7 @@ function isOpenAccess(book: BookData): boolean {
   return !!(book.openAccessLinks && book.openAccessLinks.length);
 }
 
-function formatDate(value: string): string {
+function formatDate(value: string, includeTime = false): string {
   const date = new Date(value);
   return isNaN(date.getTime())
     ? value
@@ -559,6 +820,10 @@ function formatDate(value: string): string {
         year: "numeric",
         month: "long",
         day: "numeric",
+        ...(includeTime && {
+          hour: "numeric",
+          minute: "2-digit",
+        }),
         timeZone: "UTC",
       });
 }
