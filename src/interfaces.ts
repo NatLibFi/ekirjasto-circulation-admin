@@ -52,6 +52,69 @@ export interface BookData {
   coverUrl?: string;
 }
 
+export interface CirculationIdentifier {
+  identifier: string;
+  type: string;
+}
+
+export interface CirculationLicense {
+  checkout_url: string;
+  checkouts_available: number | null;
+  checkouts_left: number | null;
+  currently_available_loans: number | null;
+  expires: string | null;
+  id: number;
+  identifier: string;
+  is_inactive: boolean;
+  is_loan_limited: boolean;
+  is_missing: boolean;
+  is_perpetual: boolean;
+  is_time_limited: boolean;
+  last_checked: string | null;
+  status: string;
+  status_url: string;
+  terms_concurrency: number | null;
+  total_remaining_loans: number | null;
+}
+
+export interface CirculationLoan {
+  end: string;
+  external_identifier: string;
+  id: number;
+  license_id: number;
+  patron_database_id: number;
+  patron_id: string;
+  start: string;
+}
+
+export interface CirculationHold extends CirculationLoan {
+  position: number;
+}
+
+export interface LicensePoolData {
+  availability_time: string | null;
+  collection: { id: number; name: string };
+  data_source: { id: number; name: string };
+  holds: CirculationHold[];
+  id: number;
+  identifier: CirculationIdentifier;
+  licenses: CirculationLicense[];
+  licenses_available: number;
+  licenses_owned: number;
+  licenses_reserved: number;
+  loans: CirculationLoan[];
+  open_access: boolean;
+  patrons_in_hold_queue: number;
+  presentation_edition_id: number;
+  suppressed: boolean;
+  unlimited_access: boolean;
+}
+
+export interface CirculationData {
+  identifier: CirculationIdentifier;
+  license_pools: LicensePoolData[];
+}
+
 export interface RolesData {
   [key: string]: string;
 }
