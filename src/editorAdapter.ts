@@ -124,6 +124,7 @@ export default function adapter(data: OPDSEntry): BookData {
     updated: data.updated,
     rating: rating,
     coverUrl: coverUrl,
+    accessibility: data.accessibility,
     raw: data.unparsed,
   };
 }

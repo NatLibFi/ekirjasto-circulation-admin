@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+import Accessibility from "@natlibfi/ekirjasto-opds-feed-parser/lib/src/accessibility";
+
 export interface FeatureFlags {
   enableAutoList?: boolean;
 }
@@ -50,6 +52,7 @@ export interface BookData {
   issued?: string;
   rating?: number;
   coverUrl?: string;
+  accessibility?: Accessibility;
   raw?: any;
 }
 

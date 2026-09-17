@@ -1,9 +1,11 @@
 import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import Accessibility from "@natlibfi/ekirjasto-opds-feed-parser/lib/src/accessibility";
 
 export type ExtendedBookData = BookData & {
   updated?: string;
   issued?: string;
   targetAgeRange?: string[];
+  accessibility?: Accessibility;
 };
 
 interface RawAttribute {
@@ -137,6 +139,24 @@ export function targetAge(book: ExtendedBookData): string | string[] | null {
     book.targetAgeRange ||
     categoryLabel(book, "http://schema.org/typicalAgeRange")
   );
+}
+
+export function accessibilityConformance(
+  book: ExtendedBookData
+): string | null {
+  return book.accessibility &&
+    book.accessibility.conformance &&
+    book.accessibility.conformance.conformsTo
+    ? book.accessibility.conformance.conformsTo
+    : null;
+}
+
+export function accessibilityFeatures(book: ExtendedBookData): string[] | null {
+  const features =
+    book.accessibility &&
+    book.accessibility.waysOfReading &&
+    book.accessibility.waysOfReading.features;
+  return features && features.length ? features : null;
 }
 
 function rawValue(book: BookData, key: string): string | null {

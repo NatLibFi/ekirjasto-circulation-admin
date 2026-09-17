@@ -3,10 +3,7 @@ import { Store } from "redux";
 import { connect } from "react-redux";
 import editorAdapter from "../editorAdapter";
 import ActionCreator from "../actions";
-import {
-  BookData,
-  FetchErrorData,
-} from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import { CirculationData } from "../interfaces";
 import { RootState } from "../store";
@@ -16,6 +13,8 @@ import BookDetailsTableSection from "./BookDetailsTableSection";
 import SummaryContainer from "./SummaryContainer";
 import {
   audience,
+  accessibilityConformance,
+  accessibilityFeatures,
   circulationDataUrl,
   copiesAvailable,
   copiesOwned,
@@ -37,7 +36,7 @@ import {
 
 export interface BookDetailsProps {
   book: ExtendedBookData;
-  workEntry?: BookData;
+  workEntry?: ExtendedBookData;
   // Kept for compatibility with the props supplied by OPDSCatalog.
   updateBook?: (...args: any[]) => any;
   bookUrl?: string;
@@ -173,6 +172,16 @@ function renderBookTables(
           ["Audience", audience(book)],
           ["Target age", targetAge(book)],
           ["Fiction", fictionType(book)],
+        ]}
+      />
+      <BookDetailsTableSection
+        title="Accessibility"
+        rows={[
+          [
+            "Conformance",
+            accessibilityConformance(props.workEntry || book),
+          ],
+          ["Ways of reading", accessibilityFeatures(props.workEntry || book)],
         ]}
       />
       <BookDetailsTableSection
