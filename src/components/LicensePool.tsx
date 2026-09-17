@@ -222,32 +222,60 @@ function LicenseTableRows({ license }: LicenseTableRowsProps): JSX.Element {
       {renderBookTableRow("Concurrency", license.terms_concurrency)}
       {renderBookTableRow("Checkouts available", license.checkouts_available)}
       {renderBookTableRow("Checkouts left", license.checkouts_left)}
+      {renderBookTableRow("Expires", formatDateValue(license.expires, true))}
       {renderBookTableRow(
         "License status document",
         <a className="license-status-document-link" href={license.status_url}>
           {license.status_url}
         </a>
       )}
-      {renderBookTableRow("Checkout URL", license.checkout_url)}
-      {renderBookTableRow(
-        "Currently available loans",
-        license.currently_available_loans
-      )}
-      {renderBookTableRow(
-        "Total remaining loans (min(concurrency, checkouts left))",
-        license.total_remaining_loans
-      )}
-      {renderBookTableRow("Expires", formatDateValue(license.expires, true))}
-      {renderBookTableRow("Inactive", String(license.is_inactive))}
-      {renderBookTableRow("Loan pool", String(license.is_loan_limited))}
-      {renderBookTableRow("Time limited", String(license.is_time_limited))}
-      {renderBookTableRow("Perpetual", String(license.is_perpetual))}
-      {renderBookTableRow("Missing from feed", String(license.is_missing))}
-      {renderBookTableRow(
-        "Last checked in feed",
-        formatDateValue(license.last_checked)
-      )}
+      <tr className="license-additional-fields-row">
+        <td colSpan={2}>
+          <LicenseAdditionalFieldsDetails license={license} />
+        </td>
+      </tr>
     </React.Fragment>
+  );
+}
+
+function LicenseAdditionalFieldsDetails({
+  license,
+}: LicenseTableRowsProps): JSX.Element {
+  const [expanded, setExpanded] = React.useState(false);
+
+  return (
+    <details
+      className="license-additional-fields"
+      onToggle={(event: React.SyntheticEvent<HTMLDetailsElement>) =>
+        setExpanded(event.currentTarget.open)
+      }
+    >
+      <summary aria-expanded={expanded}>
+        {expanded ? "Show less" : "Show more"}
+      </summary>
+      <table className="custom-book-table">
+        <tbody>
+          {renderBookTableRow("Checkout URL", license.checkout_url)}
+          {renderBookTableRow(
+            "Currently available loans",
+            license.currently_available_loans
+          )}
+          {renderBookTableRow(
+            "Total remaining loans (min(concurrency, checkouts left))",
+            license.total_remaining_loans
+          )}
+          {renderBookTableRow("Inactive", String(license.is_inactive))}
+          {renderBookTableRow("Loan pool", String(license.is_loan_limited))}
+          {renderBookTableRow("Time limited", String(license.is_time_limited))}
+          {renderBookTableRow("Perpetual", String(license.is_perpetual))}
+          {renderBookTableRow("Missing from feed", String(license.is_missing))}
+          {renderBookTableRow(
+            "Last checked in feed",
+            formatDateValue(license.last_checked)
+          )}
+        </tbody>
+      </table>
+    </details>
   );
 }
 
