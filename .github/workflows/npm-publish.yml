@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - main
+
   release:
     types: [published]
+
   workflow_call:
     inputs:
       version-source:
@@ -26,77 +28,227 @@ concurrency:
   group: npm-publish-${{ github.ref_name }}-${{ github.event_name }}
   cancel-in-progress: true
 
-permissions:
-  id-token: write  # Required for OIDC
-  contents: read
-
 jobs:
   npm-publish:
+    name: Publish npm package
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Resolve publish parameters (push)
+      - name: Resolve publish parameters for push
         if: github.event_name == 'push'
+        shell: bash
         run: |
-          echo "VERSION_SOURCE=dunamai" >> "$GITHUB_ENV"
-          echo "PUBLISH_TAG=next" >> "$GITHUB_ENV"
+          echo "VERSION_SOURCE=dunamai" >> "${GITHUB_ENV}"
+          echo "PUBLISH_TAG=next" >> "${GITHUB_ENV}"
 
-      - name: Resolve publish parameters (release)
+      - name: Resolve publish parameters for release
         if: github.event_name == 'release'
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          echo "VERSION_SOURCE=release-tag" >> "$GITHUB_ENV"
-          echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
-          echo "PUBLISH_TAG=latest" >> "$GITHUB_ENV"
+          echo "VERSION_SOURCE=release-tag" >> "${GITHUB_ENV}"
+          echo "RELEASE_TAG=${RELEASE_TAG}" >> "${GITHUB_ENV}"
+          echo "PUBLISH_TAG=latest" >> "${GITHUB_ENV}"
 
-      - name: Resolve publish parameters (workflow_call)
+      - name: Resolve publish parameters for workflow call
         if: github.event_name == 'workflow_call'
+        shell: bash
+        env:
+          INPUT_VERSION_SOURCE: ${{ inputs.version-source }}
+          INPUT_RELEASE_TAG: ${{ inputs.release-tag }}
+          INPUT_PUBLISH_TAG: ${{ inputs.publish-tag }}
         run: |
-          echo "VERSION_SOURCE=${{ inputs.version-source }}" >> "$GITHUB_ENV"
-          echo "RELEASE_TAG=${{ inputs.release-tag }}" >> "$GITHUB_ENV"
-          echo "PUBLISH_TAG=${{ inputs.publish-tag }}" >> "$GITHUB_ENV"
+          echo \
+            "VERSION_SOURCE=${INPUT_VERSION_SOURCE}" \
+            >> "${GITHUB_ENV}"
 
-      - uses: actions/checkout@v4
+          echo \
+            "RELEASE_TAG=${INPUT_RELEASE_TAG}" \
+            >> "${GITHUB_ENV}"
+
+          echo \
+            "PUBLISH_TAG=${INPUT_PUBLISH_TAG}" \
+            >> "${GITHUB_ENV}"
+
+      - name: Validate publish parameters
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${VERSION_SOURCE}" != "dunamai" &&
+                "${VERSION_SOURCE}" != "release-tag" ]]
+          then
+            echo \
+              "Version source must be dunamai or release-tag. Got: ${VERSION_SOURCE}" >&2
+            exit 1
+          fi
+
+          if [[ "${VERSION_SOURCE}" == "release-tag" ]]; then
+            if [[ ! "${RELEASE_TAG:-}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo \
+                "Release tag must match vX.Y.Z. Got: ${RELEASE_TAG:-}" >&2
+              exit 1
+            fi
+          fi
+
+          if [[ -z "${PUBLISH_TAG:-}" ]]; then
+            echo "npm publish tag must not be empty" >&2
+            exit 1
+          fi
+
+      - name: Validate GitHub Release
+        if: github.event_name == 'release'
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TARGET: ${{ github.event.release.target_commitish }}
+        run: |
+          set -euo pipefail
+
+          EXPECTED_TARGET="release/${RELEASE_TAG}"
+
+          if [[ "${RELEASE_TARGET}" != "${EXPECTED_TARGET}" ]]; then
+            echo \
+              "Release target must be ${EXPECTED_TARGET}. Got: ${RELEASE_TARGET}" >&2
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20.18
+          node-version: "20.18"
           registry-url: https://registry.npmjs.org/
           cache: npm
 
-      - name: Upgrade npm (trusted publishing requirement) ⬆️
+      - name: Upgrade npm for trusted publishing
         run: npm install -g npm@^11.5.1
 
-      - name: Set up Python 🐍
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_call' && inputs.version-source == 'dunamai') }}
+      - name: Set up Python
+        if: >-
+          github.event_name == 'push' ||
+          (
+            github.event_name == 'workflow_call' &&
+            inputs.version-source == 'dunamai'
+          )
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Set up Dunamai 🪄
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_call' && inputs.version-source == 'dunamai') }}
+      - name: Set up Dunamai
+        if: >-
+          github.event_name == 'push' ||
+          (
+            github.event_name == 'workflow_call' &&
+            inputs.version-source == 'dunamai'
+          )
         run: pip install -r requirements-ci.txt
 
-      - name: Install locked dependencies 🔧
+      - name: Install locked dependencies
         run: npm ci
 
-      - name: Version ✅
+      - name: Set package version
+        shell: bash
         run: |
-          if [ "${VERSION_SOURCE}" = "dunamai" ]; then
-            npm version --no-git-tag-version $(dunamai from git --style semver)
+          set -euo pipefail
+
+          if [[ "${VERSION_SOURCE}" == "dunamai" ]]; then
+            VERSION="$(dunamai from git --style semver)"
           else
-            if [ -z "${RELEASE_TAG}" ]; then
-              echo "release-tag input is required when version-source is not 'dunamai'." 1>&2
-              exit 1
-            fi
-            npm version --no-git-tag-version "${RELEASE_TAG}"
+            VERSION="${RELEASE_TAG}"
           fi
 
-      - name: Test 🧪
+          echo "Publishing package version ${VERSION}"
+          npm version --no-git-tag-version "${VERSION}"
+
+      - name: Test
         env:
           TZ: Europe/Helsinki
         run: npm test
 
-      - name: Publish 📚 (OIDC Trusted Publishing)
-        run: npm publish --tag "${PUBLISH_TAG}" --access public --provenance
+      - name: Publish to npm with OIDC trusted publishing
+        run: |
+          npm publish \
+            --tag "${PUBLISH_TAG}" \
+            --access public \
+            --provenance
+
+  mark-released:
+    name: Mark PRs as released
+    needs: [npm-publish]
+
+    # Only GitHub Release publications mark PRs as released.
+    if: github.event_name == 'release'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Create released label if needed
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if ! gh label list \
+            --limit 1000 \
+            --json name \
+            --jq '.[].name' |
+            grep -Fxq "released"
+          then
+            echo "Creating label released"
+
+            gh label create "released" \
+              --color "0E8A16" \
+              --description "Included in a published release"
+          fi
+
+      - name: Mark release PRs as released
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          RELEASE_LABEL="release:${RELEASE_TAG}"
+
+          gh pr list \
+            --state merged \
+            --label "${RELEASE_LABEL}" \
+            --limit 100 \
+            --json number,title \
+            --jq '
+              .[]
+              | [.number, .title]
+              | @tsv
+            ' \
+            > released-prs.txt
+
+          if [[ ! -s released-prs.txt ]]; then
+            echo "No PRs found with label ${RELEASE_LABEL}" >&2
+            exit 1
+          fi
+
+          while IFS=$'\t' read -r pr title
+          do
+            echo "Marking PR #${pr} as released: ${title}"
+
+            gh pr edit "${pr}" \
+              --add-label "released"
+          done < released-prs.txt
