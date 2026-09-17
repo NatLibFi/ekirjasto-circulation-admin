@@ -6,6 +6,23 @@ export type ExtendedBookData = BookData & {
   targetAgeRange?: string[];
 };
 
+interface RawAttribute {
+  value?: string;
+  _?: string;
+}
+
+interface RawNode {
+  [key: string]: any;
+  $?: { [key: string]: RawAttribute };
+}
+
+function rawArray<T>(value: T | T[] | null | undefined): T[] {
+  if (value === null || value === undefined) {
+    return [];
+  }
+  return Array.isArray(value) ? value : [value];
+}
+
 export function formatContributor(contributor: {
   name: string;
   role?: string;
@@ -85,12 +102,12 @@ export function circulationUrl(
         .map((key) => book.raw[key])
     : [];
   const rawLinks = rawLinkValues.reduce(
-    (links: any[], value: any) =>
-      links.concat(Array.isArray(value) ? value : value ? [value] : []),
+    (links: RawNode[], value: RawNode | RawNode[]) =>
+      links.concat(rawArray(value)),
     []
   );
   const circulationLink = rawLinks.find(
-    (link: any) =>
+    (link: RawNode) =>
       link &&
       link["$"] &&
       link["$"].rel &&
@@ -130,10 +147,14 @@ export function circulationUrl(
     .join("/")}/circulation`;
 }
 
-function rawAttributeValue(attribute: any): string | null {
+function rawAttributeValue(
+  attribute: RawAttribute | string | number | null | undefined
+): string | null {
   return attribute && typeof attribute === "object"
     ? attribute.value || attribute._ || null
-    : attribute || null;
+    : attribute === null || attribute === undefined
+    ? null
+    : String(attribute);
 }
 
 export function updated(book: ExtendedBookData): string | null {
@@ -160,48 +181,32 @@ export function targetAge(book: ExtendedBookData): string | string[] | null {
 
 function rawValue(book: BookData, key: string): string | null {
   const value = book.raw && book.raw[key];
-  const firstValue = Array.isArray(value) ? value[0] : value;
+  const firstValue = rawArray(value)[0];
   if (firstValue === null || firstValue === undefined) {
     return null;
   }
 
-  if (typeof firstValue === "object") {
-    const textValue = firstValue._ ?? firstValue.value;
-    return textValue === null || textValue === undefined
-      ? null
-      : String(textValue);
-  }
-
-  return String(firstValue);
+  return rawAttributeValue(firstValue);
 }
 
 function categoryLabel(book: BookData, scheme: string): string | null {
   const category = rawCategories(book).find(
-    (candidate) =>
-      candidate["$"] &&
-      candidate["$"]["scheme"] &&
-      normalizeCategoryScheme(candidate["$"]["scheme"].value) ===
-        normalizeCategoryScheme(scheme)
+    (candidate) => categoryScheme(candidate) === normalizeCategoryScheme(scheme)
   );
   return label(category);
 }
 
 export function audience(book: BookData): string | null {
   const audienceCategory = rawCategories(book).find(
-    (category) =>
-      category["$"] &&
-      category["$"]["scheme"] &&
-      category["$"]["scheme"].value === "http://schema.org/audience"
+    (category) => categoryScheme(category) === "http://schema.org/audience"
   );
   return label(audienceCategory);
 }
 
 export function fictionType(book: BookData): string | null {
   const category = rawCategories(book).find((candidate) => {
-    const scheme = candidate["$"] && candidate["$"]["scheme"];
     return (
-      scheme &&
-      normalizeCategoryScheme(scheme.value) ===
+      categoryScheme(candidate) ===
         "http://librarysimplified.org/terms/fiction"
     );
   });
@@ -209,8 +214,14 @@ export function fictionType(book: BookData): string | null {
   return categoryValue(category, "label");
 }
 
-function normalizeCategoryScheme(scheme: string): string {
-  return scheme.replace(/\/$/, "");
+function normalizeCategoryScheme(scheme: string | null): string {
+  return scheme ? scheme.replace(/\/$/, "") : "";
+}
+
+function categoryScheme(category: RawNode): string {
+  return normalizeCategoryScheme(
+    category["$"] && rawAttributeValue(category["$"]["scheme"])
+  );
 }
 
 export function genres(book: BookData): string[] | null {
@@ -224,11 +235,10 @@ export function genres(book: BookData): string[] | null {
     .filter(
       (category) =>
         label(category) &&
-        category["$"] &&
-        category["$"]["scheme"] &&
         excluded
           .concat([fictionScheme])
-          .indexOf(category["$"]["scheme"].value) === -1
+          .map(normalizeCategoryScheme)
+          .indexOf(categoryScheme(category)) === -1
     )
     .map(label)
     .filter(Boolean);
@@ -237,9 +247,7 @@ export function genres(book: BookData): string[] | null {
     values = raw
       .filter(
         (category) =>
-          category["$"] &&
-          category["$"]["scheme"] &&
-          category["$"]["scheme"].value === fictionScheme
+          categoryScheme(category) === normalizeCategoryScheme(fictionScheme)
       )
       .map(label)
       .filter(Boolean);
@@ -249,13 +257,14 @@ export function genres(book: BookData): string[] | null {
 }
 
 export function distributor(book: BookData): string | null {
-  const distributions = book.raw && book.raw["bibframe:distribution"];
+  const distributions = rawArray<RawNode>(
+    book.raw && book.raw["bibframe:distribution"]
+  );
   const provider =
-    distributions &&
     distributions[0] &&
     distributions[0]["$"] &&
     distributions[0]["$"]["bibframe:ProviderName"];
-  return provider ? provider.value : null;
+  return rawAttributeValue(provider);
 }
 
 export function isbn(book: BookData): string | null {
@@ -268,15 +277,16 @@ export function isbn(book: BookData): string | null {
 export function medium(book: BookData): string | null {
   const value =
     book.raw && book.raw["$"] && book.raw["$"]["schema:additionalType"];
-  if (!value || !value.value) {
+  const mediumValue = rawAttributeValue(value);
+  if (!mediumValue) {
     return null;
   }
-  if (value.value === "http://bib.schema.org/Audiobook") {
+  if (mediumValue === "http://bib.schema.org/Audiobook") {
     return "Audio";
   }
   if (
-    value.value === "http://schema.org/EBook" ||
-    value.value === "http://schema.org/Book"
+    mediumValue === "http://schema.org/EBook" ||
+    mediumValue === "http://schema.org/Book"
   ) {
     return "eBook";
   }
@@ -330,11 +340,12 @@ function rawAcquisitionTypes(book: BookData): {
   drm: string[];
   formats: string[];
 } {
-  const links = (book.raw && book.raw.link) || [];
+  const links = rawArray<RawNode>(book.raw && book.raw.link);
   const types = links.reduce(
-    (types: { drm: string[]; formats: string[] }, link: any) => {
+    (types: { drm: string[]; formats: string[] }, link: RawNode) => {
       const rel = link && link["$"] && link["$"].rel;
-      if (!rel || !rel.value || rel.value.indexOf("/acquisition/") === -1) {
+      const relation = rawAttributeValue(rel);
+      if (!relation || relation.indexOf("/acquisition/") === -1) {
         return types;
       }
 
@@ -345,11 +356,13 @@ function rawAcquisitionTypes(book: BookData): {
             key === "indirectAcquisition"
         )
         .reduce(
-          (acquisitions: any[], key) => acquisitions.concat(link[key]),
+          (acquisitions: RawNode[], key) =>
+            acquisitions.concat(rawArray(link[key])),
           []
         );
       if (!indirectAcquisitions.length) {
-        const type = link["$"]["type"] && link["$"]["type"].value;
+        const type =
+          link["$"] && rawAttributeValue(link["$"]["type"]);
         if (type) {
           types.formats.push(type);
         }
@@ -381,17 +394,21 @@ function uniqueValues(values: string[]): string[] {
   return values.filter((value, index) => values.indexOf(value) === index);
 }
 
-function indirectAcquisitionTypeChain(acquisition: any): string[] {
+function indirectAcquisitionTypeChain(acquisition: RawNode): string[] {
   const type =
     acquisition && acquisition["$"] && acquisition["$"]["type"]
-      ? acquisition["$"]["type"].value
-      : acquisition && acquisition.type;
+      ? rawAttributeValue(acquisition["$"]["type"])
+      : rawAttributeValue(acquisition && acquisition.type);
   const nested = Object.keys(acquisition || {})
     .filter(
       (key) =>
         key === "opds:indirectAcquisition" || key === "indirectAcquisition"
     )
-    .reduce((acquisitions: any[], key) => acquisitions.concat(acquisition[key]), []);
+    .reduce(
+      (acquisitions: RawNode[], key) =>
+        acquisitions.concat(rawArray(acquisition[key])),
+      []
+    );
   const nestedChain = nested.length
     ? indirectAcquisitionTypeChain(nested[nested.length - 1])
     : [];
@@ -399,16 +416,16 @@ function indirectAcquisitionTypeChain(acquisition: any): string[] {
 }
 
 function rawCategories(book: BookData): any[] {
-  return (book.raw && book.raw.category) || [];
+  return rawArray<RawNode>(book.raw && book.raw.category);
 }
 
-function label(category: any): string | null {
+function label(category: RawNode): string | null {
   return categoryValue(category, "label");
 }
 
-function categoryValue(category: any, attribute: string): string | null {
+function categoryValue(category: RawNode, attribute: string): string | null {
   const value = category && category["$"] && category["$"][attribute];
-  return value && value.value ? value.value : null;
+  return rawAttributeValue(value);
 }
 
 function formatDate(value: string, includeTime = false): string {
