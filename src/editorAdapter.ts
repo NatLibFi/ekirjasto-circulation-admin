@@ -124,5 +124,6 @@ export default function adapter(data: OPDSEntry): BookData {
     updated: data.updated,
     rating: rating,
     coverUrl: coverUrl,
+    raw: data.unparsed,
   };
 }

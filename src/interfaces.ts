@@ -50,6 +50,7 @@ export interface BookData {
   issued?: string;
   rating?: number;
   coverUrl?: string;
+  raw?: any;
 }
 
 export interface CirculationIdentifier {

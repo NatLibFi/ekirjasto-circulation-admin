@@ -18,6 +18,7 @@ export interface BookDetailsProps {
     issued?: string;
     targetAgeRange?: string[];
   };
+  workEntry?: BookData;
   // Kept for compatibility with the props supplied by OPDSCatalog.
   updateBook?: (...args: any[]) => any;
   bookUrl?: string;
@@ -124,6 +125,7 @@ export class BookDetails extends React.Component<BookDetailsProps> {
 
 function mapStateToProps(state): Partial<BookDetailsProps> {
   return {
+    workEntry: state.editor.book.data,
     circulationData: state.editor.circulation.data,
     circulationIsFetching: state.editor.circulation.isFetching,
     circulationFetchError: state.editor.circulation.fetchError,
@@ -248,6 +250,23 @@ function renderBookTables(
           ["Fiction", fictionType(book)],
         ]}
       />
+      <BookDetailsTable
+        title="Popularity"
+        rows={[
+          [
+            "Selected by patrons",
+            selectedByPatrons(props.workEntry || book),
+          ],
+        ]}
+      />
+      <BookDetailsTable
+        title="Availability"
+        rows={[
+          ["Copies owned (total concurrency)", copiesOwned(book)],
+          ["Copies available", copiesAvailable(book)],
+          ["Patrons in queue", patronsInQueue(book)],
+        ]}
+      />
       <LicensePool
         data={props.circulationData}
         isFetching={props.circulationIsFetching}
@@ -255,6 +274,43 @@ function renderBookTables(
       />
     </div>
   );
+}
+
+function copiesOwned(book: BookData): number | string | null {
+  return book.copies && book.copies.total !== undefined
+    ? book.copies.total
+    : null;
+}
+function copiesAvailable(book: BookData): number | string | null {
+  return book.copies && book.copies.available !== undefined
+    ? book.copies.available
+    : null;
+}
+
+function patronsInQueue(book: BookData): number | string | null {
+  return book.holds && book.holds.total !== undefined ? book.holds.total : null;
+}
+
+function selectedByPatrons(book: BookData): number | null {
+  const rawKey =
+    book.raw &&
+    Object.keys(book.raw).find(
+      (key) =>
+        key === "simplified:selected_by_patrons" ||
+        key.endsWith(":selected_by_patrons") ||
+        key === "selected_by_patrons"
+    );
+  const value = rawKey ? rawValue(book, rawKey) : null;
+  const directValue = (book as BookData & { selected_by_patrons?: number | null })
+    .selected_by_patrons;
+  const selectedValue = value === null ? directValue : value;
+
+  if (selectedValue === null || selectedValue === undefined) {
+    return null;
+  }
+
+  const selected = Number(selectedValue);
+  return Number.isNaN(selected) ? null : selected;
 }
 
 function circulationUrl(
@@ -343,13 +399,17 @@ function renderBookTableRow(
   value: string | number | string[] | null | undefined | JSX.Element
 ) {
   const values = Array.isArray(value) ? value : [value];
-  const displayValues = values.length && values.some(Boolean) ? values : [""];
+  const displayValues =
+    values.length &&
+    values.some((item) => item !== null && item !== undefined && item !== "")
+      ? values
+      : [""];
   const className = name.toLowerCase().replace(/\s/g, "-");
 
   return displayValues.map((item, index) => (
     <tr key={`${name}-${index}`} className={className}>
       <th scope="row">{index === 0 ? name : null}</th>
-      <td>{item || ""}</td>
+      <td>{item ?? ""}</td>
     </tr>
   ));
 }
@@ -399,9 +459,18 @@ function targetAge(book: BookDetailsProps["book"]): string | string[] | null {
 function rawValue(book: BookData, key: string): string | null {
   const value = book.raw && book.raw[key];
   const firstValue = Array.isArray(value) ? value[0] : value;
-  return firstValue && typeof firstValue === "object"
-    ? firstValue._ || firstValue.value || null
-    : firstValue || null;
+  if (firstValue === null || firstValue === undefined) {
+    return null;
+  }
+
+  if (typeof firstValue === "object") {
+    const textValue = firstValue._ ?? firstValue.value;
+    return textValue === null || textValue === undefined
+      ? null
+      : String(textValue);
+  }
+
+  return String(firstValue);
 }
 
 function categoryLabel(book: BookData, scheme: string): string | null {
