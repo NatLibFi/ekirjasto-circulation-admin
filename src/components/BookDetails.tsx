@@ -62,18 +62,14 @@ export class BookDetails extends React.Component<BookDetailsProps> {
   }
 
   private fetchCirculation() {
-    const url = circulationUrl(
-      this.props.book,
-      this.props.library,
-      this.props.bookUrl
-    );
+    const url = circulationUrl(this.props.bookUrl);
     if (url && this.props.fetchCirculation) {
       this.props.fetchCirculation(url);
     }
   }
 
   private circulationUrl(props: BookDetailsProps) {
-    return circulationUrl(props.book, props.library, props.bookUrl);
+    return circulationUrl(props.bookUrl);
   }
 
   render(): JSX.Element {
@@ -93,6 +89,7 @@ export class BookDetails extends React.Component<BookDetailsProps> {
           </div>
         </div>
         <div className="custom-book-details-main">
+          {/* Kept for compatibility with the surrounding OPDS client layout. */}
           <div className="circulation-links" />
         </div>
       </div>
@@ -126,7 +123,13 @@ export default BookDetails;
 
 function renderBookTables(
   book: BookDetailsProps["book"],
-  props: BookDetailsProps
+  props: Pick<
+    BookDetailsProps,
+    | "workEntry"
+    | "circulationData"
+    | "circulationIsFetching"
+    | "circulationFetchError"
+  >
 ) {
   return (
     <div className="custom-book-tables" lang="en">

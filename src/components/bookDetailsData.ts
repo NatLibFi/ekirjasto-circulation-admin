@@ -92,59 +92,18 @@ export function selectedByPatrons(book: BookData): number | null {
 }
 
 export function circulationUrl(
-  book: BookData,
-  library?: string,
   bookUrl?: string
 ): string | null {
-  const rawLinkValues = book.raw
-    ? Object.keys(book.raw)
-        .filter((key) => key === "link" || key.endsWith(":link"))
-        .map((key) => book.raw[key])
-    : [];
-  const rawLinks = rawLinkValues.reduce(
-    (links: RawNode[], value: RawNode | RawNode[]) =>
-      links.concat(rawArray(value)),
-    []
-  );
-  const circulationLink = rawLinks.find(
-    (link: RawNode) =>
-      link &&
-      link["$"] &&
-      link["$"].rel &&
-      rawAttributeValue(link["$"].rel) ===
-        "http://librarysimplified.org/terms/rel/circulation-details"
-  );
-
-  const rawUrl =
-    circulationLink && circulationLink["$"] && circulationLink["$"].href
-      ? rawAttributeValue(circulationLink["$"].href)
-      : null;
-  if (rawUrl) {
-    return rawUrl;
-  }
-
-  if (!library || !bookUrl) {
+  if (!bookUrl) {
     return null;
   }
 
-  const librarySlug = library.split(/[/?#]/)[0];
   const worksMarker = "/works/";
-  const worksIndex = bookUrl.indexOf(worksMarker);
-  if (!librarySlug || worksIndex === -1) {
+  if (bookUrl.indexOf(worksMarker) === -1) {
     return null;
   }
 
-  const identifierPath = bookUrl
-    .substring(worksIndex + worksMarker.length)
-    .split(/[?#]/)[0];
-  const parts = identifierPath.split("/");
-  if (parts.length < 2 || !parts[0] || !parts.slice(1).join("/")) {
-    return null;
-  }
-
-  return `/${librarySlug}/admin/works/${parts[0]}/${parts
-    .slice(1)
-    .join("/")}/circulation`;
+  return bookUrl.replace(worksMarker, "/admin/works/") + "/circulation";
 }
 
 function rawAttributeValue(
@@ -340,6 +299,8 @@ function rawAcquisitionTypes(book: BookData): {
   drm: string[];
   formats: string[];
 } {
+  // The adapted BookData keeps only the first indirect type. Read raw OPDS
+  // links here so nested indirect-acquisition types are not lost.
   const links = rawArray<RawNode>(book.raw && book.raw.link);
   const types = links.reduce(
     (types: { drm: string[]; formats: string[] }, link: RawNode) => {
