@@ -30,46 +30,6 @@ export interface BookDetailsProps {
   fetchCirculation?: (url: string) => Promise<any>;
 }
 
-interface SummaryCellProps {
-  summary: string;
-  language?: string;
-}
-
-class SummaryCell extends React.Component<SummaryCellProps> {
-  state = { expanded: false };
-
-  render(): JSX.Element {
-    const { summary, language } = this.props;
-    const plainSummary = stripMarkup(summary);
-    const isLong = plainSummary.length > SUMMARY_PREVIEW_LENGTH;
-    const displayedSummary = isLong
-      ? plainSummary.substring(0, SUMMARY_PREVIEW_LENGTH).trimEnd() + "…"
-      : plainSummary;
-
-    return (
-      <div className="summary" lang={language}>
-        {this.state.expanded || !isLong ? (
-          <div dangerouslySetInnerHTML={{ __html: summary }} />
-        ) : (
-          <span>{displayedSummary}</span>
-        )}
-        {isLong && (
-          <button
-            type="button"
-            className="summary-toggle"
-            aria-expanded={this.state.expanded}
-            onClick={() => this.setState({ expanded: !this.state.expanded })}
-          >
-            {this.state.expanded ? "Show less" : "Show more"}
-          </button>
-        )}
-      </div>
-    );
-  }
-}
-
-const SUMMARY_PREVIEW_LENGTH = 50;
-
 /** Renders the book details page without using web-opds-client's UI components. */
 export class BookDetails extends React.Component<BookDetailsProps> {
   componentDidMount() {
@@ -403,18 +363,13 @@ function renderBookTableRow(
 }
 
 function renderSummary(book: BookData): JSX.Element {
-  return <SummaryCell summary={book.summary as string} language={book.language} />;
-}
-
-function stripMarkup(value: string): string {
-  return value
-    .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'");
+  return (
+    <div
+      className="summary"
+      lang={book.language}
+      dangerouslySetInnerHTML={{ __html: book.summary as string }}
+    />
+  );
 }
 
 function updated(book: BookData & { updated?: string }): string | null {
