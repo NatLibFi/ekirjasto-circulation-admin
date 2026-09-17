@@ -16,7 +16,7 @@ import BookDetailsTableSection from "./BookDetailsTableSection";
 import SummaryContainer from "./SummaryContainer";
 import {
   audience,
-  circulationUrl,
+  circulationDataUrl,
   copiesAvailable,
   copiesOwned,
   distributor,
@@ -56,20 +56,20 @@ export class BookDetails extends React.Component<BookDetailsProps> {
   }
 
   componentDidUpdate(previousProps: BookDetailsProps) {
-    if (this.circulationUrl(previousProps) !== this.circulationUrl(this.props)) {
+    if (this.circulationDataUrl(previousProps) !== this.circulationDataUrl(this.props)) {
       this.fetchCirculationData();
     }
   }
 
   private fetchCirculationData() {
-    const url = circulationUrl(this.props.bookUrl);
+    const url = circulationDataUrl(this.props.bookUrl);
     if (url && this.props.fetchCirculationData) {
       this.props.fetchCirculationData(url);
     }
   }
 
-  private circulationUrl(props: BookDetailsProps) {
-    return circulationUrl(props.bookUrl);
+  private circulationDataUrl(props: BookDetailsProps) {
+    return circulationDataUrl(props.bookUrl);
   }
 
   render(): JSX.Element {

@@ -91,7 +91,8 @@ export function selectedByPatrons(book: BookData): number | null {
   return Number.isNaN(selected) ? null : selected;
 }
 
-export function circulationUrl(
+/** Returns the URL for fetching circulation (licensepool) data for the given book URL. */
+export function circulationDataUrl(
   bookUrl?: string
 ): string | null {
   if (!bookUrl) {
