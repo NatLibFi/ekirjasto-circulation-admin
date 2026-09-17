@@ -46,25 +46,25 @@ export interface BookDetailsProps {
   circulationData?: CirculationData;
   circulationIsFetching?: boolean;
   circulationFetchError?: FetchErrorData;
-  fetchCirculation?: (url: string) => Promise<any>;
+  fetchCirculationData?: (url: string) => Promise<any>;
 }
 
 /** Renders the book details page without using web-opds-client's UI components. */
 export class BookDetails extends React.Component<BookDetailsProps> {
   componentDidMount() {
-    this.fetchCirculation();
+    this.fetchCirculationData();
   }
 
   componentDidUpdate(previousProps: BookDetailsProps) {
     if (this.circulationUrl(previousProps) !== this.circulationUrl(this.props)) {
-      this.fetchCirculation();
+      this.fetchCirculationData();
     }
   }
 
-  private fetchCirculation() {
+  private fetchCirculationData() {
     const url = circulationUrl(this.props.bookUrl);
-    if (url && this.props.fetchCirculation) {
-      this.props.fetchCirculation(url);
+    if (url && this.props.fetchCirculationData) {
+      this.props.fetchCirculationData(url);
     }
   }
 
@@ -110,7 +110,8 @@ function mapDispatchToProps(dispatch): Partial<BookDetailsProps> {
   const fetcher = new DataFetcher({ adapter: editorAdapter });
   const actions = new ActionCreator(fetcher);
   return {
-    fetchCirculation: (url: string) => dispatch(actions.fetchCirculation(url)),
+    fetchCirculationData: (url: string) =>
+      dispatch(actions.fetchCirculationData(url)),
   };
 }
 

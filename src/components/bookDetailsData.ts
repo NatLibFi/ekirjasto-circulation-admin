@@ -103,7 +103,7 @@ export function circulationUrl(
     return null;
   }
 
-  return bookUrl.replace(worksMarker, "/admin/works/") + "/circulation";
+  return bookUrl.replace(worksMarker, "/admin/works/") + "/circulation_data";
 }
 
 function rawAttributeValue(

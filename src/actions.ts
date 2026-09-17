@@ -167,11 +167,11 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly CLASSIFICATIONS_FAILURE = "CLASSIFICATIONS_FAILURE";
   static readonly CLASSIFICATIONS_LOAD = "CLASSIFICATIONS_LOAD";
 
-  static readonly CIRCULATION = "CIRCULATION";
-  static readonly CIRCULATION_REQUEST = "CIRCULATION_REQUEST";
-  static readonly CIRCULATION_SUCCESS = "CIRCULATION_SUCCESS";
-  static readonly CIRCULATION_FAILURE = "CIRCULATION_FAILURE";
-  static readonly CIRCULATION_LOAD = "CIRCULATION_LOAD";
+  static readonly CIRCULATION_DATA = "CIRCULATION_DATA";
+  static readonly CIRCULATION_DATA_REQUEST = "CIRCULATION_DATA_REQUEST";
+  static readonly CIRCULATION_DATA_SUCCESS = "CIRCULATION_DATA_SUCCESS";
+  static readonly CIRCULATION_DATA_FAILURE = "CIRCULATION_DATA_FAILURE";
+  static readonly CIRCULATION_DATA_LOAD = "CIRCULATION_DATA_LOAD";
 
   static readonly EDIT_CLASSIFICATIONS_REQUEST = "EDIT_CLASSIFICATIONS_REQUEST";
   static readonly EDIT_CLASSIFICATIONS_SUCCESS = "EDIT_CLASSIFICATIONS_SUCCESS";
@@ -410,10 +410,11 @@ export default class ActionCreator extends BaseActionCreator {
     ).bind(this);
   }
 
-  fetchCirculation(url: string) {
-    return this.fetchJSON<CirculationData>(ActionCreator.CIRCULATION, url).bind(
-      this
-    );
+  fetchCirculationData(url: string) {
+    return this.fetchJSON<CirculationData>(
+      ActionCreator.CIRCULATION_DATA,
+      url
+    ).bind(this);
   }
 
   editBookCover(url: string, data: FormData) {

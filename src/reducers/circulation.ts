@@ -19,20 +19,20 @@ export default (
   action
 ): CirculationState => {
   switch (action.type) {
-    case ActionCreator.CIRCULATION_REQUEST:
+    case ActionCreator.CIRCULATION_DATA_REQUEST:
       return Object.assign({}, state, {
         data: null,
         isFetching: true,
         fetchError: null,
       });
 
-    case ActionCreator.CIRCULATION_LOAD:
+    case ActionCreator.CIRCULATION_DATA_LOAD:
       return Object.assign({}, state, {
         data: action.data,
         isFetching: false,
       });
 
-    case ActionCreator.CIRCULATION_FAILURE:
+    case ActionCreator.CIRCULATION_DATA_FAILURE:
       return Object.assign({}, state, {
         isFetching: false,
         fetchError: action.error,
