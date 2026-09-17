@@ -11,6 +11,9 @@ import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import { CirculationData } from "../interfaces";
 import { RootState } from "../store";
 import LicensePool from "./LicensePool";
+import BookCoverContainer from "./BookCoverContainer";
+import BookDetailsTableSection from "./BookDetailsTableSection";
+import SummaryContainer from "./SummaryContainer";
 
 export interface BookDetailsProps {
   book: BookData & {
@@ -63,7 +66,7 @@ export class BookDetails extends React.Component<BookDetailsProps> {
     return (
       <div className="custom-book-details" lang={book.language}>
         <div className="custom-book-details-top">
-          <BookCover book={book} />
+          <BookCoverContainer book={book} />
 
           <div className="custom-book-details-metadata">
             <h1 className="title">{book.title}</h1>
@@ -149,35 +152,13 @@ const CONTRIBUTOR_ROLE_NAMES: { [role: string]: string } = {
   clr: "Colorist",
 };
 
-function BookCover({ book }: { book: BookData }) {
-  if (book.imageUrl) {
-    return (
-      <div className="custom-book-cover">
-        <img src={book.imageUrl} alt="" className="custom-book-cover-image" />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="custom-book-cover custom-book-cover-fallback"
-      aria-hidden="true"
-    >
-      <span>{book.title}</span>
-      {book.authors && book.authors.length > 0 && (
-        <small>By {book.authors.join(", ")}</small>
-      )}
-    </div>
-  );
-}
-
 function renderBookTables(
   book: BookDetailsProps["book"],
   props: BookDetailsProps
 ) {
   return (
     <div className="custom-book-tables" lang="en">
-      <BookDetailsTable
+      <BookDetailsTableSection
         title="Basic information"
         rows={[
           ["Title", book.title],
@@ -194,14 +175,22 @@ function renderBookTables(
           ["Issued", issued(book)],
           ["Updated", updated(book)],
           ["Distributor", distributor(book)],
-          ["Summary", book.summary ? renderSummary(book) : null],
+          [
+            "Summary",
+            book.summary ? (
+              <SummaryContainer
+                summary={book.summary}
+                language={book.language}
+              />
+            ) : null,
+          ],
         ]}
       />
-      <BookDetailsTable
+      <BookDetailsTableSection
         title="DRMs and formats"
         rows={[["DRM", drm(book)], ["Formats", formats(book)]]}
       />
-      <BookDetailsTable
+      <BookDetailsTableSection
         title="Classifications"
         rows={[
           ["Genres", genres(book)],
@@ -210,7 +199,7 @@ function renderBookTables(
           ["Fiction", fictionType(book)],
         ]}
       />
-      <BookDetailsTable
+      <BookDetailsTableSection
         title="Popularity"
         rows={[
           [
@@ -219,7 +208,7 @@ function renderBookTables(
           ],
         ]}
       />
-      <BookDetailsTable
+      <BookDetailsTableSection
         title="Availability"
         rows={[
           ["Copies owned (total concurrency)", copiesOwned(book)],
@@ -321,55 +310,6 @@ function rawAttributeValue(attribute: any): string | null {
   return attribute && typeof attribute === "object"
     ? attribute.value || attribute._ || null
     : attribute || null;
-}
-
-function BookDetailsTable({
-  title,
-  rows,
-}: {
-  title: string;
-  rows: Array<[string, string | number | string[] | null | undefined | JSX.Element]>;
-}) {
-  return (
-    <section className="custom-book-table-section">
-      <h2>{title}</h2>
-      <table className="custom-book-table">
-        <tbody>
-          {rows.map(([name, value]) => renderBookTableRow(name, value))}
-        </tbody>
-      </table>
-    </section>
-  );
-}
-
-function renderBookTableRow(
-  name: string,
-  value: string | number | string[] | null | undefined | JSX.Element
-) {
-  const values = Array.isArray(value) ? value : [value];
-  const displayValues =
-    values.length &&
-    values.some((item) => item !== null && item !== undefined && item !== "")
-      ? values
-      : [""];
-  const className = name.toLowerCase().replace(/\s/g, "-");
-
-  return displayValues.map((item, index) => (
-    <tr key={`${name}-${index}`} className={className}>
-      <th scope="row">{index === 0 ? name : null}</th>
-      <td>{item ?? ""}</td>
-    </tr>
-  ));
-}
-
-function renderSummary(book: BookData): JSX.Element {
-  return (
-    <div
-      className="summary"
-      lang={book.language}
-      dangerouslySetInnerHTML={{ __html: book.summary as string }}
-    />
-  );
 }
 
 function updated(book: BookData & { updated?: string }): string | null {
