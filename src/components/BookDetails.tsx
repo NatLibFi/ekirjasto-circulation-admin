@@ -292,24 +292,12 @@ function patronsInQueue(book: BookData): number | string | null {
 }
 
 function selectedByPatrons(book: BookData): number | null {
-  const rawKey =
-    book.raw &&
-    Object.keys(book.raw).find(
-      (key) =>
-        key === "simplified:selected_by_patrons" ||
-        key.endsWith(":selected_by_patrons") ||
-        key === "selected_by_patrons"
-    );
-  const value = rawKey ? rawValue(book, rawKey) : null;
-  const directValue = (book as BookData & { selected_by_patrons?: number | null })
-    .selected_by_patrons;
-  const selectedValue = value === null ? directValue : value;
-
-  if (selectedValue === null || selectedValue === undefined) {
+  const value = rawValue(book, "simplified:selected_by_patrons");
+  if (value === null) {
     return null;
   }
 
-  const selected = Number(selectedValue);
+  const selected = Number(value);
   return Number.isNaN(selected) ? null : selected;
 }
 
@@ -435,12 +423,7 @@ function updated(book: BookData & { updated?: string }): string | null {
 }
 
 function rawUpdatedValue(book: BookData): string | null {
-  const rawUpdated = book.raw && (book.raw.updated || book.raw["atom:updated"]);
-  const value = Array.isArray(rawUpdated) ? rawUpdated[0] : rawUpdated;
-  if (!value) {
-    return null;
-  }
-  return typeof value === "string" ? value : value._ || value.value || null;
+  return rawValue(book, "updated") || rawValue(book, "atom:updated");
 }
 
 function issued(book: BookDetailsProps["book"]): string | null {
