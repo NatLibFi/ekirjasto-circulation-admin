@@ -133,6 +133,26 @@ describe("BookDetails", () => {
     ]);
   });
 
+  it("shows duration for audiobooks", () => {
+    const audiobook = Object.assign({}, book, {
+      duration: 3661,
+      raw: Object.assign({}, book.raw, {
+        $: {
+          "schema:additionalType": { value: "http://bib.schema.org/Audiobook" },
+        },
+      }),
+    });
+    const wrapper = shallow(<BookDetails book={audiobook} />);
+    const basicInformationRows = wrapper
+      .find(BookDetailsTableSection)
+      .at(0)
+      .prop("rows");
+
+    expect(
+      basicInformationRows.find((row) => row[0] === "Duration")
+    ).to.deep.equal(["Duration", "1:01:01"]);
+  });
+
   it("renders the summary inside the basic information table", () => {
     const wrapper = shallow(<BookDetails book={book} />);
     const basicInformation = wrapper.find(BookDetailsTableSection).at(0).dive();

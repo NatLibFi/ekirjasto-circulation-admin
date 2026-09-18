@@ -53,6 +53,7 @@ export interface BookData {
   rating?: number;
   coverUrl?: string;
   accessibility?: Accessibility;
+  duration?: string;
   raw?: any;
 }
 
