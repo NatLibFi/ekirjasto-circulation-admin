@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+import Accessibility from "@natlibfi/ekirjasto-opds-feed-parser/lib/src/accessibility";
+
 export interface FeatureFlags {
   enableAutoList?: boolean;
 }
@@ -37,6 +39,7 @@ export interface BookData {
   publisher?: string;
   imprint?: string;
   summary?: string;
+  updated?: string;
   hideLink?: LinkData;
   restoreLink?: LinkData;
   refreshLink?: LinkData;
@@ -49,6 +52,69 @@ export interface BookData {
   issued?: string;
   rating?: number;
   coverUrl?: string;
+  accessibility?: Accessibility;
+  duration?: string;
+  raw?: any;
+}
+
+export interface CirculationIdentifier {
+  identifier: string;
+  type: string;
+}
+
+export interface CirculationLicense {
+  checkout_url: string;
+  checkouts_available: number | null;
+  checkouts_left: number | null;
+  currently_available_loans: number | null;
+  expires: string | null;
+  id: number;
+  identifier: string;
+  is_inactive: boolean;
+  is_loan_limited: boolean;
+  is_missing: boolean;
+  is_perpetual: boolean;
+  is_time_limited: boolean;
+  last_checked: string | null;
+  loans: CirculationLoan[];
+  status: string;
+  terms_concurrency: number | null;
+  total_remaining_loans: number | null;
+}
+
+export interface CirculationLoan {
+  end: string;
+  id: number;
+  license_id: number | string;
+  start: string;
+}
+
+export interface CirculationHold extends CirculationLoan {
+  position: number;
+}
+
+export interface LicensePoolData {
+  availability_time: string | null;
+  collection: { id: number; name: string };
+  data_source: { id: number; name: string };
+  holds?: CirculationHold[];
+  pool_id: number;
+  pool_identifier: CirculationIdentifier;
+  licenses: CirculationLicense[];
+  licenses_available: number;
+  licenses_owned: number;
+  licenses_reserved: number;
+  loans?: CirculationLoan[];
+  open_access: boolean;
+  patrons_in_hold_queue: number | null;
+  presentation_edition_id: number;
+  suppressed: boolean;
+  unlimited_access: boolean;
+}
+
+export interface CirculationData {
+  identifier: CirculationIdentifier;
+  license_pools: LicensePoolData[];
 }
 
 export interface RolesData {
@@ -111,6 +177,8 @@ export interface ClassificationData {
   name: string;
   source: string;
   weight: number;
+  genre?: string;
+  mapping?: string;
 }
 
 export interface CirculationEventData {

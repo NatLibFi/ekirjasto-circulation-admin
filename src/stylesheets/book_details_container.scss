@@ -1,8 +1,9 @@
 .book-details-container {
   padding: 40px;
-  max-width: 700px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding-bottom: 60px;
+  // Leave enough scrollable space for the fixed footer to clear the final rows.
+  padding-bottom: 120px;
 
   .list-back-link {
     display: block;

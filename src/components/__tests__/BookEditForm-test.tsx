@@ -4,7 +4,7 @@ import { stub } from "sinon";
 import * as React from "react";
 import { mount } from "enzyme";
 
-import BookEditForm from "../BookEditForm";
+import BookEditForm from "../bookdetails/BookEditForm";
 import EditableInput from "../EditableInput";
 import WithRemoveButton from "../WithRemoveButton";
 import Contributors from "../Contributors";

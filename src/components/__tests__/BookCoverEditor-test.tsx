@@ -4,7 +4,7 @@ import { stub } from "sinon";
 import * as React from "react";
 import { mount } from "enzyme";
 
-import { BookCoverEditor } from "../BookCoverEditor";
+import { BookCoverEditor } from "../bookdetails/BookCoverEditor";
 import EditableInput from "../EditableInput";
 import ErrorMessage from "../ErrorMessage";
 import { BookData, RightsStatusData } from "../../interfaces";

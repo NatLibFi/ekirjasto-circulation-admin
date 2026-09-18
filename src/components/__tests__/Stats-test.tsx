@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { normalizeStatistics, Stats, StatsProps } from "../Stats";
 import LibraryStats from "../LibraryStats";
 import ErrorMessage from "../ErrorMessage";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 
 import { statisticsApiResponseData } from "../../../tests/__data__/statisticsApiResponseData";
 

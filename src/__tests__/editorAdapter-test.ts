@@ -1,5 +1,4 @@
 import { expect } from "chai";
-import { stub } from "sinon";
 
 import adapter from "../editorAdapter";
 import {
@@ -9,7 +8,6 @@ import {
   Category,
   Summary,
 } from "@natlibfi/ekirjasto-opds-feed-parser";
-import Accessibility from "@natlibfi/ekirjasto-opds-feed-parser/lib/src/accessibility";
 
 describe("editorAdapter", () => {
   it("adapts valid OPDS entry", () => {
@@ -159,7 +157,10 @@ describe("editorAdapter", () => {
     expect(adapted.publisher).to.equal("publisher");
     expect(adapted.imprint).to.equal("imprint");
     expect(adapted.issued).to.equal("issued");
+    expect(adapted.updated).to.equal("updated");
     expect(adapted.rating).to.equal("4");
+    expect(adapted.accessibility).to.equal(entry.accessibility);
+    expect(adapted.raw).to.equal(entry.unparsed);
   });
 
   it("doesn't crash when expected data is missing", () => {

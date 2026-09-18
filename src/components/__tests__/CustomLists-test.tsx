@@ -6,7 +6,7 @@ import { shallow, mount } from "enzyme";
 
 import { CustomLists } from "../CustomLists";
 import ErrorMessage from "../ErrorMessage";
-import LoadingIndicator from "@thepalaceproject/web-opds-client/lib/components/LoadingIndicator";
+import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 import CustomListEditor from "../CustomListEditor";
 import Admin from "../../models/Admin";
 import { LaneData } from "../../interfaces";

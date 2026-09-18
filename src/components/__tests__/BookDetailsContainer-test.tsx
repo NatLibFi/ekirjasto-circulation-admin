@@ -5,9 +5,8 @@ import * as React from "react";
 import { shallow } from "enzyme";
 
 import buildStore from "../../store";
-import BookDetailsContainer from "../BookDetailsContainer";
-import BookDetailsTabContainer from "../BookDetailsTabContainer";
-import BookDetails from "../BookDetails";
+import BookDetailsContainer from "../bookdetails/BookDetailsContainer";
+import BookDetailsTabContainer from "../bookdetails/BookDetailsTabContainer";
 
 class DefaultBookDetails extends React.Component<any, any> {
   render() {
@@ -50,9 +49,9 @@ describe("BookDetailsContainer", () => {
   });
 
   it("renders BookDetails with its child's props", () => {
-    const bookDetails = wrapper.find(BookDetails);
-    expect(bookDetails.prop("book")).to.equal(bookData);
-    expect(bookDetails.prop("anotherProp")).to.equal("anotherProp");
+    const bookDetails = wrapper.find(BookDetailsTabContainer).prop("children");
+    expect(bookDetails.props.book).to.equal(bookData);
+    expect(bookDetails.props.anotherProp).to.equal("anotherProp");
   });
 
   it("shows a tab container with initial tab", () => {

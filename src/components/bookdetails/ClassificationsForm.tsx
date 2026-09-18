@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import EditableInput from "./EditableInput";
-import WithRemoveButton from "./WithRemoveButton";
-import GenreForm from "./GenreForm";
-import { BookData, GenreTree } from "../interfaces";
+import EditableInput from "../EditableInput";
+import WithRemoveButton from "../WithRemoveButton";
+import GenreForm from "../GenreForm";
+import { BookData, GenreTree } from "../../interfaces";
 import { Button, Panel } from "library-simplified-reusable-components";
 import { Alert } from "react-bootstrap";
 

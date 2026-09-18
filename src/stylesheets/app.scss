@@ -3,7 +3,7 @@
 $fontfamily: 'Open Sans', sans-serif;
 
 @import "~bootstrap/dist/css/bootstrap.css";
-@import "~@thepalaceproject/web-opds-client/lib/stylesheets/app.scss";
+@import "~@natlibfi/ekirjasto-web-opds-client/lib/stylesheets/app.scss";
 @import "~library-simplified-reusable-components/dist/reusable-components.css";
 
 @import "mixins";
@@ -15,6 +15,7 @@ $fontfamily: 'Open Sans', sans-serif;
 @import "badge";
 @import "book_details_container";
 @import "book_details_tab_container";
+@import "book_details_custom";
 @import "catalog_overrides";
 @import "change_password_form";
 @import "circulation_events_download_form";

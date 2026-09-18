@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ClassificationData } from "../interfaces";
+import { ClassificationData } from "../../interfaces";
 
 export interface ClassificationsTableProps {
   classifications: ClassificationData[];
@@ -21,7 +21,7 @@ export default class ClassificationsTable extends React.Component<
               <th>Type</th>
               <th>Name</th>
               <th>Source</th>
-              <th>Weight</th>
+              <th>Mapped to</th>
             </tr>
           </thead>
           <tbody>
@@ -32,7 +32,7 @@ export default class ClassificationsTable extends React.Component<
                 <td>{this.readableType(classification.type)}</td>
                 <td>{classification.name}</td>
                 <td>{classification.source}</td>
-                <td>{classification.weight}</td>
+                <td>{classification.mapping}</td>
               </tr>
             ))}
           </tbody>
