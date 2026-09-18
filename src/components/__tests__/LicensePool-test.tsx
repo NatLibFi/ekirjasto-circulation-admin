@@ -89,9 +89,9 @@ describe("LicensePool", () => {
       "Licenses (1)"
     );
     expect(wrapper.find("caption").map((caption) => caption.text())).to.deep.equal([
-      "Hold 301",
-      "License (1) license-identifier",
-      "Loan 401",
+      "Hold (1)",
+      "License (1)",
+      "Loan (1)",
     ]);
     expect(wrapper.find("summary").map((summary) => summary.text())).to.deep.equal([
       "Holds (1)",
