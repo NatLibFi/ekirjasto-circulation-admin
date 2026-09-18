@@ -159,7 +159,13 @@ function LoanInformationSection({
       <summary>Active Loans{loans.length ? ` (${loans.length})` : " (0)"}</summary>
       <div className="license-pool-record-tables">
         {loans.length ? (
-          loans.map((loan) => <LoanInformationTable key={loan.id} loan={loan} />)
+          loans.map((loan, index) => (
+            <LoanInformationTable
+              key={loan.id}
+              loan={loan}
+              position={index + 1}
+            />
+          ))
         ) : (
           <table className="custom-book-table">
             <tbody>{renderBookTableRow("Loans", "No loans")}</tbody>
@@ -180,7 +186,13 @@ function HoldInformationSection({
       <summary>Holds{holds.length ? ` (${holds.length})` : " (0)"}</summary>
       <div className="license-pool-record-tables">
         {holds.length ? (
-          holds.map((hold) => <HoldInformationTable key={hold.id} hold={hold} />)
+          holds.map((hold, index) => (
+            <HoldInformationTable
+              key={hold.id}
+              hold={hold}
+              position={index + 1}
+            />
+          ))
         ) : (
           <table className="custom-book-table">
             <tbody>{renderBookTableRow("Holds", "No holds")}</tbody>
@@ -191,10 +203,13 @@ function HoldInformationSection({
   );
 }
 
-function LoanInformationTable({ loan }: LoanTableRowsProps): JSX.Element {
+function LoanInformationTable({
+  loan,
+  position,
+}: LoanTableRowsProps & { position: number }): JSX.Element {
   return (
     <table className="custom-book-table">
-      <caption>Loan ({loan.id})</caption>
+      <caption>Loan ({position})</caption>
       <tbody>
         <LoanTableRows loan={loan} />
       </tbody>
@@ -202,10 +217,13 @@ function LoanInformationTable({ loan }: LoanTableRowsProps): JSX.Element {
   );
 }
 
-function HoldInformationTable({ hold }: { hold: CirculationHold }): JSX.Element {
+function HoldInformationTable({
+  hold,
+  position,
+}: { hold: CirculationHold; position: number }): JSX.Element {
   return (
     <table className="custom-book-table">
-      <caption>Hold ({hold.id})</caption>
+      <caption>Hold ({position})</caption>
       <tbody>
         <HoldTableRows hold={hold} />
       </tbody>
@@ -276,6 +294,7 @@ function LicenseAdditionalFieldsDetails({
 function LoanTableRows({ loan }: LoanTableRowsProps): JSX.Element {
   return (
     <React.Fragment key={loan.id}>
+      {renderBookTableRow("Loan ID", loan.id)}
       {renderBookTableRow("License identifier", loan.license_id)}
       {renderBookTableRow("Loan start", formatDateValue(loan.start, true))}
       {renderBookTableRow("Loan end", formatDateValue(loan.end, true))}
@@ -286,6 +305,7 @@ function LoanTableRows({ loan }: LoanTableRowsProps): JSX.Element {
 function HoldTableRows({ hold }: { hold: CirculationHold }): JSX.Element {
   return (
     <React.Fragment key={hold.id}>
+      {renderBookTableRow("Hold ID", hold.id)}
       {renderBookTableRow("Hold position", hold.position)}
       {renderBookTableRow("Hold start", formatDateValue(hold.start, true))}
       {renderBookTableRow("Hold end", formatDateValue(hold.end, true))}
