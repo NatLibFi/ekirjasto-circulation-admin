@@ -44,7 +44,7 @@ export class LicensePool extends React.Component<LicensePoolProps> {
           </table>
         ) : data && data.license_pools.length ? (
           data.license_pools.map((pool) => (
-            <LicensePoolTables key={pool.id} pool={pool} />
+            <LicensePoolTables key={pool.pool_id} pool={pool} />
           ))
         ) : (
           <table className="custom-book-table">
@@ -76,11 +76,11 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
           "Licensepool created",
           formatDateValue(pool.availability_time)
         )}
-        {renderBookTableRow("Licenses owned", pool.licenses_owned)}
+        {renderBookTableRow("Licenses owned (total concurrency)", pool.licenses_owned)}
         {renderBookTableRow("Licenses available", pool.licenses_available)}
         {renderBookTableRow("Holds", pool.patrons_in_hold_queue ?? 0)}
         {renderBookTableRow(
-          "Holds ratio",
+          "Holds to concurrency ratio",
           pool.patrons_in_hold_queue !== null &&
             pool.patrons_in_hold_queue !== undefined &&
             pool.licenses_owned
@@ -141,7 +141,7 @@ function LicenseInformationTable({
 }: LicenseTableRowsProps & { position: number }): JSX.Element {
   return (
     <table className="custom-book-table">
-      <caption>License ({position}) {license.identifier}</caption>
+      <caption>License ({position})</caption>
       <tbody>
         <LicenseTableRows license={license} />
       </tbody>
@@ -223,12 +223,6 @@ function LicenseTableRows({ license }: LicenseTableRowsProps): JSX.Element {
       {renderBookTableRow("Checkouts available", license.checkouts_available)}
       {renderBookTableRow("Checkouts left", license.checkouts_left)}
       {renderBookTableRow("Expires", formatDateValue(license.expires, true))}
-      {renderBookTableRow(
-        "License status document",
-        <a className="license-status-document-link" href={license.status_url}>
-          {license.status_url}
-        </a>
-      )}
       <tr className="license-additional-fields-row">
         <td colSpan={2}>
           <LicenseAdditionalFieldsDetails license={license} />
@@ -286,10 +280,6 @@ function LoanTableRows({ loan }: LoanTableRowsProps): JSX.Element {
       {renderBookTableRow("License identifier", loan.license_id)}
       {renderBookTableRow("Loan start", formatDateValue(loan.start, true))}
       {renderBookTableRow("Loan end", formatDateValue(loan.end, true))}
-      {renderBookTableRow(
-        "Loan status document (only for viewing)",
-        <a className="license-status-document-link" href={loan.loan_status_document}>{loan.loan_status_document}</a>
-      )}
     </React.Fragment>
   );
 }

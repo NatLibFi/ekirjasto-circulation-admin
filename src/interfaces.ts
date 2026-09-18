@@ -77,18 +77,15 @@ export interface CirculationLicense {
   last_checked: string | null;
   loans: CirculationLoan[];
   status: string;
-  status_url: string;
   terms_concurrency: number | null;
   total_remaining_loans: number | null;
 }
 
 export interface CirculationLoan {
   end: string;
-  external_identifier?: string;
   id: number;
   license_id: number | string;
   start: string;
-  loan_status_document: string;
 }
 
 export interface CirculationHold extends CirculationLoan {
@@ -100,8 +97,8 @@ export interface LicensePoolData {
   collection: { id: number; name: string };
   data_source: { id: number; name: string };
   holds?: CirculationHold[];
-  id: number;
-  identifier: CirculationIdentifier;
+  pool_id: number;
+  pool_identifier: CirculationIdentifier;
   licenses: CirculationLicense[];
   licenses_available: number;
   licenses_owned: number;

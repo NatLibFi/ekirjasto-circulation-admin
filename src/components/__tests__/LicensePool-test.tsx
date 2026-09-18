@@ -18,13 +18,12 @@ const circulationData: CirculationData = {
           end: "2024-01-05T12:30:00Z",
           id: 301,
           license_id: 201,
-          loan_status_document: "https://example.com/hold/301",
           position: 1,
           start: "2024-01-04T12:30:00Z",
         },
       ],
-      id: 101,
-      identifier: { identifier: "pool-identifier", type: "text" },
+      pool_id: 101,
+      pool_identifier: { identifier: "pool-identifier", type: "text" },
       licenses: [
         {
           checkout_url: "https://example.com/checkout/201",
@@ -45,12 +44,10 @@ const circulationData: CirculationData = {
               end: "2024-01-10T14:00:00Z",
               id: 401,
               license_id: 201,
-              loan_status_document: "https://example.com/loan/401",
               start: "2024-01-03T14:00:00Z",
             },
           ],
           status: "available",
-          status_url: "https://example.com/license/201",
           terms_concurrency: 5,
           total_remaining_loans: 2,
         },
@@ -75,10 +72,12 @@ describe("LicensePool", () => {
       "License pool information"
     );
     expect(rowValue(wrapper, "licensepool-created")).to.equal("January 2, 2024");
-    expect(rowValue(wrapper, "licenses-owned")).to.equal("5");
+    expect(rowValue(wrapper, "licenses-owned-(total-concurrency)")).to.equal(
+      "5"
+    );
     expect(rowValue(wrapper, "licenses-available")).to.equal("2");
     expect(rowValue(wrapper, "holds")).to.equal("1");
-    expect(rowValue(wrapper, "holds-ratio")).to.equal("20.0%");
+    expect(rowValue(wrapper, "holds-to-concurrency-ratio")).to.equal("20.0%");
     expect(rowValue(wrapper, "licenses-reserved-(ready-to-checkout)")).to.equal(
       "1"
     );
@@ -105,10 +104,25 @@ describe("LicensePool", () => {
     expect(wrapper.find(".license-additional-fields").text()).to.contain(
       "https://example.com/checkout/201"
     );
-    expect(wrapper.find(".license-status-document-link").map((link) => link.prop("href"))).to.deep.equal([
-      "https://example.com/license/201",
-      "https://example.com/loan/401",
-    ]);
+  });
+
+  it("calculates the holds to concurrency ratio", () => {
+    const wrapper = mount(
+      <LicensePool
+        data={{
+          ...circulationData,
+          license_pools: [
+            {
+              ...circulationData.license_pools[0],
+              licenses_owned: 8,
+              patrons_in_hold_queue: 3,
+            },
+          ],
+        }}
+      />
+    );
+
+    expect(rowValue(wrapper, "holds-to-concurrency-ratio")).to.equal("37.5%");
   });
 
   it("shows loading status before circulation data arrives", () => {
