@@ -5,7 +5,7 @@ import * as PropTypes from "prop-types";
 import BookDetailsTabContainer from "./BookDetailsTabContainer";
 import { BookDetails, ConnectedBookDetails } from "./BookDetails";
 import { BookDetailsContainerProps } from "@natlibfi/ekirjasto-web-opds-client/lib/components/Root";
-import { RootState } from "../store";
+import { RootState } from "../../store";
 
 export interface BookDetailsContainerContext {
   csrfToken: string;

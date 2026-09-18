@@ -1,16 +1,16 @@
 import * as React from "react";
 import { Store } from "redux";
 import { connect } from "react-redux";
-import editorAdapter from "../editorAdapter";
+import editorAdapter from "../../editorAdapter";
 import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
-import ActionCreator from "../actions";
-import ErrorMessage from "./ErrorMessage";
-import EditableInput from "./EditableInput";
-import { BookData, RightsStatusData } from "../interfaces";
+import ActionCreator from "../../actions";
+import ErrorMessage from "../ErrorMessage";
+import EditableInput from "../EditableInput";
+import { BookData, RightsStatusData } from "../../interfaces";
 import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
-import { RootState } from "../store";
+import { RootState } from "../../store";
 import { Panel, Button, Form } from "library-simplified-reusable-components";
-import UpdatingLoader from "./UpdatingLoader";
+import UpdatingLoader from "../UpdatingLoader";
 
 export interface BookCoverEditorStateProps {
   bookAdminUrl?: string;

@@ -1,16 +1,16 @@
 import * as React from "react";
 import { Store } from "redux";
 import { connect } from "react-redux";
-import editorAdapter from "../editorAdapter";
-import ActionCreator from "../actions";
+import editorAdapter from "../../editorAdapter";
+import ActionCreator from "../../actions";
 import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
-import { CirculationData } from "../interfaces";
-import { RootState } from "../store";
+import { CirculationData } from "../../interfaces";
+import { RootState } from "../../store";
 import LicensePool from "./LicensePool";
 import BookCoverContainer from "./BookCoverContainer";
 import BookDetailsTableSection from "./BookDetailsTableSection";
-import SummaryContainer from "./SummaryContainer";
+import SummaryContainer from "../SummaryContainer";
 import {
   audience,
   accessibilityConformance,

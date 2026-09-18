@@ -3,7 +3,7 @@ import { expect } from "chai";
 import * as React from "react";
 import { mount, shallow } from "enzyme";
 
-import LicensePool from "../LicensePool";
+import LicensePool from "../bookdetails/LicensePool";
 import { CirculationData } from "../../interfaces";
 
 const circulationData: CirculationData = {

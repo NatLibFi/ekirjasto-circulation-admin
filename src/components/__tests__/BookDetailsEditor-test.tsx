@@ -4,9 +4,9 @@ import { stub } from "sinon";
 import * as React from "react";
 import { shallow, mount } from "enzyme";
 
-import { BookDetailsEditor } from "../BookDetailsEditor";
+import { BookDetailsEditor } from "../bookdetails/BookDetailsEditor";
 import { Button } from "library-simplified-reusable-components";
-import BookEditForm from "../BookEditForm";
+import BookEditForm from "../bookdetails/BookEditForm";
 import ErrorMessage from "../ErrorMessage";
 
 describe("BookDetailsEditor", () => {

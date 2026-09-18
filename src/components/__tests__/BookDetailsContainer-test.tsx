@@ -5,8 +5,8 @@ import * as React from "react";
 import { shallow } from "enzyme";
 
 import buildStore from "../../store";
-import BookDetailsContainer from "../BookDetailsContainer";
-import BookDetailsTabContainer from "../BookDetailsTabContainer";
+import BookDetailsContainer from "../bookdetails/BookDetailsContainer";
+import BookDetailsTabContainer from "../bookdetails/BookDetailsTabContainer";
 
 class DefaultBookDetails extends React.Component<any, any> {
   render() {

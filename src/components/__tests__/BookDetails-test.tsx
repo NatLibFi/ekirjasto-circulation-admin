@@ -4,10 +4,10 @@ import { spy } from "sinon";
 import * as React from "react";
 import { shallow } from "enzyme";
 
-import BookDetails from "../BookDetails";
-import BookCoverContainer from "../BookCoverContainer";
-import BookDetailsTableSection from "../BookDetailsTableSection";
-import LicensePool from "../LicensePool";
+import BookDetails from "../bookdetails/BookDetails";
+import BookCoverContainer from "../bookdetails/BookCoverContainer";
+import BookDetailsTableSection from "../bookdetails/BookDetailsTableSection";
+import LicensePool from "../bookdetails/LicensePool";
 import SummaryContainer from "../SummaryContainer";
 import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { CirculationData } from "../../interfaces";

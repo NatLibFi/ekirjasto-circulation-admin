@@ -8,7 +8,7 @@ import OPDSCatalog from "@natlibfi/ekirjasto-web-opds-client/lib/components/OPDS
 import Header from "../Header";
 import Footer from "../Footer";
 import WelcomePage from "../WelcomePage";
-import BookDetailsContainer from "../BookDetailsContainer";
+import BookDetailsContainer from "../bookdetails/BookDetailsContainer";
 import title from "../../utils/title";
 
 describe("CatalogPage", () => {

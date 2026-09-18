@@ -1,14 +1,14 @@
 import * as React from "react";
-import editorAdapter from "../editorAdapter";
+import editorAdapter from "../../editorAdapter";
 import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
-import ActionCreator from "../actions";
+import ActionCreator from "../../actions";
 import { connect } from "react-redux";
 import BookDetailsEditor from "./BookDetailsEditor";
 import Classifications from "./Classifications";
 import BookCoverEditor from "./BookCoverEditor";
 import CustomListsForBook from "./CustomListsForBook";
-import { BookData } from "../interfaces";
-import { TabContainer, TabContainerProps } from "./TabContainer";
+import { BookData } from "../../interfaces";
+import { TabContainer, TabContainerProps } from "../TabContainer";
 
 export interface BookDetailsTabContainerProps extends TabContainerProps {
   bookUrl: string;

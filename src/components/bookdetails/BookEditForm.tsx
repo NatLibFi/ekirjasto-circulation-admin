@@ -1,6 +1,6 @@
 import * as React from "react";
-import EditableInput from "./EditableInput";
-import EditorField from "./EditorField";
+import EditableInput from "../EditableInput";
+import EditorField from "../EditorField";
 import { Form } from "library-simplified-reusable-components";
 import {
   BookData,
@@ -8,10 +8,10 @@ import {
   RolesData,
   MediaData,
   LanguagesData,
-} from "../interfaces";
-import LanguageField from "./LanguageField";
-import { formatString } from "../utils/sharedFunctions";
-import Contributors from "./Contributors";
+} from "../../interfaces";
+import LanguageField from "../LanguageField";
+import { formatString } from "../../utils/sharedFunctions";
+import Contributors from "../Contributors";
 
 export interface BookEditFormProps extends BookData {
   roles: RolesData;

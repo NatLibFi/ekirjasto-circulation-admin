@@ -3,7 +3,7 @@ import { expect } from "chai";
 import * as React from "react";
 import { shallow } from "enzyme";
 
-import ClassificationsTable from "../ClassificationsTable";
+import ClassificationsTable from "../bookdetails/ClassificationsTable";
 import classificationsData from "./classificationsData";
 import { ClassificationData } from "../../interfaces";
 

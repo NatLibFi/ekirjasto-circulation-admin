@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 const OPDSCatalog = require("@natlibfi/ekirjasto-web-opds-client/");
 import * as PropTypes from "prop-types";
 import { ActionsProvider } from "@natlibfi/ekirjasto-web-opds-client/lib/components/context/ActionsContext";
-import BookDetailsContainer from "./BookDetailsContainer";
+import BookDetailsContainer from "./bookdetails/BookDetailsContainer";
 import Header from "./Header";
 import Footer from "./Footer";
 import computeBreadcrumbs from "../computeBreadcrumbs";

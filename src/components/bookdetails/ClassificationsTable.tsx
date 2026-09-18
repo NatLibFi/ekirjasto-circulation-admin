@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ClassificationData } from "../interfaces";
+import { ClassificationData } from "../../interfaces";
 
 export interface ClassificationsTableProps {
   classifications: ClassificationData[];

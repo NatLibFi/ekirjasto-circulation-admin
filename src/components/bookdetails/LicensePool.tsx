@@ -6,7 +6,7 @@ import {
   CirculationLicense,
   CirculationLoan,
   LicensePoolData,
-} from "../interfaces";
+} from "../../interfaces";
 
 export interface LicensePoolProps {
   data?: CirculationData;
@@ -194,7 +194,7 @@ function HoldInformationSection({
 function LoanInformationTable({ loan }: LoanTableRowsProps): JSX.Element {
   return (
     <table className="custom-book-table">
-      <caption>Loan {loan.id}</caption>
+      <caption>Loan ({loan.id})</caption>
       <tbody>
         <LoanTableRows loan={loan} />
       </tbody>
@@ -205,7 +205,7 @@ function LoanInformationTable({ loan }: LoanTableRowsProps): JSX.Element {
 function HoldInformationTable({ hold }: { hold: CirculationHold }): JSX.Element {
   return (
     <table className="custom-book-table">
-      <caption>Hold {hold.id}</caption>
+      <caption>Hold ({hold.id})</caption>
       <tbody>
         <HoldTableRows hold={hold} />
       </tbody>
@@ -276,7 +276,6 @@ function LicenseAdditionalFieldsDetails({
 function LoanTableRows({ loan }: LoanTableRowsProps): JSX.Element {
   return (
     <React.Fragment key={loan.id}>
-      {renderBookTableRow("Loan ID", loan.id)}
       {renderBookTableRow("License identifier", loan.license_id)}
       {renderBookTableRow("Loan start", formatDateValue(loan.start, true))}
       {renderBookTableRow("Loan end", formatDateValue(loan.end, true))}
@@ -287,7 +286,6 @@ function LoanTableRows({ loan }: LoanTableRowsProps): JSX.Element {
 function HoldTableRows({ hold }: { hold: CirculationHold }): JSX.Element {
   return (
     <React.Fragment key={hold.id}>
-      {renderBookTableRow("Hold ID", hold.id)}
       {renderBookTableRow("Hold position", hold.position)}
       {renderBookTableRow("Hold start", formatDateValue(hold.start, true))}
       {renderBookTableRow("Hold end", formatDateValue(hold.end, true))}
