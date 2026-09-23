@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as PropTypes from "prop-types";
 import { Store } from "redux";
 import { connect } from "react-redux";
 import editorAdapter from "../../editorAdapter";
@@ -7,6 +8,7 @@ import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfac
 import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import { CirculationData } from "../../interfaces";
 import { RootState } from "../../store";
+import Admin from "../../models/Admin";
 import LicensePool from "./LicensePool";
 import BookCoverContainer from "./BookCoverContainer";
 import BookDetailsTableSection from "./BookDetailsTableSection";
@@ -50,17 +52,29 @@ export interface BookDetailsProps {
 
 /** Renders the book details page without using web-opds-client's UI components. */
 export class BookDetails extends React.Component<BookDetailsProps> {
+  context: { admin: Admin };
+  static contextTypes = {
+    admin: PropTypes.object.isRequired,
+  };
+
   componentDidMount() {
     this.fetchCirculationData();
   }
 
   componentDidUpdate(previousProps: BookDetailsProps) {
-    if (this.circulationDataUrl(previousProps) !== this.circulationDataUrl(this.props)) {
+    if (
+      this.circulationDataUrl(previousProps) !==
+      this.circulationDataUrl(this.props)
+    ) {
       this.fetchCirculationData();
     }
   }
 
   private fetchCirculationData() {
+    if (!this.context.admin || !this.context.admin.isSystemAdmin()) {
+      return;
+    }
+
     const url = circulationDataUrl(this.props.bookUrl);
     if (url && this.props.fetchCirculationData) {
       this.props.fetchCirculationData(url);
@@ -84,7 +98,7 @@ export class BookDetails extends React.Component<BookDetailsProps> {
             {book.series && book.series.name && (
               <p className="series">{book.series.name}</p>
             )}
-            {renderBookTables(book, this.props)}
+            {renderBookTables(book, this.props, this.context.admin)}
           </div>
         </div>
         <div className="custom-book-details-main">
@@ -129,7 +143,8 @@ function renderBookTables(
     | "circulationData"
     | "circulationIsFetching"
     | "circulationFetchError"
-  >
+  >,
+  admin: Admin
 ) {
   return (
     <div className="custom-book-tables" lang="en">
@@ -164,7 +179,10 @@ function renderBookTables(
       />
       <BookDetailsTableSection
         title="DRMs and formats"
-        rows={[["DRM", drm(book)], ["Formats", formats(book)]]}
+        rows={[
+          ["DRM", drm(book)],
+          ["Formats", formats(book)],
+        ]}
       />
       <BookDetailsTableSection
         title="Classifications"
@@ -178,10 +196,7 @@ function renderBookTables(
       <BookDetailsTableSection
         title="Accessibility"
         rows={[
-          [
-            "Conformance",
-            accessibilityConformance(props.workEntry || book),
-          ],
+          ["Conformance", accessibilityConformance(props.workEntry || book)],
           ["Ways of reading", accessibilityFeatures(props.workEntry || book)],
         ]}
       />
@@ -199,11 +214,13 @@ function renderBookTables(
           ["Patrons in queue", patronsInQueue(book)],
         ]}
       />
-      <LicensePool
-        data={props.circulationData}
-        isFetching={props.circulationIsFetching}
-        fetchError={props.circulationFetchError}
-      />
+      {admin && admin.isSystemAdmin() && (
+        <LicensePool
+          data={props.circulationData}
+          isFetching={props.circulationIsFetching}
+          fetchError={props.circulationFetchError}
+        />
+      )}
     </div>
   );
 }

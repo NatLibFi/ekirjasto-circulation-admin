@@ -11,6 +11,7 @@ import LicensePool from "../bookdetails/LicensePool";
 import SummaryContainer from "../SummaryContainer";
 import { BookData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import { CirculationData } from "../../interfaces";
+import Admin from "../../models/Admin";
 
 const book: BookData = {
   id: "urn:isbn:9780000000000",
@@ -80,7 +81,9 @@ const circulationData: CirculationData = {
 
 describe("BookDetails", () => {
   it("renders the book header and the new metadata components", () => {
-    const wrapper = shallow(<BookDetails book={book} />);
+    const wrapper = shallow(<BookDetails book={book} />, {
+      context: { admin: new Admin([{ role: "system" }]) },
+    });
 
     expect(wrapper.find(".custom-book-details").prop("lang")).to.equal("en");
     expect(wrapper.find("h1.title").text()).to.equal("The Mayan Secrets");
@@ -103,7 +106,9 @@ describe("BookDetails", () => {
         $: { "schema:additionalType": { value: "http://schema.org/EBook" } },
       }),
     });
-    const wrapper = shallow(<BookDetails book={bookWithDetails} />);
+    const wrapper = shallow(<BookDetails book={bookWithDetails} />, {
+      context: { admin: new Admin([{ role: "system" }]) },
+    });
     const sections = wrapper.find(BookDetailsTableSection);
 
     expect(sections.at(0).prop("title")).to.equal("Basic information");
@@ -126,11 +131,12 @@ describe("BookDetails", () => {
     expect(sections.at(2).prop("rows")[1][1]).to.equal("Children");
     expect(sections.at(2).prop("rows")[2][1]).to.deep.equal(["13-15"]);
     expect(sections.at(4).prop("rows")[0][1]).to.equal(7);
-    expect(sections.at(5).prop("rows").map((row) => row[1])).to.deep.equal([
-      4,
-      2,
-      3,
-    ]);
+    expect(
+      sections
+        .at(5)
+        .prop("rows")
+        .map((row) => row[1])
+    ).to.deep.equal([4, 2, 3]);
   });
 
   it("shows duration for audiobooks", () => {
@@ -142,7 +148,9 @@ describe("BookDetails", () => {
         },
       }),
     });
-    const wrapper = shallow(<BookDetails book={audiobook} />);
+    const wrapper = shallow(<BookDetails book={audiobook} />, {
+      context: { admin: new Admin([{ role: "system" }]) },
+    });
     const basicInformationRows = wrapper
       .find(BookDetailsTableSection)
       .at(0)
@@ -154,7 +162,9 @@ describe("BookDetails", () => {
   });
 
   it("renders the summary inside the basic information table", () => {
-    const wrapper = shallow(<BookDetails book={book} />);
+    const wrapper = shallow(<BookDetails book={book} />, {
+      context: { admin: new Admin([{ role: "system" }]) },
+    });
     const basicInformation = wrapper.find(BookDetailsTableSection).at(0).dive();
 
     expect(basicInformation.find(SummaryContainer)).to.have.length(1);
@@ -167,7 +177,9 @@ describe("BookDetails", () => {
   });
 
   it("renders the cover through the cover component", () => {
-    const wrapper = shallow(<BookDetails book={book} />);
+    const wrapper = shallow(<BookDetails book={book} />, {
+      context: { admin: new Admin([{ role: "system" }]) },
+    });
     const cover = wrapper.find(BookCoverContainer).dive();
 
     expect(cover.find("img").prop("src")).to.equal(book.imageUrl);
@@ -184,7 +196,9 @@ describe("BookDetails", () => {
       },
       raw: { "simplified:selected_by_patrons": "11" },
     });
-    const wrapper = shallow(<BookDetails book={book} workEntry={workEntry} />);
+    const wrapper = shallow(<BookDetails book={book} workEntry={workEntry} />, {
+      context: { admin: new Admin([{ role: "system" }]) },
+    });
     const sections = wrapper.find(BookDetailsTableSection);
 
     expect(sections.at(3).prop("rows")).to.deep.equal([
@@ -204,13 +218,22 @@ describe("BookDetails", () => {
         circulationData={circulationData}
         circulationIsFetching={true}
         circulationFetchError={fetchError}
-      />
+      />,
+      { context: { admin: new Admin([{ role: "system" }]) } }
     );
     const licensePool = wrapper.find(LicensePool);
 
     expect(licensePool.prop("data")).to.equal(circulationData);
     expect(licensePool.prop("isFetching")).to.equal(true);
     expect(licensePool.prop("fetchError")).to.equal(fetchError);
+  });
+
+  it("does not render the license pool for non-system admins", () => {
+    const wrapper = shallow(<BookDetails book={book} />, {
+      context: { admin: new Admin([{ role: "manager", library: "library" }]) },
+    });
+
+    expect(wrapper.find(LicensePool)).to.have.length(0);
   });
 
   it("fetches circulation data on mount and when the book URL changes", () => {
@@ -220,19 +243,41 @@ describe("BookDetails", () => {
         book={book}
         bookUrl="http://example.com/works/ISBN/11111111"
         fetchCirculationData={fetchCirculationData}
-      />
+      />,
+      { context: { admin: new Admin([{ role: "system" }]) } }
     );
 
-    expect(fetchCirculationData.calledWith(
-      "http://example.com/admin/works/ISBN/11111111/circulation_data"
-    )).to.equal(true);
+    expect(
+      fetchCirculationData.calledWith(
+        "http://example.com/admin/works/ISBN/11111111/circulation_data"
+      )
+    ).to.equal(true);
 
     wrapper.setProps({
       bookUrl: "http://example.com/works/3M/other-book",
     });
-    expect(fetchCirculationData.calledWith(
-      "http://example.com/admin/works/3M/other-book/circulation_data"
-    )).to.equal(true);
+    expect(
+      fetchCirculationData.calledWith(
+        "http://example.com/admin/works/3M/other-book/circulation_data"
+      )
+    ).to.equal(true);
   });
 
+  it("does not fetch circulation data for non-system admins", () => {
+    const fetchCirculationData = spy();
+    shallow(
+      <BookDetails
+        book={book}
+        bookUrl="http://example.com/works/ISBN/11111111"
+        fetchCirculationData={fetchCirculationData}
+      />,
+      {
+        context: {
+          admin: new Admin([{ role: "manager", library: "library" }]),
+        },
+      }
+    );
+
+    expect(fetchCirculationData.called).to.equal(false);
+  });
 });
