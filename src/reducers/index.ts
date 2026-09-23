@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 import book, { BookState } from "./book";
 import complaints, { ComplaintsState } from "./complaints";
 import classifications, { ClassificationsState } from "./classifications";
+import circulation, { CirculationState } from "./circulation";
 import bookCoverPreview, { BookCoverPreviewState } from "./bookCoverPreview";
 import bookCover from "./bookCover";
 import customListsForBook from "./customListsForBook";
@@ -35,8 +36,8 @@ import languages from "./languages";
 import rightsStatuses from "./rightsStatuses";
 import collection, {
   CollectionState,
-} from "@thepalaceproject/web-opds-client/lib/reducers/collection";
-import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/reducers/collection";
+import { CollectionData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import changePassword from "./changePassword";
 import { FetchEditState } from "./createFetchEditReducer";
 import { RegisterLibraryState } from "./createRegisterLibraryReducer";
@@ -67,6 +68,7 @@ export interface State {
   book: BookState;
   complaints: ComplaintsState;
   classifications: ClassificationsState;
+  circulation: CirculationState;
   bookCoverPreview: BookCoverPreviewState;
   bookCover: FetchEditState<string>;
   customListsForBook: FetchEditState<CustomListsData>;
@@ -107,6 +109,7 @@ export default combineReducers<State>({
   book,
   complaints,
   classifications,
+  circulation,
   bookCoverPreview,
   bookCover,
   customListsForBook,

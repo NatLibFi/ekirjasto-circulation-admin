@@ -4,10 +4,10 @@ import { stub } from "sinon";
 import * as React from "react";
 import { shallow } from "enzyme";
 
-import { Classifications } from "../Classifications";
+import { Classifications } from "../bookdetails/Classifications";
 import ErrorMessage from "../ErrorMessage";
-import ClassificationsForm from "../ClassificationsForm";
-import ClassificationsTable from "../ClassificationsTable";
+import ClassificationsForm from "../bookdetails/ClassificationsForm";
+import ClassificationsTable from "../bookdetails/ClassificationsTable";
 import buildStore from "../../store";
 import genreData from "./genreData";
 import classificationsData from "./classificationsData";

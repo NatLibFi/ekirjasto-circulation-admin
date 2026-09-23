@@ -3,9 +3,9 @@ import { Store } from "redux";
 import * as PropTypes from "prop-types";
 
 import BookDetailsTabContainer from "./BookDetailsTabContainer";
-import BookDetails from "./BookDetails";
-import { BookDetailsContainerProps } from "@thepalaceproject/web-opds-client/lib/components/Root";
-import { RootState } from "../store";
+import { BookDetails, ConnectedBookDetails } from "./BookDetails";
+import { BookDetailsContainerProps } from "@natlibfi/ekirjasto-web-opds-client/lib/components/Root";
+import { RootState } from "../../store";
 
 export interface BookDetailsContainerContext {
   csrfToken: string;
@@ -33,7 +33,15 @@ export default class BookDetailsContainer extends React.Component<
     const child = React.Children.only(
       this.props.children
     ) as React.ReactElement<BookDetails>;
-    const book = React.createElement(BookDetails, child.props);
+    const book = React.createElement(ConnectedBookDetails, {
+      ...child.props,
+      bookUrl: this.props.bookUrl,
+      store: this.context.editorStore,
+      library: this.context.library(
+        this.props.collectionUrl,
+        this.props.bookUrl
+      ),
+    } as any);
 
     return (
       <div className="book-details-container">

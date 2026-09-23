@@ -4,6 +4,7 @@ import {
   ComplaintsData,
   GenreTree,
   ClassificationData,
+  CirculationData,
   CirculationEventData,
   LibrariesData,
   CollectionsData,
@@ -28,13 +29,13 @@ import {
   StatisticsData,
   QuickSightEmbeddedURLData,
 } from "./interfaces";
-import { CollectionData } from "@thepalaceproject/web-opds-client/lib/interfaces";
-import DataFetcher from "@thepalaceproject/web-opds-client/lib/DataFetcher";
+import { CollectionData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
+import DataFetcher from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import {
   RequestError,
   RequestRejector,
-} from "@thepalaceproject/web-opds-client/lib/DataFetcher";
-import BaseActionCreator from "@thepalaceproject/web-opds-client/lib/actions";
+} from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
+import BaseActionCreator from "@natlibfi/ekirjasto-web-opds-client/lib/actions";
 import {
   getCustomListEditorFormData,
   getCustomListEditorSearchUrl,
@@ -165,6 +166,12 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly CLASSIFICATIONS_SUCCESS = "CLASSIFICATIONS_SUCCESS";
   static readonly CLASSIFICATIONS_FAILURE = "CLASSIFICATIONS_FAILURE";
   static readonly CLASSIFICATIONS_LOAD = "CLASSIFICATIONS_LOAD";
+
+  static readonly CIRCULATION_DATA = "CIRCULATION_DATA";
+  static readonly CIRCULATION_DATA_REQUEST = "CIRCULATION_DATA_REQUEST";
+  static readonly CIRCULATION_DATA_SUCCESS = "CIRCULATION_DATA_SUCCESS";
+  static readonly CIRCULATION_DATA_FAILURE = "CIRCULATION_DATA_FAILURE";
+  static readonly CIRCULATION_DATA_LOAD = "CIRCULATION_DATA_LOAD";
 
   static readonly EDIT_CLASSIFICATIONS_REQUEST = "EDIT_CLASSIFICATIONS_REQUEST";
   static readonly EDIT_CLASSIFICATIONS_SUCCESS = "EDIT_CLASSIFICATIONS_SUCCESS";
@@ -399,6 +406,13 @@ export default class ActionCreator extends BaseActionCreator {
   fetchClassifications(url: string) {
     return this.fetchJSON<{ classifications: ClassificationData[] }>(
       ActionCreator.CLASSIFICATIONS,
+      url
+    ).bind(this);
+  }
+
+  fetchCirculationData(url: string) {
+    return this.fetchJSON<CirculationData>(
+      ActionCreator.CIRCULATION_DATA,
       url
     ).bind(this);
   }

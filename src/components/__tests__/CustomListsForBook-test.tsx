@@ -4,7 +4,7 @@ import { stub } from "sinon";
 import * as React from "react";
 import { mount } from "enzyme";
 import { Button } from "library-simplified-reusable-components";
-import { CustomListsForBook } from "../CustomListsForBook";
+import { CustomListsForBook } from "../bookdetails/CustomListsForBook";
 import ErrorMessage from "../ErrorMessage";
 import WithRemoveButton from "../WithRemoveButton";
 import InputList from "../InputList";

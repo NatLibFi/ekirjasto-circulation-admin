@@ -1,7 +1,7 @@
 import * as React from "react";
 import EntryPointsTabs from "./EntryPointsTabs";
-import { CollectionContainerProps } from "@thepalaceproject/web-opds-client/lib/components/Root";
-import Collection from "@thepalaceproject/web-opds-client/lib/components/Collection";
+import { CollectionContainerProps } from "@natlibfi/ekirjasto-web-opds-client/lib/components/Root";
+import Collection from "@natlibfi/ekirjasto-web-opds-client/lib/components/Collection";
 
 /** Wrapper for `EntryPointsTabs`. This component is passed into the
     OPDSCatalog from web-opds-client. */
