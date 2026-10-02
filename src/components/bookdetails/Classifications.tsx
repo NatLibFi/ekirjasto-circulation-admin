@@ -87,8 +87,15 @@ export class Classifications extends React.Component<ClassificationsProps> {
 
   UNSAFE_componentWillMount() {
     if (this.props.bookUrl) {
-      this.props.fetchGenreTree("/admin/genres");
-      this.props.fetchClassifications(this.classificationsUrl());
+      // These actions expose request errors through Redux, but reject with a
+      // structured error object as well. Handle the expected rejection here so
+      // it is not reported as an uncaught runtime error by the dev overlay.
+      Promise.resolve(this.props.fetchGenreTree("/admin/genres")).catch(
+        () => undefined
+      );
+      Promise.resolve(
+        this.props.fetchClassifications(this.classificationsUrl())
+      ).catch(() => undefined);
     }
   }
 
@@ -106,17 +113,23 @@ export class Classifications extends React.Component<ClassificationsProps> {
   }
 
   refresh() {
-    this.props.fetchBook(this.props.bookAdminUrl);
-    this.props.fetchClassifications(this.classificationsUrl());
+    Promise.resolve(this.props.fetchBook(this.props.bookAdminUrl)).catch(
+      () => undefined
+    );
+    Promise.resolve(
+      this.props.fetchClassifications(this.classificationsUrl())
+    ).catch(() => undefined);
     this.props.refreshCatalog();
   }
 
   editClassifications(data: FormData) {
-    return this.props
-      .editClassifications(this.editClassificationsUrl(), data)
+    return Promise.resolve(
+      this.props.editClassifications(this.editClassificationsUrl(), data)
+    )
       .then((response) => {
         this.refresh();
-      });
+      })
+      .catch(() => undefined);
   }
 }
 

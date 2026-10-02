@@ -77,7 +77,13 @@ export class BookDetails extends React.Component<BookDetailsProps> {
 
     const url = circulationDataUrl(this.props.bookUrl);
     if (url && this.props.fetchCirculationData) {
-      this.props.fetchCirculationData(url);
+      // The action stores the error in Redux for LicensePool to display, but
+      // also rejects with the raw FetchErrorData object. Consume that expected
+      // rejection so webpack-dev-server does not report it as an uncaught
+      // runtime error ([object Object]).
+      Promise.resolve(this.props.fetchCirculationData(url)).catch(
+        () => undefined
+      );
     }
   }
 

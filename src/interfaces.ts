@@ -158,10 +158,7 @@ export type Audience = "Children" | "Young Adult" | "Adult" | "Adults Only";
 export type Fiction = "Fiction" | "Nonfiction";
 
 export interface GenreTree {
-  Fiction: {
-    [index: string]: GenreData;
-  };
-  Nonfiction: {
+  [classification: string]: {
     [index: string]: GenreData;
   };
 }
