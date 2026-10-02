@@ -187,7 +187,7 @@ export default class ClassificationsForm extends React.Component<
                 </div>
               </div>
               <div className="form-group genre-group-form">
-                <p>Genres</p>
+                <p>Current Genres</p>
                 {genres.sort().map((category) => (
                   <WithRemoveButton
                     key={category}
@@ -246,9 +246,9 @@ export default class ClassificationsForm extends React.Component<
     }
 
     return book.categories.filter((category) => {
-      return (
-        !!this.props.genreTree["Fiction"][category] ||
-        !!this.props.genreTree["Nonfiction"][category]
+      return Object.keys(this.props.genreTree).some(
+        (top) =>
+          !!this.props.genreTree[top] && !!this.props.genreTree[top][category]
       );
     });
   }
@@ -261,13 +261,12 @@ export default class ClassificationsForm extends React.Component<
   }
 
   filterGenres(genres: string[], fiction = true) {
-    const top = fiction ? "Fiction" : "Nonfiction";
-
-    if (!this.props.genreTree[top]) {
+    const genreGroup = this.genreGroup(fiction);
+    if (!genreGroup) {
       return [];
     }
 
-    return genres.filter((genre) => this.props.genreTree[top][genre]);
+    return genres.filter((genre) => genreGroup[genre]);
   }
 
   genreOptions() {
@@ -275,19 +274,16 @@ export default class ClassificationsForm extends React.Component<
       return [];
     }
 
-    const top = this.state.fiction ? "Fiction" : "Nonfiction";
-
-    if (!this.props.genreTree[top]) {
+    const genreGroup = this.genreGroup(this.state.fiction);
+    if (!genreGroup) {
       return [];
     }
 
-    return Object.keys(this.props.genreTree[top]).map(
-      (key) => this.props.genreTree[top][key]
-    );
+    return Object.keys(genreGroup).map((key) => genreGroup[key]);
   }
 
   fullGenre(category) {
-    for (const top of ["Fiction", "Nonfiction"]) {
+    for (const top of Object.keys(this.props.genreTree)) {
       const genre = this.props.genreTree[top][category];
       if (genre) {
         return genre.parents.concat([genre.name]).join(" > ");
@@ -295,6 +291,20 @@ export default class ClassificationsForm extends React.Component<
     }
 
     return category;
+  }
+
+  genreGroup(fiction: boolean) {
+    const top = fiction
+      ? ["Fiction", "Kaunokirjallisuus"]
+      : ["Nonfiction", "Tietokirjallisuus"];
+
+    for (const name of top) {
+      if (this.props.genreTree[name]) {
+        return this.props.genreTree[name];
+      }
+    }
+
+    return null;
   }
 
   validateAudience(audience, genres) {

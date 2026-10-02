@@ -82,16 +82,24 @@ export default class CatalogPage extends React.Component<CatalogPageProps, {}> {
     if (collectionUrl) {
       let urlParts = collectionUrl.split("/");
       if (urlParts.length > 0) {
-        return urlParts[0];
+        return this.libraryFromUrlPart(urlParts[0]);
       }
     }
     if (bookUrl) {
       let urlParts = bookUrl.split("/");
       if (urlParts.length > 0) {
-        return urlParts[0];
+        return this.libraryFromUrlPart(urlParts[0]);
       }
     }
     return null;
+  }
+
+  /**
+   * Extract the library key without allowing a query string from a catalog URL
+   * to become part of the API path (for example, `test-lib?max_cache_age=0`).
+   */
+  libraryFromUrlPart(urlPart: string): string {
+    return urlPart.split(/[?#]/, 1)[0];
   }
 
   hasLibrary(): boolean {
