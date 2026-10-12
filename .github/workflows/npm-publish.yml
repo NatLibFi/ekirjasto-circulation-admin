@@ -197,6 +197,9 @@ jobs:
       issues: write
       pull-requests: write
 
+    env:
+      GH_REPO: ${{ github.repository }}
+
     steps:
       - name: Create released label if needed
         shell: bash
