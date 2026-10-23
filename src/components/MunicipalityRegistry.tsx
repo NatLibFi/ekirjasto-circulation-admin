@@ -111,7 +111,7 @@ export default class MunicipalityRegistry extends React.Component<
         isFetching: false,
       });
     }
-  };
+  }
 
   updateEmail(kind: EmailChange["kind"], key: string, email: string) {
     const version = ++this.saveVersion;
