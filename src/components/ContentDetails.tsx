@@ -79,7 +79,7 @@ export default function ContentDetails({
                   ) : (
                     <>
                       <button
-                        className="btn btn-default danger"
+                        className="btn btn-default"
                         type="button"
                         onClick={() => onView(item)}
                       >
@@ -100,7 +100,7 @@ export default function ContentDetails({
                         {nextStatus === "published" ? "Julkaise" : "Piilota"}
                       </button>
                       <button
-                        className="btn btn-default"
+                        className="btn btn-default danger"
                         type="button"
                         onClick={() => onDelete(item)}
                       >
