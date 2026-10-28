@@ -4,7 +4,6 @@ import Libraries from "./Libraries";
 import Collections from "./Collections";
 import IndividualAdmins from "./IndividualAdmins";
 import PatronAuthServices from "./PatronAuthServices";
-import SitewideAnnouncements from "./SitewideAnnouncements";
 import SitewideSettings from "./SitewideSettings";
 import MetadataServices from "./MetadataServices";
 import CatalogServices from "./CatalogServices";
@@ -48,7 +47,6 @@ const SYSTEM_ADMIN_TABS = {
   metadata: MetadataServices,
   catalogServices: CatalogServices,
   discovery: DiscoveryServices,
-  sitewideAnnouncements: SitewideAnnouncements,
   contentManagement: ContentManagement,
 };
 
@@ -57,7 +55,6 @@ const { individualAdmins, ...EKIRJASTO_SYSTEM_ADMIN_TABS } = SYSTEM_ADMIN_TABS;
 const DISPLAY_NAMES: Partial<Record<keyof typeof SYSTEM_ADMIN_TABS, string>> = {
   individualAdmins: "Admins",
   patronAuth: "Patron Authentication",
-  sitewideAnnouncements: "Sitewide Announcements",
   sitewideSettings: "Sitewide Settings",
   catalogServices: "External Catalogs",
   contentManagement: "Content Management",
