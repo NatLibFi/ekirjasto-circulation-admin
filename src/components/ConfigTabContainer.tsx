@@ -9,6 +9,7 @@ import SitewideSettings from "./SitewideSettings";
 import MetadataServices from "./MetadataServices";
 import CatalogServices from "./CatalogServices";
 import DiscoveryServices from "./DiscoveryServices";
+import ContentManagement from "./ContentManagement";
 import {
   TabContainer,
   TabContainerProps,
@@ -31,9 +32,13 @@ const COMMON_TABS = { libraries: Libraries };
 const LIBRARY_MANAGER_TABS = {
   ...COMMON_TABS,
   individualAdmins: IndividualAdmins,
+  contentManagement: ContentManagement,
 };
 
-const EKIRJASTO_LIBRARY_MANAGER_TABS = { ...COMMON_TABS };
+const EKIRJASTO_LIBRARY_MANAGER_TABS = {
+  ...COMMON_TABS,
+  contentManagement: ContentManagement,
+};
 
 const SYSTEM_ADMIN_TABS = {
   ...LIBRARY_MANAGER_TABS,
@@ -44,6 +49,7 @@ const SYSTEM_ADMIN_TABS = {
   catalogServices: CatalogServices,
   discovery: DiscoveryServices,
   sitewideAnnouncements: SitewideAnnouncements,
+  contentManagement: ContentManagement,
 };
 
 const { individualAdmins, ...EKIRJASTO_SYSTEM_ADMIN_TABS } = SYSTEM_ADMIN_TABS;
@@ -54,6 +60,7 @@ const DISPLAY_NAMES: Partial<Record<keyof typeof SYSTEM_ADMIN_TABS, string>> = {
   sitewideAnnouncements: "Sitewide Announcements",
   sitewideSettings: "Sitewide Settings",
   catalogServices: "External Catalogs",
+  contentManagement: "Content Management",
 };
 
 /** Body of the system configuration page, with a tab for each type of
@@ -96,6 +103,10 @@ export default class ConfigTabContainer extends TabContainer<
       return admin.isEkirjastoUser()
         ? EKIRJASTO_LIBRARY_MANAGER_TABS
         : LIBRARY_MANAGER_TABS;
+    }
+
+    if (admin.isContentWriterOfSomeLibrary()) {
+      return { ...COMMON_TABS, contentManagement: ContentManagement };
     }
 
     return COMMON_TABS;

@@ -133,6 +133,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     // Other links that will be rendered in a Link router component and are library specific.
     const libraryLinkItems = [
       { label: "Lists", href: "lists/" },
+      {
+        label: "Sisällönhallinta",
+        href: "content/",
+        auth: this.context.admin.isContentWriter(currentLibrary),
+      },
       { label: "Lanes", href: "lanes/", auth: isLibraryManager },
       {
         label: "Patrons",
