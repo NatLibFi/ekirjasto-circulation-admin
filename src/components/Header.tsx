@@ -159,14 +159,14 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           (this.isEkirjasto && isSiteWide && isSystemAdmin),
       },
       {
-        label: "Järjestelmän asetukset",
+        label: "Asetukset",
         href: "config/",
         // Finland: Palace shows system config for all roles.
         // For E-kirjasto limit to system admins only.
         auth: !this.isEkirjasto || isSystemAdmin,
       },
       {
-        label: "Troubleshooting",
+        label: "Ajot",
         href: "troubleshooting/",
         auth: isSystemAdmin,
       },
