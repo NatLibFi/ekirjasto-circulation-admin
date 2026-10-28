@@ -38,6 +38,14 @@ describe("TroubleshootingPage", () => {
     expect(wrapper.find(TroubleshootingTabContainer).length).to.equal(1);
   });
 
+  it("falls back to diagnostics for an unknown route tab", () => {
+    wrapper.setProps({ params: { tab: "nypl", subtab: "" } });
+
+    expect(wrapper.find(TroubleshootingTabContainer).prop("tab")).to.equal(
+      "diagnostics"
+    );
+  });
+
   it("switches tabs", () => {
     it("switches tabs", () => {
       expect(wrapper.state()["tab"]).to.equal("diagnostics");
