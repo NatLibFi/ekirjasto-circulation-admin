@@ -1,0 +1,164 @@
+.content-page {
+  .content-page-main {
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+
+  .content-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .content-table,
+  .content-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85em;
+    table-layout: auto;
+  }
+
+  %content-table-cell {
+    border: 0;
+    border-bottom: 1px solid #ccc;
+    padding: 4px 6px;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  .content-table-cell {
+    @extend %content-table-cell;
+  }
+
+  .content-table-actions {
+    @extend %content-table-cell;
+    white-space: nowrap;
+  }
+
+  .content-action-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .content-action-button {
+    margin: 0;
+  }
+
+  .content-editor-form {
+    label {
+      display: block;
+      margin: 12px 0 4px;
+    }
+
+    input,
+    select {
+      margin-left: 4px;
+    }
+
+    .content-title-input {
+      display: block;
+      width: min(100%, 800px);
+      max-width: 100%;
+      margin: 4px 0 0;
+      box-sizing: border-box;
+    }
+  }
+
+  .editor-toolbar {
+    display: flex;
+    gap: 4px;
+    margin: 50px 0 4px;
+  }
+
+  .content-link-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin: 8px 0 12px;
+
+    label {
+      display: inline;
+      margin: 0;
+    }
+
+    input {
+      margin: 0 8px 0 0;
+    }
+
+    button {
+      margin: 0;
+    }
+
+    .content-link-error {
+      flex-basis: 100%;
+      margin: 0;
+      color: #a94442;
+    }
+  }
+
+  .content-editor {
+    min-height: 240px;
+    max-width: 70%;
+    border: 1px solid #777;
+    padding: 12px;
+    background-color: #fff;
+  }
+
+  .content-details-table pre {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .content-details-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .content-details-table {
+    th,
+    td {
+      @extend %content-table-cell;
+      text-align: left;
+    }
+  }
+
+  .content-page-section {
+    margin-bottom: 24px;
+  }
+
+  .content-management-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .content-type-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-right: 1px solid #ccc;
+    padding: 8px;
+
+    button {
+      border: 0;
+      background: transparent;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+
+      &.active {
+        background: #eee;
+        font-weight: 600;
+      }
+    }
+  }
+
+  @media (max-width: 700px) {
+    .content-management-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+}
