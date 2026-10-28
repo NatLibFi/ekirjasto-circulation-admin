@@ -104,6 +104,9 @@ export default class ContentPage extends React.Component<
 > {
   context: ContentPageContext;
   static contextTypes = { csrfToken: PropTypes.string.isRequired };
+  static childContextTypes = {
+    library: PropTypes.func,
+  };
 
   constructor(props: ContentPageProps) {
     super(props);
@@ -117,6 +120,12 @@ export default class ContentPage extends React.Component<
       loading: false,
       creating: false,
       mode: "none",
+    };
+  }
+
+  getChildContext() {
+    return {
+      library: () => this.props.params.library,
     };
   }
 
