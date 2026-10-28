@@ -74,12 +74,12 @@ export default function ContentDetails({
                       type="button"
                       onClick={() => onCreate(language.language)}
                     >
-                      Luo uusi
+                      Lisää
                     </button>
                   ) : (
                     <>
                       <button
-                        className="btn btn-default"
+                        className="btn btn-default danger"
                         type="button"
                         onClick={() => onView(item)}
                       >

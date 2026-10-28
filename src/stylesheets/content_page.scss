@@ -4,6 +4,11 @@
     margin: 0 auto;
   }
 
+  button {
+    padding: 4px 8px;
+    font-size: 0.9em;
+  }
+
   .content-table-wrapper {
     overflow-x: auto;
   }
@@ -65,8 +70,62 @@
 
   .editor-toolbar {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     margin: 50px 0 4px;
+  }
+
+  .editor-group {
+    width: 100%;
+    max-width: 1500px;
+    margin-top: 50px;
+  }
+
+  .editor-panel {
+    box-sizing: border-box;
+    border: 1px solid $blue-dark;
+    padding: 12px;
+
+    > .editor-toolbar {
+      margin-top: 0;
+    }
+  }
+
+  .has-switcher .editor-panel {
+    border-top: 0;
+  }
+
+  .editor-switcher {
+    gap: 0;
+    margin: 0;
+    border-bottom: 1px solid $blue-dark;
+
+    .editor-switcher-button {
+      flex: 1 1 0;
+      margin: 0;
+      border: 1px solid transparent;
+      border-radius: 4px 4px 0 0;
+
+      &[aria-pressed="true"] {
+        position: relative;
+        z-index: 1;
+        margin-bottom: -1px;
+        border-color: $blue-dark;
+        border-bottom-color: $white;
+        background: $white;
+        color: $blue-dark;
+
+        &:hover,
+        &:focus {
+          background: $white;
+          color: $blue-dark;
+        }
+      }
+    }
+  }
+
+  .editor-panel .btn {
+    white-space: normal;
   }
 
   .content-link-form {
@@ -98,7 +157,7 @@
 
   .content-editor {
     min-height: 240px;
-    max-width: 70%;
+    max-width: none;
     border: 1px solid #777;
     padding: 12px;
     background-color: #fff;
@@ -145,7 +204,7 @@
     button {
       border: 0;
       background: transparent;
-      padding: 10px;
+      padding: 4px 8px;
       text-align: left;
       cursor: pointer;
 

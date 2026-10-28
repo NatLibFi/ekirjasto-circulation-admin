@@ -31,7 +31,8 @@ export class ContentManagement extends React.Component<ContentManagementProps> {
       <section className="content-management">
         <h2>Content management</h2>
         <p>
-          Create and manage news, FAQs, and disruption banners for a library.
+          Create and manage news, FAQs, and rich sitewide disruption
+          announcements for a library.
         </p>
         <ul>
           {libraries.map((library) => (

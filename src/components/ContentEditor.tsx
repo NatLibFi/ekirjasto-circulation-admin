@@ -8,7 +8,7 @@ import {
 } from "draft-js";
 import { Button } from "library-simplified-reusable-components";
 
-import { ContentItem, ContentType } from "./ContentPage";
+import { ContentItem } from "./ContentPage";
 
 export function normalizeLinkUrl(url: string): string | undefined {
   const trimmedUrl = url.trim();
@@ -173,144 +173,182 @@ export default function ContentEditor({
   return (
     <section className="content-editor-form">
       <label>
-        Type{" "}
+        Uusi{" "}
+        <span>
+          {item.type === "faq"
+            ? "Käyttöohjeet"
+            : item.type === "banner"
+            ? "Häiriöilmoitus"
+            : "Ajankohtaista"}
+        </span>
+      </label>
+      <label>
+        Kieli{" "}
         <select
-          value={item.type}
-          onChange={(event) =>
-            updateItem({ type: event.target.value as ContentType })
-          }
+          value={item.language || ""}
+          onChange={(event) => updateItem({ language: event.target.value })}
         >
-          <option value="news">Ajankohtaista</option>
-          <option value="faq">Käyttöohjeet</option>
-          <option value="banner">Häiriöilmoitus</option>
+          <option value="fi">Suomi</option>
+          <option value="sv">Svenska</option>
+          <option value="en">English</option>
         </select>
       </label>
       <label>
-        Language{" "}
-        <input
-          value={item.language || ""}
-          onChange={(event) => updateItem({ language: event.target.value })}
-        />
-      </label>
-      <label>
-        Title{" "}
+        Otsikko{" "}
         <input
           className="content-title-input"
           value={item.title || ""}
           onChange={(event) => updateItem({ title: event.target.value })}
         />
       </label>
-      <div className="editor-toolbar" aria-label="Text formatting">
-        <button
-          className="btn btn-default"
-          type="button"
-          aria-pressed={activeEditor === "intro"}
-          onClick={() => onChangeActiveEditor("intro")}
-        >
-          Introduction
-        </button>
-        <button
-          className="btn btn-default"
-          type="button"
-          aria-pressed={activeEditor === "content"}
-          onClick={() => onChangeActiveEditor("content")}
-        >
-          Content
-        </button>
-      </div>
-      <div className="editor-toolbar" aria-label="Text formatting">
-        <button
-          className="btn btn-default"
-          type="button"
-          onClick={() => toggleInline("BOLD")}
-        >
-          Bold
-        </button>
-        <button
-          className="btn btn-default"
-          type="button"
-          onClick={() => toggleInline("ITALIC")}
-        >
-          Italic
-        </button>
-        <button
-          className="btn btn-default"
-          type="button"
-          onClick={() => changeBlock("header-two")}
-        >
-          Heading
-        </button>
-        <button
-          className="btn btn-default"
-          type="button"
-          onClick={() => changeBlock("unordered-list-item")}
-        >
-          List
-        </button>
-        <button
-          className="btn btn-default"
-          type="button"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={openLinkForm}
-        >
-          Add link
-        </button>
-      </div>
-      {linkFormOpen && (
-        <form className="content-link-form" onSubmit={addLink}>
-          <label htmlFor="content-link-text">Linkkiteksti</label>
-          <input
-            id="content-link-text"
-            value={linkText}
-            onChange={(event) => setLinkText(event.target.value)}
-          />
-          <label htmlFor="content-link-url">URL-osoite</label>
-          <input
-            id="content-link-url"
-            type="text"
-            placeholder="https://example.com"
-            value={linkUrl}
-            onChange={(event) => setLinkUrl(event.target.value)}
-          />
-          {linkError && (
-            <p className="content-link-error" role="alert">
-              {linkError}
-            </p>
-          )}
-          <button className="btn btn-primary" type="submit">
-            Lisää linkki
-          </button>
-          <button
-            className="btn btn-default"
-            type="button"
-            onClick={closeLinkForm}
-          >
-            Peruuta
-          </button>
-        </form>
-      )}
-      <label htmlFor="editorial-content-body">
-        {activeEditor === "intro" ? "Johdanto" : "Sisältö"}
-      </label>
       <div
-        id="editorial-content-body"
-        className="editor content-editor"
-        role="textbox"
-        aria-label="Sisältö"
-        tabIndex={0}
-        onClick={focusEditor}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            focusEditor();
-          }
-        }}
+        className={`editor-group ${
+          item.type !== "banner" ? "has-switcher" : ""
+        }`}
       >
-        <Editor
-          ref={editorRef}
-          editorState={editor}
-          onChange={onChangeEditor}
-        />
+        {item.type !== "banner" && (
+          <div className="editor-toolbar editor-switcher" aria-label="Editor">
+            <button
+              className="btn btn-default editor-switcher-button"
+              type="button"
+              aria-pressed={activeEditor === "intro"}
+              onClick={() => onChangeActiveEditor("intro")}
+            >
+              Esittelyteksti
+            </button>
+            <button
+              className="btn btn-default editor-switcher-button"
+              type="button"
+              aria-pressed={activeEditor === "content"}
+              onClick={() => onChangeActiveEditor("content")}
+            >
+              Sisältö
+            </button>
+          </div>
+        )}
+        <div className="editor-panel">
+          <div className="editor-toolbar" aria-label="Text formatting">
+            <button
+              className="btn btn-default"
+              type="button"
+              onClick={() => toggleInline("BOLD")}
+            >
+              Lihavoitu
+            </button>
+            <button
+              className="btn btn-default"
+              type="button"
+              onClick={() => toggleInline("ITALIC")}
+            >
+              Kursivoitu
+            </button>
+            <button
+              className="btn btn-default"
+              type="button"
+              onClick={() => changeBlock("header-one")}
+            >
+              Otsikkotaso 1
+            </button>
+
+            <button
+              className="btn btn-default"
+              type="button"
+              onClick={() => changeBlock("header-two")}
+            >
+              Otsikkotaso 2
+            </button>
+            <button
+              className="btn btn-default"
+              type="button"
+              onClick={() => changeBlock("header-three")}
+            >
+              Otsikkotaso 3
+            </button>
+            <button
+              className="btn btn-default"
+              type="button"
+              onClick={() => changeBlock("unordered-list-item")}
+            >
+              Lista
+            </button>
+            <button
+              className="btn btn-default"
+              type="button"
+              onClick={() => changeBlock("ordered-list-item")}
+            >
+              Numeroitu lista
+            </button>
+
+            <button
+              className="btn btn-default"
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={openLinkForm}
+            >
+              Lisää linkki
+            </button>
+          </div>
+          {linkFormOpen && (
+            <form className="content-link-form" onSubmit={addLink}>
+              <label htmlFor="content-link-text">Linkkiteksti</label>
+              <input
+                id="content-link-text"
+                value={linkText}
+                onChange={(event) => setLinkText(event.target.value)}
+              />
+              <label htmlFor="content-link-url">URL-osoite</label>
+              <input
+                id="content-link-url"
+                type="text"
+                placeholder="https://example.com"
+                value={linkUrl}
+                onChange={(event) => setLinkUrl(event.target.value)}
+              />
+              {linkError && (
+                <p className="content-link-error" role="alert">
+                  {linkError}
+                </p>
+              )}
+              <button className="btn btn-primary" type="submit">
+                Lisää linkki
+              </button>
+              <button
+                className="btn btn-default"
+                type="button"
+                onClick={closeLinkForm}
+              >
+                Peruuta
+              </button>
+            </form>
+          )}
+          <label htmlFor="editorial-content-body">
+            Muokkaat nyt:{" "}
+            <strong>
+              {activeEditor === "intro" ? "Esittelyteksti" : "Sisältö"}
+            </strong>
+          </label>
+          <div
+            id="editorial-content-body"
+            className="editor content-editor"
+            role="textbox"
+            aria-label="Sisältö"
+            tabIndex={0}
+            onClick={focusEditor}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                focusEditor();
+              }
+            }}
+          >
+            <Editor
+              ref={editorRef}
+              editorState={editor}
+              onChange={onChangeEditor}
+              ariaLabel="Sisältö"
+            />
+          </div>
+        </div>
       </div>
       <Button callback={() => onSave("draft")} content="Tallenna luonnos" />
       <Button callback={() => onSave("published")} content="Julkaise" />

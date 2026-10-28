@@ -8,6 +8,26 @@ import { insertLink, normalizeLinkUrl } from "../ContentEditor";
 import ContentEditor from "../ContentEditor";
 
 describe("content editor links", () => {
+  it("offers disruption banners as an editable content type", () => {
+    const editor = EditorState.createEmpty();
+    const wrapper = mount(
+      <ContentEditor
+        item={{ type: "banner", language: "fi" }}
+        introEditor={editor}
+        contentEditor={editor}
+        activeEditor="content"
+        onChangeItem={() => undefined}
+        onChangeActiveEditor={() => undefined}
+        onChangeIntroEditor={() => undefined}
+        onChangeContentEditor={() => undefined}
+        onSave={() => undefined}
+      />
+    );
+
+    expect(wrapper.find("label").first().text()).to.contain("Häiriöilmoitus");
+    expect(wrapper.find(".editor-switcher-button")).to.have.length(0);
+  });
+
   it("serializes a link inside its paragraph", () => {
     const editor = EditorState.createWithContent(
       ContentState.createFromText("Example")
@@ -77,7 +97,7 @@ describe("content editor links", () => {
 
     wrapper
       .find("button")
-      .filterWhere((button) => button.text() === "Add link")
+      .filterWhere((button) => button.text() === "Lisää linkki")
       .simulate("click");
     wrapper.find("#content-link-text").simulate("change", {
       target: { value: "Example" },
@@ -93,6 +113,25 @@ describe("content editor links", () => {
     expect(
       convertContentToHTML((updatedEditor as EditorState).getCurrentContent())
     ).to.contain('<a href="https://example.com">');
+  });
+
+  it("provides intro and content tabs for news", () => {
+    const editor = EditorState.createEmpty();
+    const wrapper = mount(
+      <ContentEditor
+        item={{ type: "news", language: "fi" }}
+        introEditor={editor}
+        contentEditor={editor}
+        activeEditor="content"
+        onChangeItem={() => undefined}
+        onChangeActiveEditor={() => undefined}
+        onChangeIntroEditor={() => undefined}
+        onChangeContentEditor={() => undefined}
+        onSave={() => undefined}
+      />
+    );
+
+    expect(wrapper.find(".editor-switcher-button")).to.have.length(2);
   });
 
   it("loads anchor HTML as a link entity", () => {
