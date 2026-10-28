@@ -40,10 +40,9 @@ export interface ContentItem {
   title: string;
   intro_html: string;
   body_html: string;
-  status: "draft" | "published" | "hide";
+  status: "draft" | "published";
   slug: string;
   published_at?: string;
-  hidden_at?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -243,6 +242,12 @@ export default class ContentPage extends React.Component<
 
   save = async (status: "draft" | "published") => {
     const { item, introEditor, contentEditor } = this.state;
+    if (
+      status === "published" &&
+      !window.confirm(`Publish ${item.title || "this content"}?`)
+    ) {
+      return;
+    }
     const intro_html = convertContentToHTML(introEditor.getCurrentContent());
     const body_html = convertContentToHTML(contentEditor.getCurrentContent());
     const payload = {
@@ -287,7 +292,10 @@ export default class ContentPage extends React.Component<
     await this.loadGroup(saved.group_id);
   };
 
-  changeStatus = async (item: ContentItem, status: "published" | "hide") => {
+  changeStatus = async (item: ContentItem, status: "published" | "draft") => {
+    if (status === "published" && !window.confirm(`Publish ${item.title}?`)) {
+      return;
+    }
     const response = await fetch(
       `/${this.props.params.library}/admin/content/${item.id}`,
       {

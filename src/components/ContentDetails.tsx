@@ -17,7 +17,7 @@ interface ContentDetailsProps {
   onBack: () => void;
   onView: (item: ContentItem) => void;
   onEdit: (item: ContentItem) => void;
-  onChangeStatus: (item: ContentItem, status: "published" | "hide") => void;
+  onChangeStatus: (item: ContentItem, status: "published" | "draft") => void;
   onDelete: (item: ContentItem) => void;
   onCreate: (language: string) => void;
 }
@@ -47,7 +47,6 @@ export default function ContentDetails({
             <th>Luotu</th>
             <th>Julkaistu</th>
             <th>Muokattu</th>
-            <th>Piilotettu</th>
             <th>Toiminnot</th>
           </tr>
         </thead>
@@ -55,7 +54,7 @@ export default function ContentDetails({
           {languages.map((language) => {
             const item = language as ContentItem;
             const nextStatus =
-              item.status === "published" ? "hide" : "published";
+              item.status === "published" ? "draft" : "published";
             return (
               <tr key={language.language}>
                 <th>{language.language}</th>
@@ -68,7 +67,6 @@ export default function ContentDetails({
                     : "—"}
                 </td>
                 <td>{formatDate(language.updated_at)}</td>
-                <td>{language.status === "hide" ? "Kyllä" : "—"}</td>
                 <td className="content-action-buttons">
                   {!language.available ? (
                     <button
