@@ -20,6 +20,7 @@ import {
   circulationDataUrl,
   copiesAvailable,
   copiesOwned,
+  dataSourceModified,
   distributor,
   drm,
   formats,
@@ -28,9 +29,13 @@ import {
   genres,
   issued,
   isbn,
+  layout,
   medium,
   patronsInQueue,
   selectedByPatrons,
+  numberOfPages,
+  seriesName,
+  seriesPosition,
   targetAge,
   updated,
   ExtendedBookData,
@@ -101,9 +106,7 @@ export class BookDetails extends React.Component<BookDetailsProps> {
           <div className="custom-book-details-metadata">
             <h1 className="title">{book.title}</h1>
             {book.subtitle && <p className="subtitle">{book.subtitle}</p>}
-            {book.series && book.series.name && (
-              <p className="series">{book.series.name}</p>
-            )}
+            {seriesName(book) && <p className="series">{seriesName(book)}</p>}
             {renderBookTables(book, this.props, this.context.admin)}
           </div>
         </div>
@@ -168,9 +171,14 @@ function renderBookTables(
           ["Language", book.language],
           ["Medium", medium(book)],
           ["Duration", audiobookDuration(book)],
+          ["Pages", numberOfPages(book)],
+          ["Layout", layout(book)],
+          ["Series", seriesName(book)],
+          ["Series position", seriesPosition(book)],
           ["Published", book.published],
           ["Issued", issued(book)],
           ["Updated", updated(book)],
+          ["Data source modified", dataSourceModified(book)],
           ["Distributor", distributor(book)],
           [
             "Summary",
