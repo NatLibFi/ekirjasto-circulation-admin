@@ -27,7 +27,7 @@ describe("content editor links", () => {
       />
     );
 
-    expect(wrapper.find("label").first().text()).to.contain("Häiriöilmoitus");
+    expect(wrapper.find("label").first().text()).to.contain("Kieli");
     expect(wrapper.find(".editor-switcher-button")).to.have.length(0);
   });
 
@@ -240,7 +240,7 @@ describe("ContentPage creation", () => {
 
     page.setState({ mode: "language-view", item: { type: "faq" } });
     expect(wrapper.find(".content-page-subheading").text()).to.equal(
-      "Katso Käyttöohjeet"
+      " Käyttöohje"
     );
 
     page.setState({ mode: "edit", item: { type: "banner" } });

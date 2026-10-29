@@ -22,7 +22,7 @@ describe("ContentItemView", () => {
       />
     );
 
-    expect(wrapper.find("h2").map((heading) => heading.text())).to.deep.equal([
+    expect(wrapper.find("h3").map((heading) => heading.text())).to.deep.equal([
       "Sisältöteksti",
     ]);
     expect(wrapper.html()).to.not.contain("Intro");

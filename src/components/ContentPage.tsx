@@ -180,7 +180,7 @@ export default class ContentPage extends React.Component<
 
   edit = (item: ContentItem) => {
     this.openItem(item, "edit");
-  };
+  }
 
   openItem = (item: ContentItem, action: "view" | "edit", updateUrl = true) => {
     if (updateUrl) {
@@ -200,7 +200,7 @@ export default class ContentPage extends React.Component<
       ),
       activeEditor: "content",
     });
-  };
+  }
 
   newItem = () =>
     this.setState({
@@ -211,7 +211,7 @@ export default class ContentPage extends React.Component<
       contentEditor: EditorState.createEmpty(),
       activeEditor: "content",
       error: undefined,
-    });
+    })
 
   view = (item: ContentGroup) => {
     const groupId = item.group_id;
@@ -220,7 +220,7 @@ export default class ContentPage extends React.Component<
     );
     this.setState({ creating: false, mode: "view", error: undefined });
     this.loadGroup(groupId);
-  };
+  }
 
   showTable = () => {
     browserHistory.push(`/admin/web/content/${this.props.params.library}`);
@@ -230,7 +230,7 @@ export default class ContentPage extends React.Component<
       languages: [],
       error: undefined,
     });
-  };
+  }
 
   showGroup = () => {
     if (!this.props.params.identifier || !this.props.params.type) {
@@ -241,11 +241,11 @@ export default class ContentPage extends React.Component<
       `/admin/web/content/${this.props.params.library}/${this.props.params.type}/${this.props.params.identifier}`
     );
     this.setState({ mode: "view", creating: false, error: undefined });
-  };
+  }
 
   viewLanguage = (item: ContentItem) => {
     this.openItem(item, "view");
-  };
+  }
 
   save = async (status: "draft" | "published") => {
     const { item, introEditor, contentEditor } = this.state;
@@ -297,7 +297,7 @@ export default class ContentPage extends React.Component<
     );
     await this.load();
     await this.loadGroup(saved.group_id);
-  };
+  }
 
   changeStatus = async (item: ContentItem, status: "published" | "draft") => {
     if (status === "published" && !window.confirm(`Publish ${item.title}?`)) {
@@ -328,7 +328,7 @@ export default class ContentPage extends React.Component<
       error: undefined,
     });
     await this.load();
-  };
+  }
 
   deleteItem = async (item: ContentItem) => {
     if (!window.confirm(`Delete ${item.title}?`)) return;
@@ -339,7 +339,7 @@ export default class ContentPage extends React.Component<
     });
     this.setState({ mode: "none", creating: false });
     await this.load();
-  };
+  }
 
   createLanguage = (language: string) => {
     const group = this.state.items.find(
@@ -357,7 +357,7 @@ export default class ContentPage extends React.Component<
       },
       languages: this.state.languages,
     });
-  };
+  }
 
   selectType = (type?: ContentType) => {
     browserHistory.push(
@@ -366,7 +366,7 @@ export default class ContentPage extends React.Component<
         : `/admin/web/content/${this.props.params.library}`
     );
     this.setState({ mode: "none", creating: false });
-  };
+  }
 
   render() {
     const {
