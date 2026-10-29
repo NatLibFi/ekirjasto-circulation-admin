@@ -2,6 +2,10 @@
   .content-page-main {
     max-width: 1700px;
     margin: 50px;
+
+    > h1 {
+      margin-bottom: 32px;
+    }
   }
 
   button {
