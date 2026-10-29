@@ -8,7 +8,8 @@ import { Button } from "library-simplified-reusable-components";
 import Header from "./Header";
 import Footer from "./Footer";
 import ContentTable from "./ContentTable";
-import ContentDetails from "./ContentDetails";
+import ContentDetails from "./ContentDetailsTable";
+import ContentItemView from "./ContentItemView";
 import ContentEditor from "./ContentEditor";
 
 export type ContentType = "news" | "faq" | "banner";
@@ -439,27 +440,11 @@ export default class ContentPage extends React.Component<
             />
           )}
           {mode === "language-view" && (
-            <section className="content-details">
-              <button
-                className="btn btn-default"
-                type="button"
-                onClick={this.showGroup}
-              >
-                Takaisin
-              </button>
-              <Button
-                callback={() => this.edit(item as ContentItem)}
-                content="Muokkaa"
-              />
-              <h1>{item.title}</h1>
-              <p>
-                {item.language} · {item.status}
-              </p>
-              {item.intro_html && (
-                <div dangerouslySetInnerHTML={{ __html: item.intro_html }} />
-              )}
-              <div dangerouslySetInnerHTML={{ __html: item.body_html || "" }} />
-            </section>
+            <ContentItemView
+              item={item}
+              onBack={this.showGroup}
+              onEdit={() => this.edit(item as ContentItem)}
+            />
           )}
           {editing && (
             <section className="content-editor-page">
