@@ -413,12 +413,16 @@ export default class ContentPage extends React.Component<
                     Häiriöilmoitus
                   </button>
                 </aside>
-                {this.props.params.type && (
-                  <div>
-                    <Button callback={this.newItem} content="Luo uusi" />
-                    <ContentTable items={visibleItems} onView={this.view} />
-                  </div>
-                )}
+                <div>
+                  {this.props.params.type ? (
+                    <>
+                      <Button callback={this.newItem} content="Luo uusi" />
+                      <ContentTable items={visibleItems} onView={this.view} />
+                    </>
+                  ) : (
+                    <p>Voit luoda ja tarkastella sisältöjä valitsemalla sisällön vasemmasta valikosta.</p>
+                  )}
+                </div>
               </div>
             </section>
           )}
