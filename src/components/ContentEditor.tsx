@@ -335,7 +335,13 @@ export default function ContentEditor({
             tabIndex={0}
             onClick={focusEditor}
             onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
+              // Do not intercept keys bubbling from Draft.js's contenteditable.
+              // In particular, preventing Space here stops Draft.js from
+              // inserting spaces into the editor.
+              if (
+                event.target === event.currentTarget &&
+                (event.key === "Enter" || event.key === " ")
+              ) {
                 event.preventDefault();
                 focusEditor();
               }
