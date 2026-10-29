@@ -230,6 +230,25 @@ describe("ContentPage creation", () => {
     );
   });
 
+  it("identifies the content type and action outside the main content page", () => {
+    const wrapper = createPage({
+      library: "library",
+      type: "faq",
+      identifier: "group-1",
+    });
+    const page = wrapper.instance() as ContentPage;
+
+    page.setState({ mode: "language-view", item: { type: "faq" } });
+    expect(wrapper.find(".content-page-subheading").text()).to.equal(
+      "Katso Käyttöohjeet"
+    );
+
+    page.setState({ mode: "edit", item: { type: "banner" } });
+    expect(wrapper.find(".content-page-subheading").text()).to.equal(
+      "Muokkaa Häiriöilmoitus"
+    );
+  });
+
   it("initializes a new translation in the existing content group", () => {
     const wrapper = createPage({ ...params, identifier: "group-1" });
     const page = wrapper.instance() as ContentPage;

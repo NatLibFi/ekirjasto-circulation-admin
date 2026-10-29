@@ -43,7 +43,7 @@ export default function ContentDetails({
           <tr>
             <th>Kieli</th>
             <th>Otsikko</th>
-            <th>Status</th>
+            <th>Tila</th>
             <th>Luotu</th>
             <th>Julkaistu</th>
             <th>Muokattu</th>

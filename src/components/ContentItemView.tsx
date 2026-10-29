@@ -20,9 +20,9 @@ export default function ContentItemView({
         Takaisin
       </button>
       <Button callback={onEdit} content="Muokkaa" />
-      <h1>{item.title}</h1>
+      <h2>Otsikko: {item.title}</h2>
       <p>
-        {item.language} · {item.status}
+        Kieli: {item.language}, Tila: {item.status}
       </p>
       {item.type !== "banner" && (
         <>

@@ -173,16 +173,6 @@ export default function ContentEditor({
   return (
     <section className="content-editor-form">
       <label>
-        Uusi{" "}
-        <span>
-          {item.type === "faq"
-            ? "Käyttöohjeet"
-            : item.type === "banner"
-            ? "Häiriöilmoitus"
-            : "Ajankohtaista"}
-        </span>
-      </label>
-      <label>
         Kieli{" "}
         <select
           value={item.language || ""}

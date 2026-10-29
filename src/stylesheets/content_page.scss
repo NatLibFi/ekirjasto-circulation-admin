@@ -6,6 +6,10 @@
     > h1 {
       margin-bottom: 32px;
     }
+
+    .content-page-subheading {
+      margin: -16px 0 32px;
+    }
   }
 
   button {
@@ -171,6 +175,25 @@
     margin: 0;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+  }
+
+  .content-details {
+    > h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+
+    > p {
+      margin: 0 0 32px;
+    }
+
+    > h3 {
+      margin: 32px 0 12px;
+    }
+
+    > div {
+      margin-bottom: 24px;
+    }
   }
 
   .content-details-header {

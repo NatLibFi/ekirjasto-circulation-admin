@@ -14,6 +14,12 @@ import ContentEditor from "./ContentEditor";
 
 export type ContentType = "news" | "faq" | "banner";
 
+const contentTypeLabels: Record<ContentType, string> = {
+  news: "Ajankohtaista",
+  faq: "Käyttöohje",
+  banner: "Häiriöilmoitus",
+};
+
 export const convertContentToHTML = convertToHTML({
   entityToHTML: (entity, originalText) => {
     if (entity.type === "LINK") {
@@ -374,6 +380,9 @@ export default class ContentPage extends React.Component<
       error,
     } = this.state;
     const editing = mode === "edit" || mode === "create";
+    const contentType = (item.type || this.props.params.type) as
+      | ContentType
+      | undefined;
     const visibleItems = this.props.params.type
       ? items.filter((item) => item.type === this.props.params.type)
       : items;
@@ -383,6 +392,15 @@ export default class ContentPage extends React.Component<
         <Header />
         <main className="container-fluid content-page-main">
           <h1>Sisällönhallinta</h1>
+          {mode !== "none" && contentType && (
+            <h2 className="content-page-subheading">
+              {mode === "create"
+                ? "Luo uusi"
+                : editing
+                ? "Muokkaa"
+                : ""} {contentTypeLabels[contentType]}
+            </h2>
+          )}
           {error && <p role="alert">{error}</p>}
           {mode === "none" && (
             <section className="content-page-section">
@@ -395,7 +413,7 @@ export default class ContentPage extends React.Component<
                     }
                     onClick={() => this.selectType("news")}
                   >
-                    Uutiset
+                    Ajankohtaista
                   </button>
                   <button
                     type="button"

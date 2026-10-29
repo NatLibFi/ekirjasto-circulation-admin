@@ -17,7 +17,7 @@ export default function ContentTable({ items, onView }: ContentTableProps) {
         <thead>
           <tr>
             <th className="content-table-cell">Otsikko</th>
-            <th className="content-table-cell">Status</th>
+            <th className="content-table-cell">Tila</th>
             <th className="content-table-cell">Kielet</th>
             <th className="content-table-cell">Luotu</th>
             <th className="content-table-actions">Katso</th>
