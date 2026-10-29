@@ -26,13 +26,13 @@ export default function ContentItemView({
       </p>
       {item.type !== "banner" && (
         <>
-          <h2>Esittelyteksti</h2>
+          <h3>Esittelyteksti</h3>
           {item.intro_html && (
             <div dangerouslySetInnerHTML={{ __html: item.intro_html }} />
           )}
         </>
       )}
-      <h2>Sisältöteksti</h2>
+      <h3>Sisältöteksti</h3>
       <div dangerouslySetInnerHTML={{ __html: item.body_html || "" }} />
     </section>
   );
