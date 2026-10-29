@@ -24,9 +24,13 @@ export default function ContentItemView({
       <p>
         {item.language} · {item.status}
       </p>
-      <h2>Esittelyteksti</h2>
-      {item.intro_html && (
-        <div dangerouslySetInnerHTML={{ __html: item.intro_html }} />
+      {item.type !== "banner" && (
+        <>
+          <h2>Esittelyteksti</h2>
+          {item.intro_html && (
+            <div dangerouslySetInnerHTML={{ __html: item.intro_html }} />
+          )}
+        </>
       )}
       <h2>Sisältöteksti</h2>
       <div dangerouslySetInnerHTML={{ __html: item.body_html || "" }} />
