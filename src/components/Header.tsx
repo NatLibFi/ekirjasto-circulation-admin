@@ -120,7 +120,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     };
 
     const finlandStatisticsLinkItem = {
-      label: "Tilastot",
+      label: "Lainatilastot",
       href: "statistics/",
       hidden: !this.isEkirjasto || !isSystemAdmin,
     };
@@ -133,7 +133,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     // Other links that will be rendered in a Link router component and are library specific.
     const libraryLinkItems = [
       { label: "Listat", href: "lists/" },
-      { label: "Karusellien hallinta", href: "lanes/", auth: isLibraryManager },
+      { label: "Karusellit", href: "lanes/", auth: isLibraryManager },
       {
         label: "Patrons",
         href: "patrons/",
@@ -150,7 +150,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     // Links that will be rendered in a Link router component and are sitewide.
     const sitewideLinkItems = [
       {
-        label: "Tilastot",
+        label: "Kokoelmatilasto",
         href: "dashboard/",
         auth:
           // Finland: Palace shows dashboard for all roles
