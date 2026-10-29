@@ -76,7 +76,19 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
           "Licensepool created",
           formatDateValue(pool.availability_time)
         )}
-        {renderBookTableRow("Licenses owned (total concurrency)", pool.licenses_owned)}
+        {renderBookTableRow(
+          "Licence pool status",
+          String(pool.licensepool_status)
+        )}
+        {pool.licensepool_exhausted_date &&
+          renderBookTableRow(
+            "Licence pool exhausted date",
+            formatDateValue(pool.licensepool_exhausted_date)
+          )}
+        {renderBookTableRow(
+          "Licenses owned (total concurrency)",
+          pool.licenses_owned
+        )}
         {renderBookTableRow("Licenses available", pool.licenses_available)}
         {renderBookTableRow("Holds", pool.patrons_in_hold_queue ?? 0)}
         {renderBookTableRow(
@@ -84,10 +96,16 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
           pool.patrons_in_hold_queue !== null &&
             pool.patrons_in_hold_queue !== undefined &&
             pool.licenses_owned
-            ? `${((pool.patrons_in_hold_queue / pool.licenses_owned) * 100).toFixed(1)}%`
+            ? `${(
+                (pool.patrons_in_hold_queue / pool.licenses_owned) *
+                100
+              ).toFixed(1)}%`
             : ""
         )}
-        {renderBookTableRow("Licenses reserved (ready to checkout)", pool.licenses_reserved)}
+        {renderBookTableRow(
+          "Licenses reserved (ready to checkout)",
+          pool.licenses_reserved
+        )}
         {renderBookTableRow("Open access", String(pool.open_access))}
         {renderBookTableRow("Unlimited access", String(pool.unlimited_access))}
         {renderBookTableRow("Hidden", String(pool.suppressed))}
@@ -156,7 +174,9 @@ function LoanInformationSection({
 }): JSX.Element {
   return (
     <details className="license-pool-data-section">
-      <summary>Active Loans{loans.length ? ` (${loans.length})` : " (0)"}</summary>
+      <summary>
+        Active Loans{loans.length ? ` (${loans.length})` : " (0)"}
+      </summary>
       <div className="license-pool-record-tables">
         {loans.length ? (
           loans.map((loan, index) => (
@@ -220,7 +240,10 @@ function LoanInformationTable({
 function HoldInformationTable({
   hold,
   position,
-}: { hold: CirculationHold; position: number }): JSX.Element {
+}: {
+  hold: CirculationHold;
+  position: number;
+}): JSX.Element {
   return (
     <table className="custom-book-table">
       <caption>Hold ({position})</caption>
@@ -234,7 +257,10 @@ function HoldInformationTable({
 function LicenseTableRows({ license }: LicenseTableRowsProps): JSX.Element {
   return (
     <React.Fragment key={license.id}>
-      {renderBookTableRow("License identifier (datasource)", license.identifier)}
+      {renderBookTableRow(
+        "License identifier (datasource)",
+        license.identifier
+      )}
       {renderBookTableRow("License ID (database)", license.id)}
       {renderBookTableRow("License status", license.status)}
       {renderBookTableRow("Concurrency", license.terms_concurrency)}
@@ -313,7 +339,10 @@ function HoldTableRows({ hold }: { hold: CirculationHold }): JSX.Element {
   );
 }
 
-function formatDateValue(value: string | null, includeTime = false): string | null {
+function formatDateValue(
+  value: string | null,
+  includeTime = false
+): string | null {
   return value ? formatDate(value, includeTime) : null;
 }
 

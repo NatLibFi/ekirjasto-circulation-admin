@@ -95,6 +95,8 @@ export interface CirculationHold extends CirculationLoan {
 
 export interface LicensePoolData {
   availability_time: string | null;
+  licensepool_exhausted_date: string | null;
+  licensepool_status: string | null;
   collection: { id: number; name: string };
   data_source: { id: number; name: string };
   holds?: CirculationHold[];
