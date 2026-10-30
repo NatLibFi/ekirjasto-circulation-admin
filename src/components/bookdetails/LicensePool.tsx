@@ -80,6 +80,7 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
           "Licence pool status",
           String(pool.licensepool_status)
         )}
+        {renderBookTableRow("Pool identifier", pool.pool_identifier.identifier)}
         {pool.licensepool_exhausted_date &&
           renderBookTableRow(
             "Licence pool exhausted date",
@@ -263,6 +264,20 @@ function LicenseTableRows({ license }: LicenseTableRowsProps): JSX.Element {
       )}
       {renderBookTableRow("License ID (database)", license.id)}
       {renderBookTableRow("License status", license.status)}
+      {renderBookTableRow(
+        "Licence creation date",
+        formatDateValue(license.created)
+      )}
+      {renderBookTableRow(
+        "Licence exhausted date",
+        formatDateValue(license["exhausted date"])
+      )}
+      {renderBookTableRow("Price", formatPrice(license.price))}
+      {renderBookTableRow("Total checkouts", license.total_checkouts)}
+      {renderBookTableRow("Licence type", license["license type"])}
+      {renderBookTableRow("Feed status", license["feed status"])}
+      {renderBookTableRow("Order", formatOrder(license.order))}
+      {renderBookTableRow("Reason", license.reason)}
       {renderBookTableRow("Concurrency", license.terms_concurrency)}
       {renderBookTableRow("Checkouts available", license.checkouts_available)}
       {renderBookTableRow("Checkouts left", license.checkouts_left)}
@@ -344,6 +359,18 @@ function formatDateValue(
   includeTime = false
 ): string | null {
   return value ? formatDate(value, includeTime) : null;
+}
+
+function formatPrice(
+  price?: { currency: string; value: number } | null
+): string | null {
+  return price ? `${price.value} ${price.currency}` : null;
+}
+
+function formatOrder(
+  order?: { href: string; identifier: string; name: string } | null
+): string | null {
+  return order ? `${order.name}` : null;
 }
 
 function formatDate(value: string, includeTime = false): string {
