@@ -249,6 +249,21 @@ describe("ContentPage creation", () => {
     );
   });
 
+  it("uses the selected content type for the language table heading", () => {
+    const wrapper = createPage({
+      library: "library",
+      type: "faq",
+      identifier: "group-1",
+    });
+    const page = wrapper.instance() as ContentPage;
+
+    page.setState({ mode: "view", item: { type: "news" } });
+
+    expect(wrapper.find(".content-page-subheading").text()).to.equal(
+      " Käyttöohje"
+    );
+  });
+
   it("initializes a new translation in the existing content group", () => {
     const wrapper = createPage({ ...params, identifier: "group-1" });
     const page = wrapper.instance() as ContentPage;

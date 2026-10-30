@@ -380,7 +380,9 @@ export default class ContentPage extends React.Component<
       error,
     } = this.state;
     const editing = mode === "edit" || mode === "create";
-    const contentType = (item.type || this.props.params.type) as
+    const contentType = (mode === "view"
+      ? this.props.params.type || item.type
+      : item.type || this.props.params.type) as
       | ContentType
       | undefined;
     const visibleItems = this.props.params.type
