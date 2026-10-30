@@ -16,7 +16,7 @@ export type ContentType = "news" | "faq" | "banner";
 
 const contentTypeLabels: Record<ContentType, string> = {
   news: "Ajankohtaista",
-  faq: "Käyttöohje",
+  faq: "UKK",
   banner: "Häiriöilmoitus",
 };
 
@@ -446,7 +446,7 @@ export default class ContentPage extends React.Component<
                     className={this.props.params.type === "faq" ? "active" : ""}
                     onClick={() => this.selectType("faq")}
                   >
-                    Käyttöohjeet
+                    UKK
                   </button>
                   <button
                     type="button"

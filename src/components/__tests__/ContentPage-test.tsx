@@ -240,7 +240,7 @@ describe("ContentPage creation", () => {
 
     page.setState({ mode: "language-view", item: { type: "faq" } });
     expect(wrapper.find(".content-page-subheading").text()).to.equal(
-      " Käyttöohje"
+      " UKK"
     );
 
     page.setState({ mode: "edit", item: { type: "banner" } });
@@ -260,7 +260,7 @@ describe("ContentPage creation", () => {
     page.setState({ mode: "view", item: { type: "news" } });
 
     expect(wrapper.find(".content-page-subheading").text()).to.equal(
-      " Käyttöohje"
+      " UKK"
     );
   });
 
