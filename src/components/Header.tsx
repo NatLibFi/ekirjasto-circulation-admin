@@ -120,31 +120,37 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     };
 
     const finlandStatisticsLinkItem = {
-      label: "Tilastot",
+      label: "Lainatilastot",
       href: "statistics/",
       hidden: !this.isEkirjasto || !isSystemAdmin,
     };
 
     // Links that will be rendered in a NavItem Bootstrap component.
     const libraryNavItems = [
-      { label: "Catalog", href: "%2Fgroups?max_cache_age=0" },
-      { label: "Hidden Books", href: "%2Fadmin%2Fsuppressed" },
+      { label: "Kokoelma", href: "%2Fgroups?max_cache_age=0" },
+      { label: "Piilotetut kirjat", href: "%2Fadmin%2Fsuppressed" },
     ];
     // Other links that will be rendered in a Link router component and are library specific.
     const libraryLinkItems = [
-      { label: "Lists", href: "lists/" },
-      { label: "Lanes", href: "lanes/", auth: isLibraryManager },
+      { label: "Listat", href: "lists/" },
+      { label: "Karusellit", href: "lanes/", auth: isLibraryManager },
       {
         label: "Patrons",
         href: "patrons/",
         auth: isSystemAdmin,
         hidden: this.isEkirjasto,
       },
+      {
+        label: "Sisällönhallinta",
+        href: "content/",
+        auth: this.context.admin.isContentWriter(currentLibrary),
+      },
+
     ];
     // Links that will be rendered in a Link router component and are sitewide.
     const sitewideLinkItems = [
       {
-        label: "Dashboard",
+        label: "Kokoelmatilasto",
         href: "dashboard/",
         auth:
           // Finland: Palace shows dashboard for all roles
@@ -153,14 +159,14 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           (this.isEkirjasto && isSiteWide && isSystemAdmin),
       },
       {
-        label: "System Configuration",
+        label: "Asetukset",
         href: "config/",
         // Finland: Palace shows system config for all roles.
         // For E-kirjasto limit to system admins only.
         auth: !this.isEkirjasto || isSystemAdmin,
       },
       {
-        label: "Troubleshooting",
+        label: "Ajot",
         href: "troubleshooting/",
         auth: isSystemAdmin,
       },
