@@ -264,6 +264,23 @@ describe("ContentPage creation", () => {
     );
   });
 
+  it("returns to the content table when the group route is removed", () => {
+    const wrapper = createPage({
+      library: "library",
+      type: "faq",
+      identifier: "group-1",
+    });
+    const page = wrapper.instance() as ContentPage;
+    const previousProps = page.props;
+    page.load = async () => undefined;
+
+    wrapper.setProps({ params: { library: "library", type: "faq" } });
+    page.componentDidUpdate(previousProps);
+
+    expect(page.state.mode).to.equal("none");
+    expect(page.state.languages).to.deep.equal([]);
+  });
+
   it("initializes a new translation in the existing content group", () => {
     const wrapper = createPage({ ...params, identifier: "group-1" });
     const page = wrapper.instance() as ContentPage;

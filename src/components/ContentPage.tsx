@@ -139,6 +139,30 @@ export default class ContentPage extends React.Component<
     this.load();
   }
 
+  componentDidUpdate(prevProps: ContentPageProps) {
+    const previousParams = prevProps.params;
+    const currentParams = this.props.params;
+    const routeChanged =
+      previousParams.library !== currentParams.library ||
+      previousParams.type !== currentParams.type ||
+      previousParams.identifier !== currentParams.identifier ||
+      previousParams.itemId !== currentParams.itemId ||
+      previousParams.action !== currentParams.action;
+
+    if (!routeChanged) return;
+
+    if (!currentParams.identifier) {
+      this.setState({
+        mode: "none",
+        creating: false,
+        languages: [],
+        error: undefined,
+      });
+    }
+
+    this.load();
+  }
+
   async load() {
     this.setState({ loading: true });
     const response = await fetch(
