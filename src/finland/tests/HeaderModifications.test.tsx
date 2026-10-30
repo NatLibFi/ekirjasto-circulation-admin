@@ -37,6 +37,7 @@ class ContextWrapper extends React.Component<{
         isLibraryManager: () => true,
         isSystemAdmin: () => true,
         isLibraryManagerOfSomeLibrary: () => true,
+        isContentWriter: () => false,
         isEkirjastoUser: () => this.props.isEkirjastoUser,
       },
     };
