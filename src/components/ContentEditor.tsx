@@ -290,7 +290,6 @@ export default function ContentEditor({
               <input
                 id="content-link-url"
                 type="text"
-                placeholder="https://example.com"
                 value={linkUrl}
                 onChange={(event) => setLinkUrl(event.target.value)}
               />
