@@ -54,23 +54,23 @@ class ContextWrapper extends React.Component<{
 }
 
 describe("Header Modifications", () => {
-  it("renders the 'Tilastot' link if a library is selected", () => {
+  it("renders the 'Lainatilastot' link if a library is selected", () => {
     render(
       <ContextWrapper hasLibrary isEkirjastoUser>
         <Header />
       </ContextWrapper>
     );
-    const linkElement = screen.queryByText("Tilastot");
+    const linkElement = screen.queryByText("Lainatilastot");
     expect(linkElement).toBeInTheDocument();
   });
 
-  it("does not render the 'Tilastot' link if library is not selected", () => {
+  it("does not render the 'Lainatilastot' link if library is not selected", () => {
     render(
       <ContextWrapper hasLibrary={false} isEkirjastoUser={false}>
         <Header />
       </ContextWrapper>
     );
-    const linkElement = screen.queryByText("Tilastot");
+    const linkElement = screen.queryByText("Lainatilastot");
     expect(linkElement).not.toBeInTheDocument();
   });
 
