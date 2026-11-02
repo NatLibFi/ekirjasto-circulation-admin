@@ -33,6 +33,21 @@ export function formatContributor(contributor: {
   return role ? `${contributor.name} (${role})` : contributor.name;
 }
 
+export function primaryAuthor(book: BookData): string | null {
+  const author = book.authors && book.authors[0];
+  if (!author) {
+    return null;
+  }
+
+  const parts = author.trim().split(/\s+/);
+  if (parts.length < 2) {
+    return author;
+  }
+
+  const surname = parts.pop();
+  return `${surname}, ${parts.join(" ")}`;
+}
+
 function mapContributorRole(role: string): string {
   const normalizedRole = role.trim().toLowerCase();
   return CONTRIBUTOR_ROLE_NAMES[normalizedRole] || role;

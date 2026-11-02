@@ -34,6 +34,7 @@ import {
   layout,
   medium,
   patronsInQueue,
+  primaryAuthor,
   selectedByPatrons,
   numberOfPages,
   seriesName,
@@ -165,6 +166,7 @@ function renderBookTables(
           ["Title", book.title],
           ["Subtitle", book.subtitle],
           ["ISBN", isbn(book)],
+          ["Primary author", primaryAuthor(book)],
           ["Authors", book.authors],
           [
             "Contributors",

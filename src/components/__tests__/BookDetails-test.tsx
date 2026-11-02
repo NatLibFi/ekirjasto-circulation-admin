@@ -120,6 +120,10 @@ describe("BookDetails", () => {
       "ISBN",
       "9780000000000",
     ]);
+    expect(sections.at(0).prop("rows")[3]).to.deep.equal([
+      "Primary author",
+      "Cussler, Clive",
+    ]);
     expect(sections.at(1).prop("rows")[0][1]).to.equal(null);
     expect(sections.at(1).prop("rows")[1][1]).to.deep.equal([
       "application/epub+zip",
