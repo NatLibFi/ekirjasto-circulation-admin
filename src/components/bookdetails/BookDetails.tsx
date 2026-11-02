@@ -158,6 +158,11 @@ function renderBookTables(
   >,
   admin: Admin
 ) {
+  const bookMedium = medium(book);
+  const durationValue = audiobookDuration(book);
+  const pagesValue = numberOfPages(book);
+  const layoutValue = layout(book);
+
   return (
     <div className="custom-book-tables" lang="en">
       <BookDetailsTableSection
@@ -174,13 +179,19 @@ function renderBookTables(
           ],
           ["Language", book.language],
           ["Medium", medium(book)],
-          ["Duration", audiobookDuration(book)],
-          ["Pages", numberOfPages(book)],
-          ["Layout", layout(book)],
-          ["Awards", awards(book)],
-          ["Abridged", abridged(book)],
+          ...(bookMedium === "Audio" || durationValue !== null
+            ? [["Duration", durationValue] as [string, any]]
+            : []),
+          ...(bookMedium !== "Audio" || pagesValue !== null
+            ? [["Pages", pagesValue] as [string, any]]
+            : []),
           ["Series", seriesName(book)],
           ["Series position", seriesPosition(book)],
+          ["Awards", awards(book)],
+          ["Abridged", abridged(book)],
+          ...(bookMedium !== "Audio" || layoutValue !== null
+            ? [["Layout", layoutValue] as [string, any]]
+            : []),
           ["Published", book.published],
           ["Issued", issued(book)],
           ["Updated", updated(book)],
@@ -260,10 +271,8 @@ function audiobookDuration(book: ExtendedBookData): string | null {
   const seconds = totalSeconds % 60;
 
   if (hours > 0) {
-    return `${hours}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    return `${hours}h ${minutes}min ${seconds}sec`;
   }
 
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  return `${minutes}min ${seconds}sec`;
 }

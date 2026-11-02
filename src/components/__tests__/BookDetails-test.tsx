@@ -162,7 +162,7 @@ describe("BookDetails", () => {
 
     expect(
       basicInformationRows.find((row) => row[0] === "Duration")
-    ).to.deep.equal(["Duration", "1:01:01"]);
+    ).to.deep.equal(["Duration", "1h 1min 1sec"]);
   });
 
   it("shows series name and position from the raw feed series element", () => {

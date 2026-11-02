@@ -269,16 +269,17 @@ function LicenseTableRows({ license }: LicenseTableRowsProps): JSX.Element {
         "Licence creation date",
         formatDateValue(license.created)
       )}
-      {renderBookTableRow(
-        "Licence exhausted date",
-        formatDateValue(license["exhausted date"])
-      )}
+      {license["exhausted date"] &&
+        renderBookTableRow(
+          "Licence exhausted date",
+          formatDateValue(license["exhausted date"])
+        )}
       {renderBookTableRow("Price", formatPrice(license.price))}
       {renderBookTableRow("Total checkouts", license.total_checkouts)}
       {renderBookTableRow("Licence type", license["license type"])}
       {renderBookTableRow("Feed status", license["feed status"])}
       {renderBookTableRow("Order", formatOrder(license.order))}
-      {renderBookTableRow("Reason", license.reason)}
+      {license.reason && renderBookTableRow("Reason", license.reason)}
       {renderBookTableRow("Concurrency", license.terms_concurrency)}
       {renderBookTableRow("Checkouts available", license.checkouts_available)}
       {renderBookTableRow("Checkouts left", license.checkouts_left)}
