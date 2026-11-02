@@ -80,6 +80,7 @@ function LicensePoolTable({ pool }: { pool: LicensePoolData }): JSX.Element {
           "Licence pool status",
           String(pool.licensepool_status)
         )}
+        {renderBookTableRow("Collection", pool.collection.name)}
         {renderBookTableRow("Pool identifier", pool.pool_identifier.identifier)}
         {pool.licensepool_exhausted_date &&
           renderBookTableRow(
@@ -399,7 +400,10 @@ function renderBookTableRow(
     values.some((item) => item !== null && item !== undefined && item !== "")
       ? values
       : [""];
-  const className = name.toLowerCase().replace(/\s/g, "-");
+  const className =
+    name === "Collection"
+      ? "license-pool-collection"
+      : name.toLowerCase().replace(/\s/g, "-");
 
   return displayValues.map((item, index) => (
     <tr key={`${name}-${index}`} className={className}>

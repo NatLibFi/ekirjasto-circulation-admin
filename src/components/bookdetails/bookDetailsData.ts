@@ -140,6 +140,21 @@ export function layout(book: BookData): string | null {
   return rawValue(book, "schema:layout");
 }
 
+export function awards(book: BookData): string[] | null {
+  const values = rawValues(book, "awards").concat(
+    rawValues(book, "schema:awards")
+  );
+  return values.length ? values : null;
+}
+
+export function abridged(book: BookData): boolean {
+  const value = rawValue(book, "abridged") || rawValue(book, "schema:abridged");
+  if (value === null) {
+    return false;
+  }
+  return value.toLowerCase() === "true";
+}
+
 export function dataSourceModified(book: BookData): string | null {
   const value = rawValue(book, "data_source_modified");
   return value ? formatDate(value, true) : null;
@@ -196,7 +211,16 @@ export function accessibilityFeatures(book: ExtendedBookData): string[] | null {
 }
 
 function rawValue(book: BookData, key: string): string | null {
-  const value = book.raw && book.raw[key];
+  return rawValueFromValue(book.raw && book.raw[key]);
+}
+
+function rawValues(book: BookData, key: string): string[] {
+  return rawArray(book.raw && book.raw[key])
+    .map(rawAttributeValue)
+    .filter((value): value is string => value !== null);
+}
+
+function rawValueFromValue(value: any): string | null {
   const firstValue = rawArray(value)[0];
   if (firstValue === null || firstValue === undefined) {
     return null;

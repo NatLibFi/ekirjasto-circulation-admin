@@ -89,6 +89,7 @@ describe("LicensePool", () => {
       "January 2, 2024"
     );
     expect(rowValue(wrapper, "licence-pool-status")).to.equal("available");
+    expect(rowValue(wrapper, "license-pool-collection")).to.equal("E-kirjasto");
     expect(rowValue(wrapper, "licence-pool-exhausted-date")).to.equal(
       "February 3, 2024"
     );
