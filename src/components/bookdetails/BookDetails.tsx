@@ -20,6 +20,7 @@ import {
   abridged,
   awards,
   circulationDataUrl,
+  collection,
   copiesAvailable,
   copiesOwned,
   dataSourceModified,
@@ -185,6 +186,7 @@ function renderBookTables(
           ...(bookMedium !== "Audio" || pagesValue !== null
             ? [["Pages", pagesValue] as [string, any]]
             : []),
+          ["Collection", collection(book)],
           ["Series", seriesName(book)],
           ["Series position", seriesPosition(book)],
           ["Awards", awards(book)],

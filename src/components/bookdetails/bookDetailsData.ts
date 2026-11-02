@@ -155,6 +155,10 @@ export function layout(book: BookData): string | null {
   return rawValue(book, "schema:layout");
 }
 
+export function collection(book: BookData): string | null {
+  return rawValue(book, "schema:isPartOfCollection");
+}
+
 export function awards(book: BookData): string[] | null {
   const values = rawValues(book, "awards").concat(
     rawValues(book, "schema:awards")
