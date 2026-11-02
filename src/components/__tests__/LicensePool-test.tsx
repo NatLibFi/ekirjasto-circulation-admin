@@ -124,7 +124,7 @@ describe("LicensePool", () => {
     expect(rowValue(wrapper, "total-checkouts")).to.equal("4");
     expect(rowValue(wrapper, "licence-type")).to.equal("perpetual");
     expect(rowValue(wrapper, "feed-status")).to.equal("available");
-    expect(rowValue(wrapper, "order")).to.equal("Test order (order-1)");
+    expect(rowValue(wrapper, "order")).to.equal("Test order");
     expect(wrapper.find(".license-additional-fields").text()).to.contain(
       "https://example.com/checkout/201"
     );
