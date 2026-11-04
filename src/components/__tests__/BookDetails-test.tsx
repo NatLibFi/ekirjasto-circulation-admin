@@ -120,6 +120,10 @@ describe("BookDetails", () => {
       "ISBN",
       "9780000000000",
     ]);
+    expect(sections.at(0).prop("rows")[3]).to.deep.equal([
+      "Primary author",
+      "Cussler, Clive",
+    ]);
     expect(sections.at(1).prop("rows")[0][1]).to.equal(null);
     expect(sections.at(1).prop("rows")[1][1]).to.deep.equal([
       "application/epub+zip",
@@ -158,7 +162,41 @@ describe("BookDetails", () => {
 
     expect(
       basicInformationRows.find((row) => row[0] === "Duration")
-    ).to.deep.equal(["Duration", "1:01:01"]);
+    ).to.deep.equal(["Duration", "1h 1min 1sec"]);
+  });
+
+  it("shows series name and position from the raw feed series element", () => {
+    const bookWithSeries = Object.assign({}, book, {
+      raw: Object.assign({}, book.raw, {
+        "schema:isPartOfCollection":
+          "The Azrieli Series of Holocaust Survivor Memoirs",
+        "schema:series": [
+          {
+            $: {
+              name: "The Azrieli Series of Holocaust Survivor Memoirs",
+            },
+            position: ["15"],
+          },
+        ],
+      }),
+    });
+    const wrapper = shallow(<BookDetails book={bookWithSeries} />, {
+      context: { admin: new Admin([{ role: "system" }]) },
+    });
+    const basicInformationRows = wrapper
+      .find(BookDetailsTableSection)
+      .at(0)
+      .prop("rows");
+
+    expect(
+      basicInformationRows.find((row) => row[0] === "Series")
+    ).to.deep.equal([
+      "Series",
+      "The Azrieli Series of Holocaust Survivor Memoirs",
+    ]);
+    expect(
+      basicInformationRows.find((row) => row[0] === "Series position")
+    ).to.deep.equal(["Series position", "15"]);
   });
 
   it("renders the summary inside the basic information table", () => {
