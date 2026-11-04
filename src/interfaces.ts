@@ -64,10 +64,13 @@ export interface CirculationIdentifier {
 
 export interface CirculationLicense {
   checkout_url: string;
+  created: string | null;
   checkouts_available: number | null;
   checkouts_left: number | null;
   currently_available_loans: number | null;
   expires: string | null;
+  ["exhausted date"]: string | null;
+  ["feed status"]: string | null;
   id: number;
   identifier: string;
   is_inactive: boolean;
@@ -77,9 +80,20 @@ export interface CirculationLicense {
   is_time_limited: boolean;
   last_checked: string | null;
   loans: CirculationLoan[];
+  ["license type"]: string | null;
+  order?: CirculationOrder | null;
+  price?: { currency: string; value: number } | null;
+  reason?: string | null;
   status: string;
   terms_concurrency: number | null;
   total_remaining_loans: number | null;
+  total_checkouts: number | null;
+}
+
+export interface CirculationOrder {
+  href: string;
+  identifier: string;
+  name: string;
 }
 
 export interface CirculationLoan {
@@ -95,6 +109,8 @@ export interface CirculationHold extends CirculationLoan {
 
 export interface LicensePoolData {
   availability_time: string | null;
+  licensepool_exhausted_date: string | null;
+  licensepool_status: string | null;
   collection: { id: number; name: string };
   data_source: { id: number; name: string };
   holds?: CirculationHold[];

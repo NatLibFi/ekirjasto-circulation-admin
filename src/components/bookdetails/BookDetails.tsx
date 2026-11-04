@@ -17,9 +17,13 @@ import {
   audience,
   accessibilityConformance,
   accessibilityFeatures,
+  abridged,
+  awards,
   circulationDataUrl,
+  collection,
   copiesAvailable,
   copiesOwned,
+  dataSourceModified,
   distributor,
   drm,
   formats,
@@ -28,9 +32,14 @@ import {
   genres,
   issued,
   isbn,
+  layout,
   medium,
   patronsInQueue,
+  primaryAuthor,
   selectedByPatrons,
+  numberOfPages,
+  seriesName,
+  seriesPosition,
   targetAge,
   updated,
   ExtendedBookData,
@@ -101,9 +110,7 @@ export class BookDetails extends React.Component<BookDetailsProps> {
           <div className="custom-book-details-metadata">
             <h1 className="title">{book.title}</h1>
             {book.subtitle && <p className="subtitle">{book.subtitle}</p>}
-            {book.series && book.series.name && (
-              <p className="series">{book.series.name}</p>
-            )}
+            {seriesName(book) && <p className="series">{seriesName(book)}</p>}
             {renderBookTables(book, this.props, this.context.admin)}
           </div>
         </div>
@@ -152,6 +159,11 @@ function renderBookTables(
   >,
   admin: Admin
 ) {
+  const bookMedium = medium(book);
+  const durationValue = audiobookDuration(book);
+  const pagesValue = numberOfPages(book);
+  const layoutValue = layout(book);
+
   return (
     <div className="custom-book-tables" lang="en">
       <BookDetailsTableSection
@@ -160,6 +172,7 @@ function renderBookTables(
           ["Title", book.title],
           ["Subtitle", book.subtitle],
           ["ISBN", isbn(book)],
+          ["Primary author", primaryAuthor(book)],
           ["Authors", book.authors],
           [
             "Contributors",
@@ -167,10 +180,24 @@ function renderBookTables(
           ],
           ["Language", book.language],
           ["Medium", medium(book)],
-          ["Duration", audiobookDuration(book)],
+          ...(bookMedium === "Audio" || durationValue !== null
+            ? [["Duration", durationValue] as [string, any]]
+            : []),
+          ...(bookMedium !== "Audio" || pagesValue !== null
+            ? [["Pages", pagesValue] as [string, any]]
+            : []),
+          ["Collection", collection(book)],
+          ["Series", seriesName(book)],
+          ["Series position", seriesPosition(book)],
+          ["Awards", awards(book)],
+          ["Abridged", abridged(book)],
+          ...(bookMedium !== "Audio" || layoutValue !== null
+            ? [["Layout", layoutValue] as [string, any]]
+            : []),
           ["Published", book.published],
           ["Issued", issued(book)],
           ["Updated", updated(book)],
+          ["Data source modified", dataSourceModified(book)],
           ["Distributor", distributor(book)],
           [
             "Summary",
@@ -246,10 +273,8 @@ function audiobookDuration(book: ExtendedBookData): string | null {
   const seconds = totalSeconds % 60;
 
   if (hours > 0) {
-    return `${hours}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    return `${hours}h ${minutes}min ${seconds}sec`;
   }
 
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  return `${minutes}min ${seconds}sec`;
 }
