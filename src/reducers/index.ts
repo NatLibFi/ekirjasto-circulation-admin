@@ -13,7 +13,6 @@ import libraries from "./libraries";
 import collections from "./collections";
 import individualAdmins from "./individualAdmins";
 import patronAuthServices from "./patronAuthServices";
-import sitewideAnnouncements from "./sitewideAnnouncements";
 import sitewideSettings from "./sitewideSettings";
 import metadataServices from "./metadataServices";
 import catalogServices from "./catalogServices";
@@ -47,7 +46,6 @@ import {
   CollectionsData,
   IndividualAdminsData,
   PatronAuthServicesData,
-  SitewideAnnouncementsData,
   SitewideSettingsData,
   MetadataServicesData,
   CatalogServicesData,
@@ -79,7 +77,6 @@ export interface State {
   collections: FetchEditState<CollectionsData>;
   individualAdmins: FetchEditState<IndividualAdminsData>;
   patronAuthServices: FetchEditState<PatronAuthServicesData>;
-  sitewideAnnouncements: FetchEditState<SitewideAnnouncementsData>;
   sitewideSettings: FetchEditState<SitewideSettingsData>;
   metadataServices: FetchEditState<MetadataServicesData>;
   catalogServices: FetchEditState<CatalogServicesData>;
@@ -120,7 +117,6 @@ export default combineReducers<State>({
   collections,
   individualAdmins,
   patronAuthServices,
-  sitewideAnnouncements,
   sitewideSettings,
   metadataServices,
   catalogServices,
