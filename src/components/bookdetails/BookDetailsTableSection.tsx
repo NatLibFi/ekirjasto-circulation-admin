@@ -3,6 +3,7 @@ import * as React from "react";
 export type BookDetailsTableValue =
   | string
   | number
+  | boolean
   | string[]
   | null
   | undefined
@@ -40,12 +41,14 @@ function renderBookTableRow(
     values.some((item) => item !== null && item !== undefined && item !== "")
       ? values
       : [""];
-  const className = name.toLowerCase().replace(/\s/g, "-");
+  const className = `book-details-row-${name
+    .toLowerCase()
+    .replace(/\s/g, "-")}`;
 
   return displayValues.map((item, index) => (
     <tr key={`${name}-${index}`} className={className}>
       <th scope="row">{index === 0 ? name : null}</th>
-      <td>{item ?? ""}</td>
+      <td>{typeof item === "boolean" ? String(item) : item ?? ""}</td>
     </tr>
   ));
 }

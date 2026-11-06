@@ -11,7 +11,6 @@ $fontfamily: 'Open Sans', sans-serif;
 @import "global";
 
 @import "advanced_search";
-@import "announcements";
 @import "badge";
 @import "book_details_container";
 @import "book_details_tab_container";
@@ -25,6 +24,7 @@ $fontfamily: 'Open Sans', sans-serif;
 @import "color_picker";
 @import "complaint_form";
 @import "config_tab_container";
+@import "content_page";
 @import "custom_list_editor";
 @import "custom_list_entries_editor";
 @import "custom_lists_page";

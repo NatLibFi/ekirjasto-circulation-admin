@@ -8,6 +8,8 @@ export default class Admin {
   private systemAdmin: boolean = false;
   private sitewideLibraryManager: boolean = false;
   private sitewideLibrarian: boolean = false;
+  private contentWriter: boolean = false;
+  private contentWriterAll: boolean = false;
   private manager: boolean = false;
   private libraryRoles: { [library: string]: string } = {};
 
@@ -36,6 +38,11 @@ export default class Admin {
           this.sitewideLibrarian = true;
           break;
         }
+        case "content-writer-all": {
+          this.contentWriterAll = true;
+          this.sitewideLibrarian = true;
+          break;
+        }
         case "manager": {
           this.manager = true;
           this.libraryRoles[role.library] = "manager";
@@ -43,6 +50,11 @@ export default class Admin {
         }
         case "librarian": {
           this.libraryRoles[role.library] = "librarian";
+          break;
+        }
+        case "content-writer": {
+          this.contentWriter = true;
+          this.libraryRoles[role.library] = "content-writer";
           break;
         }
         default: {
@@ -67,6 +79,12 @@ export default class Admin {
     }
     if (role === "librarian" && this.isLibrarian(library)) {
       return true;
+    }
+    if (role === "content-writer" && !!library) {
+      return this.libraryRoles[library] === "content-writer";
+    }
+    if (role === "content-writer-all") {
+      return this.contentWriterAll;
     }
     return false;
   }
@@ -97,7 +115,26 @@ export default class Admin {
     return (
       this.isLibraryManager(library) ||
       this.sitewideLibrarian ||
-      this.libraryRoles[library] === "librarian"
+      this.libraryRoles[library] === "librarian" ||
+      this.libraryRoles[library] === "content-writer"
+    );
+  }
+
+  isContentWriter(library?: string) {
+    return (
+      this.isSystemAdmin() ||
+      (!!library && this.isLibraryManager(library)) ||
+      this.contentWriterAll ||
+      (!!library && this.libraryRoles[library] === "content-writer")
+    );
+  }
+
+  isContentWriterOfSomeLibrary() {
+    return (
+      this.isSystemAdmin() ||
+      this.isLibraryManagerOfSomeLibrary() ||
+      this.contentWriter ||
+      this.contentWriterAll
     );
   }
 

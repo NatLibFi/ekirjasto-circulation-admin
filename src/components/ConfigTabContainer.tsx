@@ -4,7 +4,6 @@ import Libraries from "./Libraries";
 import Collections from "./Collections";
 import IndividualAdmins from "./IndividualAdmins";
 import PatronAuthServices from "./PatronAuthServices";
-import SitewideAnnouncements from "./SitewideAnnouncements";
 import MunicipalityRegistry from "./MunicipalityRegistry";
 import SitewideSettings from "./SitewideSettings";
 import MetadataServices from "./MetadataServices";
@@ -34,7 +33,9 @@ const LIBRARY_MANAGER_TABS = {
   individualAdmins: IndividualAdmins,
 };
 
-const EKIRJASTO_LIBRARY_MANAGER_TABS = { ...COMMON_TABS };
+const EKIRJASTO_LIBRARY_MANAGER_TABS = {
+  ...COMMON_TABS,
+};
 
 const SYSTEM_ADMIN_TABS = {
   ...LIBRARY_MANAGER_TABS,
@@ -44,7 +45,6 @@ const SYSTEM_ADMIN_TABS = {
   metadata: MetadataServices,
   catalogServices: CatalogServices,
   discovery: DiscoveryServices,
-  sitewideAnnouncements: SitewideAnnouncements,
   municipalityRegistry: MunicipalityRegistry,
 };
 
@@ -53,7 +53,6 @@ const { individualAdmins, ...EKIRJASTO_SYSTEM_ADMIN_TABS } = SYSTEM_ADMIN_TABS;
 const DISPLAY_NAMES: Partial<Record<string, string>> = {
   individualAdmins: "Admins",
   patronAuth: "Patron Authentication",
-  sitewideAnnouncements: "Sitewide Announcements",
   municipalityRegistry: "Kuntarekisteri",
   sitewideSettings: "Sitewide Settings",
   catalogServices: "External Catalogs",
@@ -99,6 +98,10 @@ export default class ConfigTabContainer extends TabContainer<
       return admin.isEkirjastoUser()
         ? EKIRJASTO_LIBRARY_MANAGER_TABS
         : LIBRARY_MANAGER_TABS;
+    }
+
+    if (admin.isContentWriterOfSomeLibrary()) {
+      return COMMON_TABS;
     }
 
     return COMMON_TABS;

@@ -33,6 +33,21 @@ export function formatContributor(contributor: {
   return role ? `${contributor.name} (${role})` : contributor.name;
 }
 
+export function primaryAuthor(book: BookData): string | null {
+  const author = book.authors && book.authors[0];
+  if (!author) {
+    return null;
+  }
+
+  const parts = author.trim().split(/\s+/);
+  if (parts.length < 2) {
+    return author;
+  }
+
+  const surname = parts.pop();
+  return `${surname}, ${parts.join(" ")}`;
+}
+
 function mapContributorRole(role: string): string {
   const normalizedRole = role.trim().toLowerCase();
   return CONTRIBUTOR_ROLE_NAMES[normalizedRole] || role;
@@ -94,9 +109,7 @@ export function selectedByPatrons(book: BookData): number | null {
 }
 
 /** Returns the URL for fetching circulation (licensepool) data for the given book URL. */
-export function circulationDataUrl(
-  bookUrl?: string
-): string | null {
+export function circulationDataUrl(bookUrl?: string): string | null {
   if (!bookUrl) {
     return null;
   }
@@ -134,6 +147,63 @@ export function issued(book: ExtendedBookData): string | null {
   );
 }
 
+export function numberOfPages(book: BookData): string | null {
+  return rawValue(book, "schema:numberOfPages");
+}
+
+export function layout(book: BookData): string | null {
+  return rawValue(book, "schema:layout");
+}
+
+export function collection(book: BookData): string | null {
+  return rawValue(book, "schema:isPartOfCollection");
+}
+
+export function awards(book: BookData): string[] | null {
+  const values = rawValues(book, "awards").concat(
+    rawValues(book, "schema:awards")
+  );
+  return values.length ? values : null;
+}
+
+export function abridged(book: BookData): boolean {
+  const value = rawValue(book, "abridged") || rawValue(book, "schema:abridged");
+  if (value === null) {
+    return false;
+  }
+  return value.toLowerCase() === "true";
+}
+
+export function dataSourceModified(book: BookData): string | null {
+  const value = rawValue(book, "data_source_modified");
+  return value ? formatDate(value, true) : null;
+}
+
+export function seriesPosition(book: BookData): string | null {
+  if (book.series && book.series.position !== undefined) {
+    return String(book.series.position);
+  }
+
+  const series = rawArray<RawNode>(book.raw && book.raw["schema:series"])[0];
+  return series ? rawValueFromNode(series, "position") : null;
+}
+
+export function seriesName(book: BookData): string | null {
+  if (book.series) {
+    return book.series.name;
+  }
+
+  const series = rawArray<RawNode>(book.raw && book.raw["schema:series"])[0];
+  return (
+    (series && rawAttributeValue(series["$"] && series["$"].name)) ||
+    rawValue(book, "schema:isPartOfCollection")
+  );
+}
+
+function rawValueFromNode(node: RawNode, key: string): string | null {
+  return rawAttributeValue(rawArray(node && node[key])[0]);
+}
+
 export function targetAge(book: ExtendedBookData): string | string[] | null {
   return (
     book.targetAgeRange ||
@@ -160,7 +230,16 @@ export function accessibilityFeatures(book: ExtendedBookData): string[] | null {
 }
 
 function rawValue(book: BookData, key: string): string | null {
-  const value = book.raw && book.raw[key];
+  return rawValueFromValue(book.raw && book.raw[key]);
+}
+
+function rawValues(book: BookData, key: string): string[] {
+  return rawArray(book.raw && book.raw[key])
+    .map(rawAttributeValue)
+    .filter((value): value is string => value !== null);
+}
+
+function rawValueFromValue(value: any): string | null {
   const firstValue = rawArray(value)[0];
   if (firstValue === null || firstValue === undefined) {
     return null;
@@ -186,8 +265,7 @@ export function audience(book: BookData): string | null {
 export function fictionType(book: BookData): string | null {
   const category = rawCategories(book).find((candidate) => {
     return (
-      categoryScheme(candidate) ===
-        "http://librarysimplified.org/terms/fiction"
+      categoryScheme(candidate) === "http://librarysimplified.org/terms/fiction"
     );
   });
 
@@ -316,7 +394,9 @@ export function drm(book: BookData): string[] | null {
   return values.length ? values : null;
 }
 
-function rawAcquisitionTypes(book: BookData): {
+function rawAcquisitionTypes(
+  book: BookData
+): {
   drm: string[];
   formats: string[];
 } {
@@ -334,8 +414,7 @@ function rawAcquisitionTypes(book: BookData): {
       const indirectAcquisitions = Object.keys(link)
         .filter(
           (key) =>
-            key === "opds:indirectAcquisition" ||
-            key === "indirectAcquisition"
+            key === "opds:indirectAcquisition" || key === "indirectAcquisition"
         )
         .reduce(
           (acquisitions: RawNode[], key) =>
@@ -343,8 +422,7 @@ function rawAcquisitionTypes(book: BookData): {
           []
         );
       if (!indirectAcquisitions.length) {
-        const type =
-          link["$"] && rawAttributeValue(link["$"]["type"]);
+        const type = link["$"] && rawAttributeValue(link["$"]["type"]);
         if (type) {
           types.formats.push(type);
         }

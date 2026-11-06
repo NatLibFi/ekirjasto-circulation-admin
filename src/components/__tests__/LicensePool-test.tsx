@@ -11,6 +11,8 @@ const circulationData: CirculationData = {
   license_pools: [
     {
       availability_time: "2024-01-02T00:00:00Z",
+      licensepool_exhausted_date: "2024-02-03T00:00:00Z",
+      licensepool_status: "available",
       collection: { id: 1, name: "E-kirjasto" },
       data_source: { id: 2, name: "Overdrive" },
       holds: [
@@ -27,10 +29,13 @@ const circulationData: CirculationData = {
       licenses: [
         {
           checkout_url: "https://example.com/checkout/201",
+          created: "2024-01-01T00:00:00Z",
           checkouts_available: 2,
           checkouts_left: 8,
           currently_available_loans: 1,
           expires: "2024-12-31T00:00:00Z",
+          "exhausted date": null,
+          "feed status": "available",
           id: 201,
           identifier: "license-identifier",
           is_inactive: false,
@@ -48,8 +53,17 @@ const circulationData: CirculationData = {
             },
           ],
           status: "available",
+          "license type": "perpetual",
+          order: {
+            href: "https://example.com/order/1",
+            identifier: "order-1",
+            name: "Test order",
+          },
+          price: { currency: "USD", value: 129.99 },
+          reason: null,
           terms_concurrency: 5,
           total_remaining_loans: 2,
+          total_checkouts: 4,
         },
       ],
       licenses_available: 2,
@@ -71,7 +85,15 @@ describe("LicensePool", () => {
     expect(wrapper.find(".license-pool-information > h2").text()).to.equal(
       "License pool information"
     );
-    expect(rowValue(wrapper, "licensepool-created")).to.equal("January 2, 2024");
+    expect(rowValue(wrapper, "licensepool-created")).to.equal(
+      "January 2, 2024"
+    );
+    expect(rowValue(wrapper, "licence-pool-status")).to.equal("available");
+    expect(rowValue(wrapper, "license-pool-collection")).to.equal("E-kirjasto");
+    expect(rowValue(wrapper, "licence-pool-exhausted-date")).to.equal(
+      "February 3, 2024"
+    );
+    expect(rowValue(wrapper, "pool-identifier")).to.equal("pool-identifier");
     expect(rowValue(wrapper, "licenses-owned-(total-concurrency)")).to.equal(
       "5"
     );
@@ -88,19 +110,21 @@ describe("LicensePool", () => {
     expect(wrapper.find(".license-information-section h2").text()).to.equal(
       "Licenses (1)"
     );
-    expect(wrapper.find("caption").map((caption) => caption.text())).to.deep.equal([
-      "Hold (1)",
-      "License (1)",
-      "Loan (1)",
-    ]);
-    expect(wrapper.find("summary").map((summary) => summary.text())).to.deep.equal([
-      "Holds (1)",
-      "Show more",
-      "Active Loans (1)",
-    ]);
-    expect(wrapper.find(".license-information").text()).to.contain(
-      "available"
+    expect(
+      wrapper.find("caption").map((caption) => caption.text())
+    ).to.deep.equal(["Hold (1)", "License (1)", "Loan (1)"]);
+    expect(
+      wrapper.find("summary").map((summary) => summary.text())
+    ).to.deep.equal(["Holds (1)", "Show more", "Active Loans (1)"]);
+    expect(wrapper.find(".license-information").text()).to.contain("available");
+    expect(rowValue(wrapper, "licence-creation-date")).to.equal(
+      "January 1, 2024"
     );
+    expect(rowValue(wrapper, "price")).to.equal("129.99 USD");
+    expect(rowValue(wrapper, "total-checkouts")).to.equal("4");
+    expect(rowValue(wrapper, "licence-type")).to.equal("perpetual");
+    expect(rowValue(wrapper, "feed-status")).to.equal("available");
+    expect(rowValue(wrapper, "order")).to.equal("Test order");
     expect(wrapper.find(".license-additional-fields").text()).to.contain(
       "https://example.com/checkout/201"
     );
@@ -123,6 +147,47 @@ describe("LicensePool", () => {
     );
 
     expect(rowValue(wrapper, "holds-to-concurrency-ratio")).to.equal("37.5%");
+  });
+
+  it("renders a null price as an empty value", () => {
+    const wrapper = mount(
+      <LicensePool
+        data={{
+          ...circulationData,
+          license_pools: [
+            {
+              ...circulationData.license_pools[0],
+              licenses: [
+                {
+                  ...circulationData.license_pools[0].licenses[0],
+                  price: null,
+                },
+              ],
+            },
+          ],
+        }}
+      />
+    );
+
+    expect(rowValue(wrapper, "price")).to.equal("");
+  });
+
+  it("does not show the exhausted date when it is missing", () => {
+    const wrapper = mount(
+      <LicensePool
+        data={{
+          ...circulationData,
+          license_pools: [
+            {
+              ...circulationData.license_pools[0],
+              licensepool_exhausted_date: null,
+            },
+          ],
+        }}
+      />
+    );
+
+    expect(wrapper.find(".licence-pool-exhausted-date")).to.have.length(0);
   });
 
   it("shows loading status before circulation data arrives", () => {
