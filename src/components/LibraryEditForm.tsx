@@ -7,12 +7,10 @@ import {
   LibraryData,
   LibrarySettingField,
   SettingData,
-  AnnouncementData,
 } from "../interfaces";
 import { Panel, Form } from "library-simplified-reusable-components";
 import { FetchErrorData } from "@natlibfi/ekirjasto-web-opds-client/lib/interfaces";
 import PairedMenus from "./PairedMenus";
-import AnnouncementsSection from "./AnnouncementsSection";
 
 export interface LibraryEditFormProps {
   data: LibrariesData;
@@ -36,7 +34,6 @@ export default class LibraryEditForm extends React.Component<
   private nameRef = React.createRef<EditableInput>();
   private shortNameRef = React.createRef<EditableInput>();
   private settingRef = React.createRef<ProtocolFormField>();
-  private announcementsRef = React.createRef<AnnouncementsSection>();
   constructor(props: LibraryEditFormProps) {
     super(props);
     this.submit = this.submit.bind(this);
@@ -49,7 +46,6 @@ export default class LibraryEditForm extends React.Component<
         this.nameRef.current,
         this.shortNameRef.current,
         this.settingRef.current,
-        this.announcementsRef.current,
       ]);
     }
   }
@@ -180,17 +176,6 @@ export default class LibraryEditForm extends React.Component<
     return forms;
   }
 
-  renderAnnouncements(setting: SettingData, value) {
-    return (
-      <AnnouncementsSection
-        key={setting.key}
-        setting={{ ...setting, ...{ format: "date-range" } }}
-        value={value && JSON.parse(value)}
-        ref={this.announcementsRef}
-      />
-    );
-  }
-
   renderPairedMenus(setting: SettingData, fields: LibrarySettingField[]) {
     const dropdownSetting = fields.find((x) => x.key === setting.paired);
     // These dropdown settings have the :skip: attribute, so they'll get rendered only here;
@@ -226,8 +211,6 @@ export default class LibraryEditForm extends React.Component<
     const render = (setting) => {
       if (setting.paired) {
         return this.renderPairedMenus(setting, fields);
-      } else if (setting.type === "announcements") {
-        return this.renderAnnouncements(setting, settingValue(setting));
       } else if (!setting.skip) {
         return (
           <ProtocolFormField
@@ -256,10 +239,6 @@ export default class LibraryEditForm extends React.Component<
   }
 
   submit(data: FormData) {
-    const announcements = this.announcementsRef.current.getValue();
-    const announcementList = [];
-    announcements.forEach((a: AnnouncementData) => announcementList.push(a));
-    data?.set("announcements", JSON.stringify(announcementList));
     this.props.save(data);
   }
 }

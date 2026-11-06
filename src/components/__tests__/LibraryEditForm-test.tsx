@@ -10,7 +10,6 @@ import { Panel, Button, Form } from "library-simplified-reusable-components";
 import ProtocolFormField from "../ProtocolFormField";
 import PairedMenus from "../PairedMenus";
 import InputList from "../InputList";
-import AnnouncementsSection from "../AnnouncementsSection";
 
 describe("LibraryEditForm", () => {
   let wrapper;
@@ -23,8 +22,7 @@ describe("LibraryEditForm", () => {
     settings: {
       "privacy-policy": "http://privacy",
       "copyright": "http://copyright",
-      "featured_lane_size": "20",
-      "announcements": "[{\"content\": \"Announcement #1\", \"start\": \"2020-06-15\", \"finish\": \"2020-08-15\", \"id\": \"1\"}]"
+      "featured_lane_size": "20"
     },
   };
   const settingFields = [
@@ -50,12 +48,6 @@ describe("LibraryEditForm", () => {
       label: "Service Area",
       category: "Geographic Areas",
       type: "list",
-    },
-    {
-      key: "announcements",
-      label: "Announcements",
-      category: "Announcements",
-      type: "announcements",
     },
   ];
 
@@ -236,19 +228,9 @@ describe("LibraryEditForm", () => {
       expect(inputList.prop("disableButton")).to.be.true;
     });
 
-    it("renders the Announcements component", () => {
-      wrapper.setProps({ item: libraryData });
-      const announcements = wrapper.find(AnnouncementsSection);
-      expect(announcements.length).to.equal(1);
-      expect(announcements.props().setting.key).to.equal("announcements");
-      expect(announcements.props().value).to.eql(
-        JSON.parse(libraryData.settings.announcements)
-      );
-    });
-
     it("subdivides fields", () => {
       const collapsible = wrapper.find(".panel");
-      expect(collapsible.length).to.equal(7);
+      expect(collapsible.length).to.equal(6);
 
       const basic = collapsible.at(0).find(".panel-heading");
       expect(basic.text()).to.contain("Basic Information");
