@@ -7,7 +7,7 @@ This is the E-kirjasto fork of the [The Palace Project](https://thepalaceproject
 
 This package may be used in a local build of the E-kirjasto [Circulation Manager](https://github.com/NatLibFi/ekirjasto-circulation), or it may be run against a remote Circulation Manager.
 
-This project uses Node.js 18. We recommend the latest version of Node.js 18.
+This project uses Node.js 22 (minimum 22.15.0). Use the version pinned in `.nvmrc` and `.node-version`.
 
 You have a number of options for installing Node.js. One convenient way on macOS is to use Homebrew and nvm to manage Node.js versions.
 
@@ -23,22 +23,22 @@ Install nvm using Homebrew:
 brew install nvm
 ```
 
-Install and use Node.js 20.18 with nvm:
+Install and use Node.js 22.23 with nvm:
 
 ```
-nvm install 20.18.1
-nvm use 20.18.1
+nvm install 22.23.4
+nvm use 22.23.4
 ```
 
 Alternatively, you can use `nodenv` on macOS:
 
 ```
 brew install nodenv
-nodenv install 20.18.1
-nodenv global 20.18.1
+nodenv install 22.23.4
+nodenv global 22.23.4
 ```
 
-If you have different projects requiring different Node.js versions, you can use nodenv to set a local version for the project by navigating to the root directory of ekirjasto-circulation-admin and executing `nodenv local 20.18.1`.
+If you have different projects requiring different Node.js versions, you can use nodenv to set a local version for the project by navigating to the root directory of ekirjasto-circulation-admin and executing `nodenv local 22.23.4`.
 
 You can also use the `n` npm package to manage Node.js versions, or simply install the Node.js binary directly.
 
@@ -69,7 +69,7 @@ If you're working on the administrative interface and want to test local changes
 2. run `npm link @natlibfi/ekirjasto-circulation-admin` from `api/admin` in the `ekirjasto-circulation` repository (which is where package.json is located),
 3. use docker-compose in the `ekirjasto-circulation` repository to run webapp, PostgreSQL, OpenSearch etc.
 4. run the web interface using `npm run dev-server -- --env=backend=http://localhost:6500` at the root of this `ekirjasto-circulation-admin` repository,
-6. visit `localhost:8080/admin/`.
+5. visit `localhost:8080/admin/`.
 
 Webpack will take care of compiling and updating any new changes made locally for development. Just hard refresh the page (command + shift + R) to see updates without having to restart either the `ekirjasto-circulation` or `ekirjasto-circulation-admin` servers.
 
