@@ -171,27 +171,29 @@ module.exports = (env) => {
 
   const proxyMiddleware = createProxyMiddleware({
     changeOrigin: true,
-    onProxyRes: responseInterceptor(
-      async (responseBuffer, proxyRes, req, res) => {
-        rewriteLocationHeader(res, req);
+    on: {
+      proxyRes: responseInterceptor(
+        async (responseBuffer, proxyRes, req, res) => {
+          rewriteLocationHeader(res, req);
 
-        const contentType = res.getHeader("content-type");
+          const contentType = String(res.getHeader("content-type") || "");
 
-        if (contentType.startsWith("application/atom+xml")) {
-          return rewriteOPDS(responseBuffer, req);
+          if (contentType.startsWith("application/atom+xml")) {
+            return rewriteOPDS(responseBuffer, req);
+          }
+
+          if (contentType.startsWith("text/html")) {
+            return rewriteHTML(responseBuffer, req);
+          }
+
+          if (contentType.startsWith("application/opensearchdescription+xml")) {
+            return rewriteOpenSearch(responseBuffer, req);
+          }
+
+          return responseBuffer;
         }
-
-        if (contentType.startsWith("text/html")) {
-          return rewriteHTML(responseBuffer, req);
-        }
-
-        if (contentType.startsWith("application/opensearchdescription+xml")) {
-          return rewriteOpenSearch(responseBuffer, req);
-        }
-
-        return responseBuffer;
-      }
-    ),
+      ),
+    },
     proxyTimeout: 5000,
     secure: false,
     selfHandleResponse: true,
@@ -201,8 +203,12 @@ module.exports = (env) => {
 
   const config = merge(dev, {
     devServer: {
-      onAfterSetupMiddleware: (devServer) => {
-        devServer.app.use("/", proxyMiddleware);
+      setupMiddlewares: (middlewares) => {
+        middlewares.push({
+          name: "circulation-manager-proxy",
+          middleware: proxyMiddleware,
+        });
+        return middlewares;
       },
     },
     output: {
