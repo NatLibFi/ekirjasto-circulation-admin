@@ -14,8 +14,8 @@
   "author": "National Library of Finland",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=22.15.0",
+    "npm": ">=8.3.0"
   },
   "scripts": {
     "prepublish": "npm run prod",
@@ -68,7 +68,6 @@
     "recharts": "^1.8.6",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "request": "^2.85.0",
     "stream-browserify": "^3.0.0",
     "timers-browserify": "^2.0.12",
     "url": "^0.11.0"
@@ -92,7 +91,7 @@
     "chai": "4.2.0",
     "clean-webpack-plugin": "^2.0.1",
     "colors-cli": "^1.0.27",
-    "copy-webpack-plugin": "6.4.0",
+    "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^6.7.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
@@ -105,6 +104,7 @@
     "fetch-mock": "^7.3.1",
     "file-loader": "^6.2.0",
     "follow-redirects": "^1.15.6",
+    "http-proxy-middleware": "^4.1.1",
     "husky": "^4.3.0",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
@@ -112,7 +112,7 @@
     "json-loader": "^0.5.4",
     "lint-staged": "^10.4.0",
     "mini-css-extract-plugin": "1.6.0",
-    "mocha": "^10.8.2",
+    "mocha": "^12.0.3",
     "msw": "^1.2.1",
     "nightwatch": "^3.14.0",
     "prettier": "2.1.2",
@@ -135,7 +135,7 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.76.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.11.1",
+    "webpack-dev-server": "^6.1.0",
     "webpack-merge": "^5.8.0"
   },
   "husky": {
@@ -147,5 +147,35 @@
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
     "*.{js,jsx,ts,tsx,css,md}": "prettier --write",
     "*.{js,css,md}": "prettier --write"
+  },
+  "overrides": {
+    "enzyme": {
+      "cheerio": "1.0.0-rc.12"
+    },
+    "@natlibfi/ekirjasto-web-opds-client": {
+      "dompurify": "^3.4.17",
+      "js-cookie": "^3.0.8"
+    },
+    "draft-js": {
+      "immutable": "^3.8.4"
+    },
+    "draft-convert": {
+      "immutable": "^3.8.4"
+    },
+    "react-smooth": {
+      "lodash": "^4.18.1"
+    },
+    "minimist@^1.0.0": "^1.2.8",
+    "shelljs@<0.8.5": "^0.8.5",
+    "minimatch@<3.1.5": "^3.1.5",
+    "msw": {
+      "cookie": "^0.7.2"
+    },
+    "serialize-javascript": "^7.1.4",
+    "nightwatch": {
+      "uuid": "^11.1.1"
+    },
+    "glob@>=9": "^14.0.4",
+    "minimatch@>=7": "^11.0.5"
   }
 }
