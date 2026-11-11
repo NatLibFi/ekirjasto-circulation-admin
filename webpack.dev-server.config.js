@@ -8,15 +8,10 @@
  * Usage:
  *   npm run dev-server -- --env=backend=https://gorgon.tpp-qa.lyrasistechnology.org
  * or
- *   npx webpack serve --config webpack.dev-server.config --env=backend=https://gorgon.tpp-qa.lyrasistechnology.org
+ *   npx webpack serve --config webpack.dev-server.config.js --env=backend=https://gorgon.tpp-qa.lyrasistechnology.org
  *
  * This makes the circulation-admin webapp available at http://localhost:8080/admin.
  */
-
-const {
-  createProxyMiddleware,
-  responseInterceptor,
-} = require("http-proxy-middleware");
 
 const { merge } = require("webpack-merge");
 const { URL } = require("url");
@@ -35,7 +30,11 @@ const devAssetsPublicPath = "/webpack-dev-assets/";
  * @param {object} env The environment.
  * @returns The webpack configuration.
  */
-module.exports = (env) => {
+module.exports = async (env) => {
+  const { createProxyMiddleware, responseInterceptor } = await import(
+    "http-proxy-middleware"
+  );
+
   const { backend } = env;
 
   if (!backend) {
