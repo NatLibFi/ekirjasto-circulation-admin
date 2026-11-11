@@ -53,9 +53,7 @@ export default class TroubleshootingPage extends React.Component<
 
   render(): JSX.Element {
     const requestedTab = this.props.params.tab || this.state.tab;
-    const tab = this.CATEGORIES[requestedTab]
-      ? requestedTab
-      : this.state.tab;
+    const tab = this.CATEGORIES[requestedTab] ? requestedTab : this.state.tab;
     let subtab = this.props.params.subtab || this.state.subtab;
     subtab =
       this.CATEGORIES[tab].indexOf(subtab) >= 0

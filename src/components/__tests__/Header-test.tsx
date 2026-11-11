@@ -211,7 +211,7 @@ describe("Header", () => {
         wrapper.setContext({ library: () => "nypl", admin: systemAdmin });
         const links = wrapper.find(Link);
         expect(links.length).to.equal(7);
-      expect(links.at(6).children().text()).to.equal("Ajot");
+        expect(links.at(6).children().text()).to.equal("Ajot");
       });
     });
   });

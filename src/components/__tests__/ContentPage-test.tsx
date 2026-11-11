@@ -47,7 +47,12 @@ describe("content editor links", () => {
       />
     );
     const contentEditor = wrapper.find(".content-editor");
-    const onKeyDown = contentEditor.prop("onKeyDown") as Function;
+    const onKeyDown = contentEditor.prop("onKeyDown") as (event: {
+      key: string;
+      target: object;
+      currentTarget: object;
+      preventDefault: () => void;
+    }) => void;
     let prevented = false;
     const editorTarget = {};
     const containerTarget = {};
@@ -239,9 +244,7 @@ describe("ContentPage creation", () => {
     const page = wrapper.instance() as ContentPage;
 
     page.setState({ mode: "language-view", item: { type: "faq" } });
-    expect(wrapper.find(".content-page-subheading").text()).to.equal(
-      " UKK"
-    );
+    expect(wrapper.find(".content-page-subheading").text()).to.equal(" UKK");
 
     page.setState({ mode: "edit", item: { type: "banner" } });
     expect(wrapper.find(".content-page-subheading").text()).to.equal(
@@ -259,9 +262,7 @@ describe("ContentPage creation", () => {
 
     page.setState({ mode: "view", item: { type: "news" } });
 
-    expect(wrapper.find(".content-page-subheading").text()).to.equal(
-      " UKK"
-    );
+    expect(wrapper.find(".content-page-subheading").text()).to.equal(" UKK");
   });
 
   it("returns to the content table when the group route is removed", () => {

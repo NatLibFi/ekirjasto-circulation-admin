@@ -406,9 +406,7 @@ export default class ContentPage extends React.Component<
     const editing = mode === "edit" || mode === "create";
     const contentType = (mode === "view"
       ? this.props.params.type || item.type
-      : item.type || this.props.params.type) as
-      | ContentType
-      | undefined;
+      : item.type || this.props.params.type) as ContentType | undefined;
     const visibleItems = this.props.params.type
       ? items.filter((item) => item.type === this.props.params.type)
       : items;
@@ -420,11 +418,8 @@ export default class ContentPage extends React.Component<
           <h1>Sisällönhallinta</h1>
           {mode !== "none" && contentType && (
             <h2 className="content-page-subheading">
-              {mode === "create"
-                ? "Luo uusi"
-                : editing
-                ? "Muokkaa"
-                : ""} {contentTypeLabels[contentType]}
+              {mode === "create" ? "Luo uusi" : editing ? "Muokkaa" : ""}{" "}
+              {contentTypeLabels[contentType]}
             </h2>
           )}
           {error && <p role="alert">{error}</p>}
@@ -465,7 +460,10 @@ export default class ContentPage extends React.Component<
                       <ContentTable items={visibleItems} onView={this.view} />
                     </>
                   ) : (
-                    <p>Voit luoda ja tarkastella sisältöjä valitsemalla sisällön vasemmasta valikosta.</p>
+                    <p>
+                      Voit luoda ja tarkastella sisältöjä valitsemalla sisällön
+                      vasemmasta valikosta.
+                    </p>
                   )}
                 </div>
               </div>
