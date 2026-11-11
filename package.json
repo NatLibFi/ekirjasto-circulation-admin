@@ -35,7 +35,7 @@
     "test-jest-file": "jest --verbose",
     "test-finland": "jest --verbose --silent --roots src/finland/tests",
     "dev": "webpack --watch --progress --config webpack.dev.config",
-    "dev-server": "webpack serve --progress --hot --config webpack.dev-server.config",
+    "dev-server": "webpack serve --progress --hot --config webpack.dev-server.config.js",
     "dev-test-axe": "TEST_AXE=true npm run dev",
     "prod": "webpack --progress --config webpack.prod.config",
     "build-docs": "typedoc --tsconfig tsconfig.json src"
