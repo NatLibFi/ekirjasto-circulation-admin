@@ -145,7 +145,6 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         href: "content/",
         auth: this.context.admin.isContentWriter(currentLibrary),
       },
-
     ];
     // Links that will be rendered in a Link router component and are sitewide.
     const sitewideLinkItems = [
