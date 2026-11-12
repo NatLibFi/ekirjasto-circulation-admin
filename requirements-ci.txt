@@ -1,1 +1,1 @@
-dunamai==1.19.0
+dunamai==1.26.5
