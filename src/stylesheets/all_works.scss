@@ -11,6 +11,13 @@
 
   .all-works-column-heading {
     display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+  }
+
+  .all-works-column-title-row {
+    display: flex;
     align-items: center;
     gap: 0.35rem;
     white-space: nowrap;
@@ -27,28 +34,22 @@
       width: 100%;
     }
 
-    span {
-      display: flex;
-      gap: 0.2rem;
+  }
+
+  .all-works-sort-button {
+    background: transparent;
+    border: 0;
+    color: #666;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+
+    &.active {
+      color: #111;
     }
   }
 
-  .all-works-sort-controls {
-    display: inline-flex;
-    flex-direction: column;
-    line-height: 0.8;
-
-    button {
-      background: transparent;
-      border: 0;
-      color: #666;
-      cursor: pointer;
-      font-size: 0.65rem;
-      padding: 0;
-
-      &.active {
-        color: #111;
-      }
-    }
+  tbody {
+    font-size: 0.9rem;
   }
 }

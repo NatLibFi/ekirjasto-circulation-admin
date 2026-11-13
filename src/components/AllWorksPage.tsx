@@ -12,14 +12,14 @@ import title from "../utils/title";
 import { RootState } from "../store";
 
 const columns = [
-  ["title", "Title"],
-  ["author", "Author"],
-  ["published_year", "Publish year"],
-  ["language", "Language"],
-  ["format", "Format"],
-  ["license_pool_status", "Licensepool status"],
-  ["licenses_owned", "Licenses"],
-  ["patrons_in_hold_queue", "Patron hold queue"],
+  ["title", "Nimi"],
+  ["author", "Tekijä(t)"],
+  ["published_year", "Julkaisuvuosi"],
+  ["language", "Kieli"],
+  ["format", "Formaatti"],
+  ["license_pool_status", "Tila"],
+  ["licenses_owned", "Lisenssit"],
+  ["patrons_in_hold_queue", "Varausjono"],
 ] as const;
 
 export function bookDetailsHref(
@@ -133,7 +133,31 @@ export default function AllWorksPage(props: {
               {columns.map(([key, label]) => (
                 <th key={key}>
                   <div className="all-works-column-heading">
-                    <span className="all-works-column-title">{label}</span>
+                    <div className="all-works-column-title-row">
+                      <span className="all-works-column-title">{label}</span>
+                      <button
+                        type="button"
+                        aria-label={`Sort ${label} ${
+                          sort === key && direction === "asc"
+                            ? "descending"
+                            : "ascending"
+                        }`}
+                        aria-pressed={sort === key}
+                        className={`all-works-sort-button${
+                          sort === key ? " active" : ""
+                        }`}
+                        onClick={() => {
+                          if (sort === key) {
+                            setDirection(direction === "asc" ? "desc" : "asc");
+                          } else {
+                            setSort(key);
+                            setDirection("asc");
+                          }
+                        }}
+                      >
+                        ⇅
+                      </button>
+                    </div>
                     <div className="all-works-column-filter">
                       {key === "license_pool_status" ? (
                         <select
@@ -143,11 +167,10 @@ export default function AllWorksPage(props: {
                             updateFilter("status", event.target.value)
                           }
                         >
-                          <option value="">All</option>
-                          <option value="active">Active</option>
-                          <option value="exhausted">Exhausted</option>
-                          <option value="no_licenses">No licenses</option>
-                          <option value="no_pool">No pool</option>
+                          <option value="">Kaikki</option>
+                          <option value="active">Aktiivinen</option>
+                          <option value="exhausted">Umpeutunut</option>
+                          <option value="no_licenses">Ei lisenssejä</option>
                         </select>
                       ) : key === "language" ? (
                         <select
@@ -157,7 +180,7 @@ export default function AllWorksPage(props: {
                             updateFilter("language", event.target.value)
                           }
                         >
-                          <option value="">All</option>
+                          <option value="">Kaikki</option>
                           {Object.keys(languages || {})
                             .sort((a, b) => a.localeCompare(b))
                             .map((code) => (
@@ -174,7 +197,7 @@ export default function AllWorksPage(props: {
                             updateFilter(key, event.target.value)
                           }
                         >
-                          <option value="">All</option>
+                          <option value="">Kaikki</option>
                           {Array.from(
                             new Set([
                               ...rows.map((work) => work[key]),
@@ -203,36 +226,6 @@ export default function AllWorksPage(props: {
                         />
                       )}
                     </div>
-                    <span className="all-works-sort-controls">
-                      <button
-                        type="button"
-                        aria-label={`Sort ${label} ascending`}
-                        aria-pressed={sort === key && direction === "asc"}
-                        className={
-                          sort === key && direction === "asc" ? "active" : ""
-                        }
-                        onClick={() => {
-                          setSort(key);
-                          setDirection("asc");
-                        }}
-                      >
-                        ▲
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={`Sort ${label} descending`}
-                        aria-pressed={sort === key && direction === "desc"}
-                        className={
-                          sort === key && direction === "desc" ? "active" : ""
-                        }
-                        onClick={() => {
-                          setSort(key);
-                          setDirection("desc");
-                        }}
-                      >
-                        ▼
-                      </button>
-                    </span>
                   </div>
                 </th>
               ))}
