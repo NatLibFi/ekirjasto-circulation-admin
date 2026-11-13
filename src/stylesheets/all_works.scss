@@ -4,4 +4,51 @@
     height: auto;
     padding: 100px;
   }
+
+  th {
+    vertical-align: top;
+  }
+
+  .all-works-column-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  .all-works-column-filter {
+    min-width: 0;
+
+    input,
+    select {
+      box-sizing: border-box;
+      max-width: 100%;
+      min-width: 4rem;
+      width: 100%;
+    }
+
+    span {
+      display: flex;
+      gap: 0.2rem;
+    }
+  }
+
+  .all-works-sort-controls {
+    display: inline-flex;
+    flex-direction: column;
+    line-height: 0.8;
+
+    button {
+      background: transparent;
+      border: 0;
+      color: #666;
+      cursor: pointer;
+      font-size: 0.65rem;
+      padding: 0;
+
+      &.active {
+        color: #111;
+      }
+    }
+  }
 }

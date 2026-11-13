@@ -92,79 +92,95 @@ export default function AllWorksPage(props: {
       <main className="body">
         <h1>Koko kokoelma</h1>
         <p>{data ? `${data.total} works, sorted by ${sortLabel}` : ""}</p>
-        <div className="all-works-filters">
-          {columns.map(([key, label]) => (
-            <label key={key}>
-              {label}
-              {key === "license_pool_status" ? (
-                <select
-                  value={filters.status}
-                  onChange={(event) =>
-                    updateFilter("status", event.target.value)
-                  }
-                >
-                  <option value="">All</option>
-                  <option value="active">Active</option>
-                  <option value="exhausted">Exhausted</option>
-                  <option value="no_licenses">No licenses</option>
-                  <option value="no_pool">No pool</option>
-                </select>
-              ) : key === "licenses_owned" ||
-                key === "patrons_in_hold_queue" ? (
-                <span>
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={filters[`${key}_min`]}
-                    onChange={(event) =>
-                      updateFilter(`${key}_min`, event.target.value)
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={filters[`${key}_max`]}
-                    onChange={(event) =>
-                      updateFilter(`${key}_max`, event.target.value)
-                    }
-                  />
-                </span>
-              ) : (
-                <input
-                  type={key === "published_year" ? "number" : "text"}
-                  value={filters[key]}
-                  onChange={(event) => updateFilter(key, event.target.value)}
-                />
-              )}
-            </label>
-          ))}
-          <label>
-            Sort
-            <select
-              value={sort}
-              onChange={(event) => setSort(event.target.value)}
-            >
-              {columns.map(([key, label]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            onClick={() => setDirection(direction === "asc" ? "desc" : "asc")}
-          >
-            {direction === "asc" ? "Ascending" : "Descending"}
-          </button>
-        </div>
         {fetchError && <ErrorMessage error={fetchError} />}
         {isFetching && !data && <LoadingIndicator />}
         <table className="table table-striped">
           <thead>
             <tr>
-              {columns.map(([, label]) => (
-                <th key={label}>{label}</th>
+              {columns.map(([key, label]) => (
+                <th key={key}>
+                  <div className="all-works-column-heading">
+                    <span className="all-works-column-title">{label}</span>
+                    <div className="all-works-column-filter">
+                      {key === "license_pool_status" ? (
+                        <select
+                          aria-label={`Filter by ${label}`}
+                          value={filters.status}
+                          onChange={(event) =>
+                            updateFilter("status", event.target.value)
+                          }
+                        >
+                          <option value="">All</option>
+                          <option value="active">Active</option>
+                          <option value="exhausted">Exhausted</option>
+                          <option value="no_licenses">No licenses</option>
+                          <option value="no_pool">No pool</option>
+                        </select>
+                      ) : key === "licenses_owned" ||
+                        key === "patrons_in_hold_queue" ? (
+                        <span>
+                          <input
+                            aria-label={`${label} minimum`}
+                            type="number"
+                            placeholder="Min"
+                            value={filters[`${key}_min`]}
+                            onChange={(event) =>
+                              updateFilter(`${key}_min`, event.target.value)
+                            }
+                          />
+                          <input
+                            aria-label={`${label} maximum`}
+                            type="number"
+                            placeholder="Max"
+                            value={filters[`${key}_max`]}
+                            onChange={(event) =>
+                              updateFilter(`${key}_max`, event.target.value)
+                            }
+                          />
+                        </span>
+                      ) : (
+                        <input
+                          aria-label={`Filter by ${label}`}
+                          type={key === "published_year" ? "number" : "text"}
+                          value={filters[key]}
+                          onChange={(event) =>
+                            updateFilter(key, event.target.value)
+                          }
+                        />
+                      )}
+                    </div>
+                    <span className="all-works-sort-controls">
+                      <button
+                        type="button"
+                        aria-label={`Sort ${label} ascending`}
+                        aria-pressed={sort === key && direction === "asc"}
+                        className={
+                          sort === key && direction === "asc" ? "active" : ""
+                        }
+                        onClick={() => {
+                          setSort(key);
+                          setDirection("asc");
+                        }}
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Sort ${label} descending`}
+                        aria-pressed={sort === key && direction === "desc"}
+                        className={
+                          sort === key && direction === "desc" ? "active" : ""
+                        }
+                        onClick={() => {
+                          setSort(key);
+                          setDirection("desc");
+                        }}
+                      >
+                        ▼
+                      </button>
+                    </span>
+                  </div>
+                </th>
               ))}
             </tr>
           </thead>
