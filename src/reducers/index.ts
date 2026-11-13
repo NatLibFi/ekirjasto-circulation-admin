@@ -41,6 +41,7 @@ import changePassword from "./changePassword";
 import { FetchEditState } from "./createFetchEditReducer";
 import { RegisterLibraryState } from "./createRegisterLibraryReducer";
 import patronManager from "./managePatrons";
+import allWorks, { AllWorksState } from "./allWorks";
 import {
   LibrariesData,
   CollectionsData,
@@ -100,6 +101,7 @@ export interface State {
   rightsStatuses: FetchEditState<RightsStatusData>;
   changePassword: FetchEditState<void>;
   patronManager: FetchEditState<PatronData>;
+  allWorks: AllWorksState;
 }
 
 export default combineReducers<State>({
@@ -138,4 +140,5 @@ export default combineReducers<State>({
   rightsStatuses,
   changePassword,
   patronManager,
+  allWorks,
 });

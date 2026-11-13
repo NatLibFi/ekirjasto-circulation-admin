@@ -65,6 +65,7 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly EDIT_CUSTOM_LISTS_FOR_BOOK = "EDIT_CUSTOM_LISTS_FOR_BOOK";
   static readonly CIRCULATION_EVENTS = "CIRCULATION_EVENTS";
   static readonly STATS = "STATS";
+  static readonly ALL_WORKS = "ALL_WORKS";
   static readonly LIBRARIES = "LIBRARIES";
   static readonly EDIT_LIBRARY = "EDIT_LIBRARY";
   static readonly DELETE_LIBRARY = "DELETE_LIBRARY";
@@ -178,6 +179,11 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly CIRCULATION_EVENTS_SUCCESS = "CIRCULATION_EVENTS_SUCCESS";
   static readonly CIRCULATION_EVENTS_FAILURE = "CIRCULATION_EVENTS_FAILURE";
   static readonly CIRCULATION_EVENTS_LOAD = "CIRCULATION_EVENTS_LOAD";
+
+  static readonly ALL_WORKS_REQUEST = "ALL_WORKS_REQUEST";
+  static readonly ALL_WORKS_SUCCESS = "ALL_WORKS_SUCCESS";
+  static readonly ALL_WORKS_FAILURE = "ALL_WORKS_FAILURE";
+  static readonly ALL_WORKS_LOAD = "ALL_WORKS_LOAD";
 
   static readonly STATS_REQUEST = "STATS_REQUEST";
   static readonly STATS_SUCCESS = "STATS_SUCCESS";
@@ -458,6 +464,40 @@ export default class ActionCreator extends BaseActionCreator {
   fetchStatistics() {
     const url = "/admin/stats";
     return this.fetchJSON<StatisticsData>(ActionCreator.STATS, url).bind(this);
+  }
+
+  fetchAllWorks(
+    library: string,
+    params: { [key: string]: string | number },
+    append = false
+  ) {
+    const query = Object.keys(params)
+      .filter((key) => params[key] !== "" && params[key] !== undefined)
+      .map(
+        (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+      )
+      .join("&");
+    const url = `/${encodeURIComponent(library)}/admin/all_works?${query}`;
+    return (dispatch) => {
+      dispatch({ type: ActionCreator.ALL_WORKS_REQUEST, url });
+      return (this as any).fetcher
+        .fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Could not load works (${response.status})`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          dispatch({ type: ActionCreator.ALL_WORKS_SUCCESS });
+          dispatch({ type: ActionCreator.ALL_WORKS_LOAD, data, append });
+          return data;
+        })
+        .catch((error) => {
+          dispatch({ type: ActionCreator.ALL_WORKS_FAILURE, error });
+          throw error;
+        });
+    };
   }
 
   fetchLibraries() {
