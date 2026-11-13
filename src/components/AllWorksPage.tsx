@@ -27,6 +27,9 @@ export default function AllWorksPage(props: {
 }): JSX.Element {
   const dispatch = useDispatch();
   const data = useSelector((state: RootState) => state.editor.allWorks.data);
+  const languages = useSelector(
+    (state: RootState) => state.editor.languages?.data
+  );
   const isFetching = useSelector(
     (state: RootState) => state.editor.allWorks.isFetching
   );
@@ -62,6 +65,10 @@ export default function AllWorksPage(props: {
     document.title = title("Koko kokoelma");
     load();
   }, [sort, direction]);
+
+  useEffect(() => {
+    dispatch(new ActionCreator().fetchLanguages() as any);
+  }, []);
 
   const updateFilter = (name: string, value: string) => {
     const next = { ...filters, [name]: value };
@@ -115,6 +122,46 @@ export default function AllWorksPage(props: {
                           <option value="exhausted">Exhausted</option>
                           <option value="no_licenses">No licenses</option>
                           <option value="no_pool">No pool</option>
+                        </select>
+                      ) : key === "language" ? (
+                        <select
+                          aria-label={`Filter by ${label}`}
+                          value={filters.language}
+                          onChange={(event) =>
+                            updateFilter("language", event.target.value)
+                          }
+                        >
+                          <option value="">All</option>
+                          {Object.keys(languages || {})
+                            .sort((a, b) => a.localeCompare(b))
+                            .map((code) => (
+                              <option key={code} value={code}>
+                                {languages[code]?.[0] || code}
+                              </option>
+                            ))}
+                        </select>
+                      ) : key === "format" ? (
+                        <select
+                          aria-label={`Filter by ${label}`}
+                          value={filters[key]}
+                          onChange={(event) =>
+                            updateFilter(key, event.target.value)
+                          }
+                        >
+                          <option value="">All</option>
+                          {Array.from(
+                            new Set([
+                              ...rows.map((work) => work[key]),
+                              filters[key],
+                            ])
+                          )
+                            .filter(Boolean)
+                            .sort((a, b) => a.localeCompare(b))
+                            .map((value) => (
+                              <option key={value} value={value}>
+                                {value}
+                              </option>
+                            ))}
                         </select>
                       ) : key === "licenses_owned" ||
                         key === "patrons_in_hold_queue" ? (
