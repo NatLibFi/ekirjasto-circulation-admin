@@ -39,14 +39,9 @@ export default function AllWorksPage(props: {
   const [filters, setFilters] = useState({
     title: "",
     author: "",
-    published_year: "",
     language: "",
     format: "",
     status: "",
-    licenses_owned_min: "",
-    licenses_owned_max: "",
-    patrons_in_hold_queue_min: "",
-    patrons_in_hold_queue_max: "",
   });
   const [sort, setSort] = useState("title");
   const [direction, setDirection] = useState("asc");
@@ -165,26 +160,7 @@ export default function AllWorksPage(props: {
                         </select>
                       ) : key === "licenses_owned" ||
                         key === "patrons_in_hold_queue" ? (
-                        <span>
-                          <input
-                            aria-label={`${label} minimum`}
-                            type="number"
-                            placeholder="Min"
-                            value={filters[`${key}_min`]}
-                            onChange={(event) =>
-                              updateFilter(`${key}_min`, event.target.value)
-                            }
-                          />
-                          <input
-                            aria-label={`${label} maximum`}
-                            type="number"
-                            placeholder="Max"
-                            value={filters[`${key}_max`]}
-                            onChange={(event) =>
-                              updateFilter(`${key}_max`, event.target.value)
-                            }
-                          />
-                        </span>
+                        <></>
                       ) : (
                         <input
                           aria-label={`Filter by ${label}`}
