@@ -4,6 +4,7 @@ import { RootState } from "../store";
 
 export interface AllWork {
   id: number;
+  admin_url?: string;
   title: string;
   author: string;
   published_year: number | null;

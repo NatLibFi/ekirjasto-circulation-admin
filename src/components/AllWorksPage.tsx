@@ -22,6 +22,37 @@ const columns = [
   ["patrons_in_hold_queue", "Patron hold queue"],
 ] as const;
 
+export function bookDetailsHref(
+  library: string,
+  adminUrl?: string
+): string | null {
+  if (!adminUrl) {
+    return null;
+  }
+
+  let pathname: string;
+  try {
+    pathname = new URL(adminUrl, window.location.origin).pathname;
+  } catch (_error) {
+    return null;
+  }
+
+  const worksMarker = "/admin/works/";
+  const worksIndex = pathname.indexOf(worksMarker);
+  if (worksIndex < 0) {
+    return null;
+  }
+
+  const workPath = pathname.slice(worksIndex + worksMarker.length);
+  if (!workPath) {
+    return null;
+  }
+
+  return `/admin/web/admin-book/${encodeURIComponent(
+    `${library}/${workPath}`
+  )}`;
+}
+
 export default function AllWorksPage(props: {
   params: { library: string };
 }): JSX.Element {
@@ -205,21 +236,31 @@ export default function AllWorksPage(props: {
                   </div>
                 </th>
               ))}
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((work) => (
-              <tr key={work.id}>
-                <td>{work.title}</td>
-                <td>{work.author}</td>
-                <td>{work.published_year}</td>
-                <td>{work.language}</td>
-                <td>{work.format}</td>
-                <td>{work.license_pool_status}</td>
-                <td>{work.licenses_owned}</td>
-                <td>{work.patrons_in_hold_queue}</td>
-              </tr>
-            ))}
+            {rows.map((work) => {
+              const detailsHref = bookDetailsHref(
+                props.params.library,
+                work.admin_url
+              );
+              return (
+                <tr key={work.id}>
+                  <td>{work.title}</td>
+                  <td>{work.author}</td>
+                  <td>{work.published_year}</td>
+                  <td>{work.language}</td>
+                  <td>{work.format}</td>
+                  <td>{work.license_pool_status}</td>
+                  <td>{work.licenses_owned}</td>
+                  <td>{work.patrons_in_hold_queue}</td>
+                  <td>
+                    {detailsHref && <a href={detailsHref}>Katso tiedot</a>}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         {canLoadMore && data && (

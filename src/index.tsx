@@ -92,6 +92,12 @@ class CirculationAdmin {
           >
             <Router history={browserHistory}>
               <Route path={catalogEditorPath} component={CatalogPage} />
+              <Route
+                path="/admin/web/admin-book/:bookUrl(/:tab)"
+                component={(routeProps) => (
+                  <CatalogPage {...routeProps} adminDetails={true} />
+                )}
+              />
               <Route path={customListPagePath} component={CustomListPage} />
               <Route path={lanePagePath} component={LanePage} />
               <Route
