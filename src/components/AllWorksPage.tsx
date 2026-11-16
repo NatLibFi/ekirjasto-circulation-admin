@@ -1,13 +1,12 @@
 import * as React from "react";
+import * as PropTypes from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ActionCreator from "../actions";
 import Header from "./Header";
 import Footer from "./Footer";
-import LoadButton from "./LoadButton";
 import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components/LoadingIndicator";
 import ErrorMessage from "./ErrorMessage";
-import { stateSelector } from "../reducers/allWorks";
 import title from "../utils/title";
 import { RootState } from "../store";
 
@@ -53,9 +52,7 @@ export function bookDetailsHref(
   )}`;
 }
 
-export default function AllWorksPage(props: {
-  params: { library: string };
-}): JSX.Element {
+function AllWorksContent(props: { params: { library: string } }): JSX.Element {
   const dispatch = useDispatch();
   const data = useSelector((state: RootState) => state.editor.allWorks.data);
   const languages = useSelector(
@@ -77,23 +74,33 @@ export default function AllWorksPage(props: {
   const [sort, setSort] = useState("title");
   const [direction, setDirection] = useState("asc");
 
-  const load = (offset = 0, append = false) => {
-    dispatch(
-      new ActionCreator().fetchAllWorks(
-        props.params.library,
-        { ...filters, sort, direction, offset },
-        append
-      ) as any
-    );
+  const load = (offset = 0, includeTotal = true) => {
+    Promise.resolve(
+      dispatch(
+        new ActionCreator().fetchAllWorks(
+          props.params.library,
+          {
+            ...filters,
+            sort,
+            direction,
+            offset,
+            include_total: includeTotal ? 1 : 0,
+          },
+          false
+        ) as any
+      )
+    ).catch(() => undefined);
   };
 
   useEffect(() => {
-    document.title = title("Koko kokoelma");
+    document.title = title("Kirjaluettelo");
     load();
   }, [sort, direction]);
 
   useEffect(() => {
-    dispatch(new ActionCreator().fetchLanguages() as any);
+    Promise.resolve(
+      dispatch(new ActionCreator().fetchLanguages() as any)
+    ).catch(() => undefined);
   }, []);
 
   const updateFilter = (name: string, value: string) => {
@@ -101,19 +108,24 @@ export default function AllWorksPage(props: {
     setFilters(next);
     window.setTimeout(
       () =>
-        dispatch(
-          new ActionCreator().fetchAllWorks(
-            props.params.library,
-            { ...next, sort, direction, offset: 0 },
-            false
-          ) as any
-        ),
+        Promise.resolve(
+          dispatch(
+            new ActionCreator().fetchAllWorks(
+              props.params.library,
+              { ...next, sort, direction, offset: 0, include_total: 1 },
+              false
+            ) as any
+          )
+        ).catch(() => undefined),
       0
     );
   };
 
   const rows = data?.works || [];
-  const canLoadMore = !!data?.has_more;
+  const page = data ? Math.floor(data.offset / data.limit) + 1 : 1;
+  const pageCount = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
+  const canGoPrevious = page > 1;
+  const canGoNext = !!data?.has_more;
   const sortLabel = useMemo(
     () => columns.find(([key]) => key === sort)?.[1] || sort,
     [sort]
@@ -123,10 +135,36 @@ export default function AllWorksPage(props: {
     <div className="all-works">
       <Header />
       <main className="body">
-        <h1>Koko kokoelma</h1>
-        <p>{data ? `${data.total} works, sorted by ${sortLabel}` : ""}</p>
+        <h1>Kirjaluettelo</h1>
+        <p>
+          {data ? `${data.total} kirjaa, Lajitteluperuste: ${sortLabel}` : ""}
+        </p>
         {fetchError && <ErrorMessage error={fetchError} />}
         {isFetching && !data && <LoadingIndicator />}
+        {data && pageCount > 1 && (
+          <nav
+            className="all-works-pagination all-works-pagination-top"
+            aria-label="Pagination"
+          >
+            <button
+              type="button"
+              disabled={!canGoPrevious || isFetching}
+              onClick={() => load(data.offset - data.limit, false)}
+            >
+              Edellinen
+            </button>
+            <span aria-live="polite">
+              Sivu {page} / {pageCount}
+            </span>
+            <button
+              type="button"
+              disabled={!canGoNext || isFetching}
+              onClick={() => load(data.offset + data.limit, false)}
+            >
+              Seuraava
+            </button>
+          </nav>
+        )}
         <table className="table table-striped">
           <thead>
             <tr>
@@ -212,13 +250,14 @@ export default function AllWorksPage(props: {
                               </option>
                             ))}
                         </select>
-                      ) : key === "licenses_owned" ||
+                      ) : key === "published_year" ||
+                        key === "licenses_owned" ||
                         key === "patrons_in_hold_queue" ? (
                         <></>
                       ) : (
                         <input
                           aria-label={`Filter by ${label}`}
-                          type={key === "published_year" ? "number" : "text"}
+                          type="text"
                           value={filters[key]}
                           onChange={(event) =>
                             updateFilter(key, event.target.value)
@@ -256,14 +295,49 @@ export default function AllWorksPage(props: {
             })}
           </tbody>
         </table>
-        {canLoadMore && data && (
-          <LoadButton
-            isFetching={isFetching}
-            loadMore={() => load(data.offset + data.limit, true)}
-          />
+        {data && pageCount > 1 && (
+          <nav
+            className="all-works-pagination all-works-pagination-bottom"
+            aria-label="Pagination"
+          >
+            <button
+              type="button"
+              disabled={!canGoPrevious || isFetching}
+              onClick={() => load(data.offset - data.limit, false)}
+            >
+              Edellinen
+            </button>
+            <span aria-live="polite">
+              Sivu {page} / {pageCount}
+            </span>
+            <button
+              type="button"
+              disabled={!canGoNext || isFetching}
+              onClick={() => load(data.offset + data.limit, false)}
+            >
+              Seuraava
+            </button>
+          </nav>
         )}
       </main>
       <Footer />
     </div>
   );
+}
+
+/** Supplies the active library to Header's legacy context consumers. */
+export default class AllWorksPage extends React.Component<{
+  params: { library: string };
+}> {
+  static childContextTypes = {
+    library: PropTypes.func,
+  };
+
+  getChildContext() {
+    return { library: () => this.props.params.library };
+  }
+
+  render() {
+    return <AllWorksContent {...this.props} />;
+  }
 }

@@ -48,13 +48,10 @@ export default (state: AllWorksState = initialState, action) => {
     case ActionCreator.ALL_WORKS_LOAD:
       return {
         ...state,
-        data:
-          action.append && state.data
-            ? {
-                ...action.data,
-                works: state.data.works.concat(action.data.works),
-              }
-            : action.data,
+        data: {
+          ...action.data,
+          total: action.data.total ?? state.data?.total ?? 0,
+        },
         isFetching: false,
       };
     case ActionCreator.ALL_WORKS_FAILURE:
