@@ -1,4 +1,25 @@
 .all-works {
+  .all-works-metadata-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 1rem 0;
+
+    legend {
+      font-weight: bold;
+    }
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+  }
+
+  .all-works-range-filter {
+    display: flex;
+    gap: 0.25rem;
+  }
+
   .body {
     position: relative;
     height: auto;
@@ -33,7 +54,6 @@
       min-width: 4rem;
       width: 100%;
     }
-
   }
 
   .all-works-sort-button {

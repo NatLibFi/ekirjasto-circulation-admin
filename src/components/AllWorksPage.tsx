@@ -9,17 +9,78 @@ import LoadingIndicator from "@natlibfi/ekirjasto-web-opds-client/lib/components
 import ErrorMessage from "./ErrorMessage";
 import title from "../utils/title";
 import { RootState } from "../store";
+import { AllWork } from "../reducers/allWorks";
 
 const columns = [
   ["title", "Nimi"],
   ["author", "Tekijä(t)"],
-  ["published_year", "Julkaisuvuosi"],
   ["language", "Kieli"],
   ["format", "Formaatti"],
   ["license_pool_status", "Tila"],
-  ["licenses_owned", "Lisenssit"],
-  ["patrons_in_hold_queue", "Varausjono"],
 ] as const;
+
+const optionalColumns = [
+  ["published_year", "Julkaisuvuosi"],
+  ["licenses_owned", "Lukuoikeudet"],
+  ["patrons_in_hold_queue", "Varausjono"],
+  ["series", "Sarja"],
+  ["duration", "Äänikirjan kesto"],
+  ["number_of_pages", "E-kirjan sivumäärä"],
+  ["awards", "Palkinnot"],
+  ["title_created_date", "Nimekkeen luontipvm"],
+  ["data_source_modified", "Tietolähteen muokkauspvm"],
+  ["original_published_year", "Alkuperäinen julkaisuvuosi"],
+  ["original_language", "Alkuperäinen kieli"],
+  ["original_title", "Alkuperäinen nimi"],
+  ["keywords", "Avainsanat"],
+  ["genres", "Genret"],
+  ["fiction", "Kauno-/tietokirjallisuus"],
+  ["audience", "Kohdeyleisö"],
+  ["target_age", "Kohdeikä"],
+] as const;
+
+type OptionalKey = typeof optionalColumns[number][0];
+const numberKeys: OptionalKey[] = [
+  "published_year",
+  "licenses_owned",
+  "patrons_in_hold_queue",
+  "duration",
+  "number_of_pages",
+  "original_published_year",
+];
+const dateKeys: OptionalKey[] = ["title_created_date", "data_source_modified"];
+const listKeys: OptionalKey[] = ["awards", "keywords", "genres"];
+
+function metadataValue(work: AllWork, key: OptionalKey): string {
+  const value = work[key];
+  if (value == null) return "";
+  if (key === "series")
+    return [value, work.series_position]
+      .filter((part) => part != null)
+      .join(" #");
+  if (key === "duration") {
+    const minutes = Math.round(Number(value) / 60);
+    return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(
+      2,
+      "0"
+    )} min`;
+  }
+  if (dateKeys.includes(key))
+    return new Date(String(value)).toLocaleDateString("fi-FI");
+  if (listKeys.includes(key)) return (value as string[]).join(", ");
+  if (key === "fiction")
+    return value ? "Kaunokirjallisuus" : "Tietokirjallisuus";
+  return String(value);
+}
+
+function licensePoolStatusLabel(status: string): string {
+  const labels: { [key: string]: string } = {
+    active: "Aktiivinen",
+    exhausted: "Umpeutunut",
+    no_licenses: "Ei lisenssejä",
+  };
+  return labels[status] || status;
+}
 
 export function bookDetailsHref(
   library: string,
@@ -55,6 +116,9 @@ export function bookDetailsHref(
 function AllWorksContent(props: { params: { library: string } }): JSX.Element {
   const dispatch = useDispatch();
   const data = useSelector((state: RootState) => state.editor.allWorks.data);
+  const genreTree = useSelector(
+    (state: RootState) => state.editor.classifications.genreTree
+  );
   const languages = useSelector(
     (state: RootState) => state.editor.languages?.data
   );
@@ -73,6 +137,10 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
   });
   const [sort, setSort] = useState("title");
   const [direction, setDirection] = useState("asc");
+  const [selectedColumns, setSelectedColumns] = useState<OptionalKey[]>([]);
+  const [metadataFilters, setMetadataFilters] = useState<{
+    [key: string]: string;
+  }>({});
 
   const load = (offset = 0, includeTotal = true) => {
     Promise.resolve(
@@ -81,6 +149,7 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
           props.params.library,
           {
             ...filters,
+            ...metadataFilters,
             sort,
             direction,
             offset,
@@ -97,9 +166,62 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
     load();
   }, [sort, direction]);
 
+  const updateMetadataFilter = (key: string, value: string) => {
+    const next = { ...metadataFilters, [key]: value };
+    setMetadataFilters(next);
+    Promise.resolve(
+      dispatch(
+        new ActionCreator().fetchAllWorks(
+          props.params.library,
+          { ...filters, ...next, sort, direction, offset: 0, include_total: 1 },
+          false
+        ) as any
+      )
+    ).catch(() => undefined);
+  };
+
+  const toggleColumn = (key: OptionalKey) => {
+    if (!selectedColumns.includes(key)) {
+      setSelectedColumns([...selectedColumns, key]);
+      return;
+    }
+    setSelectedColumns(selectedColumns.filter((selected) => selected !== key));
+    const next = { ...metadataFilters };
+    Object.keys(next)
+      .filter((name) => name === key || name.startsWith(`${key}_`))
+      .forEach((name) => delete next[name]);
+    setMetadataFilters(next);
+    const nextSort = sort === key ? "title" : sort;
+    const nextDirection = sort === key ? "asc" : direction;
+    if (nextSort !== sort) {
+      setSort(nextSort);
+      setDirection(nextDirection);
+    } else {
+      Promise.resolve(
+        dispatch(
+          new ActionCreator().fetchAllWorks(
+            props.params.library,
+            {
+              ...filters,
+              ...next,
+              sort: nextSort,
+              direction: nextDirection,
+              offset: 0,
+              include_total: 1,
+            },
+            false
+          ) as any
+        )
+      ).catch(() => undefined);
+    }
+  };
+
   useEffect(() => {
     Promise.resolve(
       dispatch(new ActionCreator().fetchLanguages() as any)
+    ).catch(() => undefined);
+    Promise.resolve(
+      dispatch(new ActionCreator().fetchGenreTree("/admin/genres") as any)
     ).catch(() => undefined);
   }, []);
 
@@ -112,7 +234,14 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
           dispatch(
             new ActionCreator().fetchAllWorks(
               props.params.library,
-              { ...next, sort, direction, offset: 0, include_total: 1 },
+              {
+                ...next,
+                ...metadataFilters,
+                sort,
+                direction,
+                offset: 0,
+                include_total: 1,
+              },
               false
             ) as any
           )
@@ -127,7 +256,9 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
   const canGoPrevious = page > 1;
   const canGoNext = !!data?.has_more;
   const sortLabel = useMemo(
-    () => columns.find(([key]) => key === sort)?.[1] || sort,
+    () =>
+      [...columns, ...optionalColumns].find(([key]) => key === sort)?.[1] ||
+      sort,
     [sort]
   );
 
@@ -141,6 +272,19 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
         </p>
         {fetchError && <ErrorMessage error={fetchError} />}
         {isFetching && !data && <LoadingIndicator />}
+        <fieldset className="all-works-metadata-options">
+          <legend>Näytettävät lisätiedot</legend>
+          {optionalColumns.map(([key, label]) => (
+            <label key={key}>
+              <input
+                type="checkbox"
+                checked={selectedColumns.includes(key)}
+                onChange={() => toggleColumn(key)}
+              />
+              {label}
+            </label>
+          ))}
+        </fieldset>
         {data && pageCount > 1 && (
           <nav
             className="all-works-pagination all-works-pagination-top"
@@ -250,10 +394,6 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
                               </option>
                             ))}
                         </select>
-                      ) : key === "published_year" ||
-                        key === "licenses_owned" ||
-                        key === "patrons_in_hold_queue" ? (
-                        <></>
                       ) : (
                         <input
                           aria-label={`Filter by ${label}`}
@@ -268,6 +408,126 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
                   </div>
                 </th>
               ))}
+              {optionalColumns
+                .filter(([key]) => selectedColumns.includes(key))
+                .map(([key, label]) => (
+                  <th key={key}>
+                    <div className="all-works-column-heading">
+                      <div className="all-works-column-title-row">
+                        <span className="all-works-column-title">{label}</span>
+                        <button
+                          type="button"
+                          aria-label={`Lajittele: ${label}`}
+                          aria-pressed={sort === key}
+                          className={`all-works-sort-button${
+                            sort === key ? " active" : ""
+                          }`}
+                          onClick={() => {
+                            if (sort === key)
+                              setDirection(
+                                direction === "asc" ? "desc" : "asc"
+                              );
+                            else {
+                              setSort(key);
+                              setDirection("asc");
+                            }
+                          }}
+                        >
+                          ⇅
+                        </button>
+                      </div>
+                      <div className="all-works-column-filter">
+                        {key === "genres" ? (
+                          <select
+                            aria-label={`Rajaa: ${label}`}
+                            value={metadataFilters[key] || ""}
+                            onChange={(event) =>
+                              updateMetadataFilter(key, event.target.value)
+                            }
+                          >
+                            <option value="">Kaikki</option>
+                            {Object.entries(genreTree || {}).map(
+                              ([group, genres]) => (
+                                <optgroup key={group} label={group}>
+                                  {Object.entries(genres).map(([label]) => {
+                                    const genre = (
+                                      data?.genre_options || []
+                                    ).find((option) => option.label === label);
+                                    return genre ? (
+                                      <option
+                                        key={genre.value}
+                                        value={genre.value}
+                                      >
+                                        {label}
+                                      </option>
+                                    ) : null;
+                                  })}
+                                </optgroup>
+                              )
+                            )}
+                          </select>
+                        ) : key === "fiction" ? (
+                          <select
+                            aria-label={`Rajaa: ${label}`}
+                            value={metadataFilters[key] || ""}
+                            onChange={(event) =>
+                              updateMetadataFilter(key, event.target.value)
+                            }
+                          >
+                            <option value="">Kaikki</option>
+                            <option value="true">Kaunokirjallisuus</option>
+                            <option value="false">Tietokirjallisuus</option>
+                          </select>
+                        ) : key === "audience" ? (
+                          <select
+                            aria-label={`Rajaa: ${label}`}
+                            value={metadataFilters[key] || ""}
+                            onChange={(event) =>
+                              updateMetadataFilter(key, event.target.value)
+                            }
+                          >
+                            <option value="">Kaikki</option>
+                            <option value="Adult">Aikuiset</option>
+                            <option value="Young Adult">Nuoret</option>
+                            <option value="Children">Lapset</option>
+                            <option value="Adults Only">Vain aikuiset</option>
+                          </select>
+                        ) : numberKeys.includes(key) ||
+                          dateKeys.includes(key) ? (
+                          <div className="all-works-range-filter">
+                            {(["min", "max"] as const).map((bound) => (
+                              <input
+                                key={bound}
+                                aria-label={`${label}: ${
+                                  bound === "min" ? "vähintään" : "enintään"
+                                }`}
+                                type={
+                                  dateKeys.includes(key) ? "date" : "number"
+                                }
+                                value={metadataFilters[`${key}_${bound}`] || ""}
+                                onChange={(event) =>
+                                  updateMetadataFilter(
+                                    `${key}_${bound}`,
+                                    event.target.value
+                                  )
+                                }
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <input
+                            aria-label={`Rajaa: ${label}`}
+                            type={key === "target_age" ? "number" : "text"}
+                            value={metadataFilters[key] || ""}
+                            onChange={(event) =>
+                              updateMetadataFilter(key, event.target.value)
+                            }
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </th>
+                ))}
               <th></th>
             </tr>
           </thead>
@@ -281,12 +541,14 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
                 <tr key={work.id}>
                   <td>{work.title}</td>
                   <td>{work.author}</td>
-                  <td>{work.published_year}</td>
                   <td>{work.language}</td>
                   <td>{work.format}</td>
-                  <td>{work.license_pool_status}</td>
-                  <td>{work.licenses_owned}</td>
-                  <td>{work.patrons_in_hold_queue}</td>
+                  <td>{licensePoolStatusLabel(work.license_pool_status)}</td>
+                  {optionalColumns
+                    .filter(([key]) => selectedColumns.includes(key))
+                    .map(([key]) => (
+                      <td key={key}>{metadataValue(work, key)}</td>
+                    ))}
                   <td>
                     {detailsHref && <a href={detailsHref}>Katso tiedot</a>}
                   </td>

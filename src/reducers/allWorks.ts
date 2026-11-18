@@ -13,10 +13,26 @@ export interface AllWork {
   license_pool_status: string;
   licenses_owned: number;
   patrons_in_hold_queue: number;
+  series: string | null;
+  series_position: number | null;
+  duration: number | null;
+  number_of_pages: number | null;
+  awards: string[];
+  title_created_date: string | null;
+  data_source_modified: string | null;
+  original_published_year: number | null;
+  original_language: string | null;
+  original_title: string | null;
+  keywords: string[];
+  genres: string[];
+  fiction: boolean | null;
+  audience: string | null;
+  target_age: string | null;
 }
 
 export interface AllWorksData {
   works: AllWork[];
+  genre_options: { value: string; label: string }[];
   total: number;
   offset: number;
   limit: number;
