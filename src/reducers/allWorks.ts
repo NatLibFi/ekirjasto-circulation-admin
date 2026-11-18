@@ -1,6 +1,7 @@
 import { RequestError } from "@natlibfi/ekirjasto-web-opds-client/lib/DataFetcher";
 import ActionCreator from "../actions";
 import { RootState } from "../store";
+import { LanguagesData } from "../interfaces";
 
 export interface AllWork {
   id: number;
@@ -32,6 +33,7 @@ export interface AllWork {
 
 export interface AllWorksData {
   works: AllWork[];
+  language_options: LanguagesData;
   genre_options: { value: string; label: string }[];
   total: number;
   offset: number;

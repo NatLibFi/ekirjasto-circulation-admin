@@ -38,9 +38,6 @@ function AllWorksContent(props: {
   const genreTree = useSelector(
     (state: RootState) => state.editor.classifications.genreTree
   );
-  const languages = useSelector(
-    (state: RootState) => state.editor.languages?.data
-  );
   const customLists = useSelector(
     (state: RootState) => state.editor.customLists.data?.custom_lists || []
   );
@@ -62,9 +59,6 @@ function AllWorksContent(props: {
 
   useEffect(() => {
     document.title = title("Kirjaluettelo");
-    Promise.resolve(
-      dispatch(new ActionCreator().fetchLanguages() as any)
-    ).catch(() => undefined);
     Promise.resolve(
       dispatch(new ActionCreator().fetchGenreTree("/admin/genres") as any)
     ).catch(() => undefined);
@@ -120,7 +114,7 @@ function AllWorksContent(props: {
           filters={filters}
           sort={sort}
           direction={direction}
-          languages={languages}
+          languages={data?.language_options}
           genreTree={genreTree}
           genreOptions={data?.genre_options}
           onFilter={changeFilter}
