@@ -1,3 +1,4 @@
+import { serializeWorkQuery, workQueryKey } from "./utils/allWorks";
 import {
   AdvancedSearchQuery,
   BookData,
@@ -39,6 +40,8 @@ import {
   getCustomListEditorFormData,
   getCustomListEditorSearchUrl,
 } from "./reducers/customListEditor";
+
+let allWorksRequestId = 0;
 
 /** Create redux actions to be dispatched by connected components, mostly
     to make requests to the server. */
@@ -471,31 +474,59 @@ export default class ActionCreator extends BaseActionCreator {
     params: { [key: string]: string | number },
     append = false
   ) {
-    const query = Object.keys(params)
-      .filter((key) => params[key] !== "" && params[key] !== undefined)
-      .map(
-        (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
-      )
-      .join("&");
+    const query = serializeWorkQuery(params);
     const url = `/${encodeURIComponent(library)}/admin/all_works?${query}`;
     return (dispatch) => {
-      dispatch({ type: ActionCreator.ALL_WORKS_REQUEST, url });
+      const requestId = ++allWorksRequestId;
+      const queryKey = workQueryKey(library, params);
+      dispatch({
+        type: ActionCreator.ALL_WORKS_REQUEST,
+        url,
+        requestId,
+        queryKey,
+        library,
+      });
       return (this as any).fetcher
         .fetch(url)
-        .then((response) => {
+        .then(async (response) => {
           if (!response.ok) {
-            throw new Error(`Could not load works (${response.status})`);
+            throw {
+              status: response.status,
+              response: await response.text(),
+              url,
+            };
           }
           return response.json();
         })
         .then((data) => {
-          dispatch({ type: ActionCreator.ALL_WORKS_SUCCESS });
-          dispatch({ type: ActionCreator.ALL_WORKS_LOAD, data, append });
+          dispatch({
+            type: ActionCreator.ALL_WORKS_SUCCESS,
+            requestId,
+            queryKey,
+          });
+          dispatch({
+            type: ActionCreator.ALL_WORKS_LOAD,
+            data,
+            append,
+            requestId,
+            queryKey,
+          });
           return data;
         })
         .catch((error) => {
-          dispatch({ type: ActionCreator.ALL_WORKS_FAILURE, error });
-          throw error;
+          const requestError: RequestError = {
+            status: error?.status ?? null,
+            response:
+              error?.response || error?.message || "Could not load works",
+            url,
+          };
+          dispatch({
+            type: ActionCreator.ALL_WORKS_FAILURE,
+            error: requestError,
+            requestId,
+            queryKey,
+          });
+          throw requestError;
         });
     };
   }

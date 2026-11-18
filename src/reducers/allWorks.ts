@@ -40,9 +40,12 @@ export interface AllWorksData {
 }
 
 export interface AllWorksState {
-  data: AllWorksData;
+  data: AllWorksData | null;
   isFetching: boolean;
-  fetchError: RequestError;
+  fetchError: RequestError | null;
+  requestId?: number;
+  dataQueryKey?: string;
+  library?: string;
 }
 
 const initialState: AllWorksState = {
@@ -60,17 +63,31 @@ export const stateSelector = {
 export default (state: AllWorksState = initialState, action) => {
   switch (action.type) {
     case ActionCreator.ALL_WORKS_REQUEST:
-      return { ...state, isFetching: true, fetchError: null };
+      return {
+        ...state,
+        isFetching: true,
+        fetchError: null,
+        requestId: action.requestId,
+        library: action.library,
+        data: state.library === action.library ? state.data : null,
+      };
     case ActionCreator.ALL_WORKS_LOAD:
+      if (action.requestId !== state.requestId) return state;
       return {
         ...state,
         data: {
           ...action.data,
-          total: action.data.total ?? state.data?.total ?? 0,
+          total:
+            action.data.total ??
+            (action.queryKey === state.dataQueryKey ? state.data?.total : 0) ??
+            0,
         },
         isFetching: false,
+        fetchError: null,
+        dataQueryKey: action.queryKey,
       };
     case ActionCreator.ALL_WORKS_FAILURE:
+      if (action.requestId !== state.requestId) return state;
       return { ...state, isFetching: false, fetchError: action.error };
     default:
       return state;
