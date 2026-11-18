@@ -82,16 +82,34 @@ function metadataValue(work: AllWork, key: OptionalKey): string {
   if (listKeys.includes(key)) return (value as string[]).join(", ");
   if (key === "fiction")
     return value ? "Kaunokirjallisuus" : "Tietokirjallisuus";
+  if (key === "audience") {
+    const labels: { [key: string]: string } = {
+      Adult: "Aikuiset",
+      "Young Adult": "Nuoret",
+      Children: "Lapset",
+      "Adults Only": "Vain aikuiset",
+    };
+    return labels[String(value)] || String(value);
+  }
   return String(value);
 }
 
 function licensePoolStatusLabel(status: string): string {
   const labels: { [key: string]: string } = {
     active: "Aktiivinen",
-    exhausted: "Umpeutunut",
-    no_licenses: "Ei lisenssejä",
+    exhausted: "Poistunut",
+    no_licenses: "Puuttuvat lisenssit",
   };
   return labels[status] || status;
+}
+
+function formatLabel(format: string): string {
+  const labels: { [key: string]: string } = {
+    audio: "äänikirja",
+    book: "e-kirja",
+  };
+  const normalizedFormat = format.trim().toLowerCase();
+  return labels[normalizedFormat] || format;
 }
 
 export function bookDetailsHref(
@@ -439,8 +457,10 @@ function AllWorksContent(props: {
                         >
                           <option value="">Kaikki</option>
                           <option value="active">Aktiivinen</option>
-                          <option value="exhausted">Umpeutunut</option>
-                          <option value="no_licenses">Ei lisenssejä</option>
+                          <option value="exhausted">Poistunut</option>
+                          <option value="no_licenses">
+                            Puuttuvat lisenssit
+                          </option>
                         </select>
                       ) : key === "language" ? (
                         <select
@@ -478,7 +498,7 @@ function AllWorksContent(props: {
                             .sort((a, b) => a.localeCompare(b))
                             .map((value) => (
                               <option key={value} value={value}>
-                                {value}
+                                {formatLabel(value)}
                               </option>
                             ))}
                         </select>
@@ -641,7 +661,7 @@ function AllWorksContent(props: {
                   </td>
                   <td className="all-works-author-cell">{work.author}</td>
                   <td>{work.language}</td>
-                  <td>{work.format}</td>
+                  <td>{formatLabel(work.format)}</td>
                   <td>{licensePoolStatusLabel(work.license_pool_status)}</td>
                   {optionalColumns
                     .filter(([key]) => selectedColumns.includes(key))
