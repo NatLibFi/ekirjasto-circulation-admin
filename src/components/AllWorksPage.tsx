@@ -10,6 +10,7 @@ import ErrorMessage from "./ErrorMessage";
 import title from "../utils/title";
 import { RootState } from "../store";
 import { AllWork } from "../reducers/allWorks";
+import { CustomListData } from "../interfaces";
 
 const columns = [
   ["title", "Nimi"],
@@ -124,7 +125,23 @@ export function bookDetailsHref(
   )}`;
 }
 
-function AllWorksContent(props: { params: { library: string } }): JSX.Element {
+function bookListsUrl(adminUrl?: string): string | null {
+  if (!adminUrl) return null;
+  try {
+    const pathname = new URL(adminUrl, window.location.origin).pathname;
+    const marker = "/admin/works/";
+    const index = pathname.indexOf(marker);
+    if (index < 0) return null;
+    return `${pathname.slice(index).replace(/\/$/, "")}/lists`;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function AllWorksContent(props: {
+  params: { library: string };
+  csrfToken?: string;
+}): JSX.Element {
   const dispatch = useDispatch();
   const data = useSelector((state: RootState) => state.editor.allWorks.data);
   const genreTree = useSelector(
@@ -139,6 +156,14 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
   const fetchError = useSelector(
     (state: RootState) => state.editor.allWorks.fetchError
   );
+  const customLists = useSelector(
+    (state: RootState) => state.editor.customLists.data?.custom_lists || []
+  );
+  const [selectedLists, setSelectedLists] = useState<{
+    [workId: number]: string;
+  }>({});
+  const [addingWork, setAddingWork] = useState<number | null>(null);
+  const [listActionError, setListActionError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     title: "",
     author: "",
@@ -148,6 +173,49 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
   });
   const [sort, setSort] = useState("title");
   const [direction, setDirection] = useState("asc");
+  useEffect(() => {
+    Promise.resolve(
+      dispatch(
+        new ActionCreator().fetchCustomLists(props.params.library) as any
+      )
+    ).catch(() => {
+      setListActionError("Listojen lataus epäonnistui.");
+    });
+  }, [dispatch, props.params.library]);
+
+  async function addWorkToList(work: AllWork) {
+    const listId = selectedLists[work.id];
+    const selectedList = customLists.find((list) => String(list.id) === listId);
+    const listsUrl = bookListsUrl(work.admin_url);
+    if (!selectedList || !listsUrl) {
+      setListActionError("Teoksen listatoiminnon osoitetta ei löytynyt.");
+      return;
+    }
+    setAddingWork(work.id);
+    setListActionError(null);
+    try {
+      const actions = new ActionCreator(null, props.csrfToken);
+      const current = await dispatch(
+        actions.fetchCustomListsForBook(listsUrl) as any
+      );
+      const memberships: CustomListData[] = current?.custom_lists || [];
+      if (!memberships.some((list) => String(list.id) === listId)) {
+        const form = new (window as any).FormData();
+        form.append("lists", JSON.stringify([...memberships, selectedList]));
+        await dispatch(actions.editCustomListsForBook(listsUrl, form) as any);
+      }
+      setSelectedLists({ ...selectedLists, [work.id]: "" });
+    } catch (error) {
+      const requestError = error as { status?: number; response?: string };
+      setListActionError(
+        `Kirjan lisääminen listalle epäonnistui${
+          requestError.status ? ` (${requestError.status})` : ""
+        }: ${requestError.response || "Yritä uudelleen."}`
+      );
+    } finally {
+      setAddingWork(null);
+    }
+  }
   const [selectedColumns, setSelectedColumns] = useState<OptionalKey[]>([]);
   const [metadataFilters, setMetadataFilters] = useState<{
     [key: string]: string;
@@ -551,7 +619,7 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
                     </div>
                   </th>
                 ))}
-              <th></th>
+              <th>Listat</th>
             </tr>
           </thead>
           <tbody>
@@ -562,8 +630,14 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
               );
               return (
                 <tr key={work.id}>
-                  <td>{work.title}</td>
-                  <td>{work.author}</td>
+                  <td>
+                    {detailsHref ? (
+                      <a href={detailsHref}>{work.title}</a>
+                    ) : (
+                      work.title
+                    )}
+                  </td>
+                  <td className="all-works-author-cell">{work.author}</td>
                   <td>{work.language}</td>
                   <td>{work.format}</td>
                   <td>{licensePoolStatusLabel(work.license_pool_status)}</td>
@@ -573,7 +647,37 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
                       <td key={key}>{metadataValue(work, key)}</td>
                     ))}
                   <td>
-                    {detailsHref && <a href={detailsHref}>Katso tiedot</a>}
+                    <select
+                      aria-label={`Valitse lista teokselle ${work.title}`}
+                      value={selectedLists[work.id] || ""}
+                      onChange={(event) =>
+                        setSelectedLists({
+                          ...selectedLists,
+                          [work.id]: event.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Lisää listalle…</option>
+                      {customLists
+                        .filter((list) => list.name)
+                        .map((list) => (
+                          <option key={list.id} value={String(list.id)}>
+                            {list.name}
+                          </option>
+                        ))}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={
+                        !selectedLists[work.id] || addingWork === work.id
+                      }
+                      onClick={() => addWorkToList(work)}
+                    >
+                      {addingWork === work.id ? "Lisätään…" : "Lisää"}
+                    </button>
+                    {listActionError && addingWork === null && (
+                      <span role="alert">{listActionError}</span>
+                    )}
                   </td>
                 </tr>
               );
@@ -616,13 +720,22 @@ export default class AllWorksPage extends React.Component<{
 }> {
   static childContextTypes = {
     library: PropTypes.func,
+    csrfToken: PropTypes.string,
+  };
+  static contextTypes = {
+    csrfToken: PropTypes.string,
   };
 
   getChildContext() {
-    return { library: () => this.props.params.library };
+    return {
+      library: () => this.props.params.library,
+      csrfToken: this.context.csrfToken,
+    };
   }
 
   render() {
-    return <AllWorksContent {...this.props} />;
+    return (
+      <AllWorksContent {...this.props} csrfToken={this.context.csrfToken} />
+    );
   }
 }

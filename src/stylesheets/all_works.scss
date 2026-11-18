@@ -35,6 +35,11 @@
     vertical-align: top;
   }
 
+  .all-works-author-cell {
+    max-width: 14rem;
+    overflow-wrap: anywhere;
+  }
+
   .all-works-column-heading {
     display: flex;
     flex-direction: column;
