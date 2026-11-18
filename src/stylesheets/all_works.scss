@@ -18,11 +18,23 @@
   .all-works-range-filter {
     display: flex;
     gap: 0.25rem;
+
+    input {
+      box-sizing: border-box;
+      flex: 0 0 4rem;
+      min-width: 0;
+      width: 4rem;
+    }
+
+    input[type="date"] {
+      flex-basis: 8rem;
+      width: 8rem;
+    }
   }
 
   .duration-range-filter input {
-    min-width: 0;
-    width: 3rem;
+    flex-basis: 4rem;
+    width: 4rem;
   }
 
   .body {
@@ -81,6 +93,11 @@
 
   tbody {
     font-size: 0.9rem;
+
+    button {
+      padding: 4px 8px;
+      font-size: 0.9em;
+    }
   }
 
   .all-works-pagination {

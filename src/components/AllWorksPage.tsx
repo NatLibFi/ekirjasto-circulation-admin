@@ -378,6 +378,7 @@ function AllWorksContent(props: {
           >
             <button
               type="button"
+              className="btn btn-default"
               disabled={!canGoPrevious || isFetching}
               onClick={() => load(data.offset - data.limit, false)}
             >
@@ -388,6 +389,7 @@ function AllWorksContent(props: {
             </span>
             <button
               type="button"
+              className="btn btn-default"
               disabled={!canGoNext || isFetching}
               onClick={() => load(data.offset + data.limit, false)}
             >
@@ -668,6 +670,7 @@ function AllWorksContent(props: {
                     </select>
                     <button
                       type="button"
+                      className="btn btn-default"
                       disabled={
                         !selectedLists[work.id] || addingWork === work.id
                       }
@@ -691,6 +694,7 @@ function AllWorksContent(props: {
           >
             <button
               type="button"
+              className="btn btn-default"
               disabled={!canGoPrevious || isFetching}
               onClick={() => load(data.offset - data.limit, false)}
             >
@@ -701,6 +705,7 @@ function AllWorksContent(props: {
             </span>
             <button
               type="button"
+              className="btn btn-default"
               disabled={!canGoNext || isFetching}
               onClick={() => load(data.offset + data.limit, false)}
             >
