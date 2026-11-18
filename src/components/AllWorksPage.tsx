@@ -24,7 +24,7 @@ const optionalColumns = [
   ["licenses_owned", "Lukuoikeudet"],
   ["patrons_in_hold_queue", "Varausjono"],
   ["series", "Sarja"],
-  ["duration", "Äänikirjan kesto"],
+  ["duration", "Äänikirjan kesto (tuntia)"],
   ["number_of_pages", "E-kirjan sivumäärä"],
   ["awards", "Palkinnot"],
   ["title_created_date", "Nimekkeen luontipvm"],
@@ -40,6 +40,17 @@ const optionalColumns = [
 ] as const;
 
 type OptionalKey = typeof optionalColumns[number][0];
+
+function apiMetadataFilters(filters: { [key: string]: string }) {
+  const result = { ...filters };
+  (["duration_min", "duration_max"] as const).forEach((key) => {
+    if (result[key] !== undefined && result[key] !== "") {
+      result[key] = String(Number(result[key]) * 60 * 60);
+    }
+  });
+  return result;
+}
+
 const numberKeys: OptionalKey[] = [
   "published_year",
   "licenses_owned",
@@ -149,7 +160,7 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
           props.params.library,
           {
             ...filters,
-            ...metadataFilters,
+            ...apiMetadataFilters(metadataFilters),
             sort,
             direction,
             offset,
@@ -173,7 +184,14 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
       dispatch(
         new ActionCreator().fetchAllWorks(
           props.params.library,
-          { ...filters, ...next, sort, direction, offset: 0, include_total: 1 },
+          {
+            ...filters,
+            ...apiMetadataFilters(next),
+            sort,
+            direction,
+            offset: 0,
+            include_total: 1,
+          },
           false
         ) as any
       )
@@ -203,7 +221,7 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
             props.params.library,
             {
               ...filters,
-              ...next,
+              ...apiMetadataFilters(next),
               sort: nextSort,
               direction: nextDirection,
               offset: 0,
@@ -236,7 +254,7 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
               props.params.library,
               {
                 ...next,
-                ...metadataFilters,
+                ...apiMetadataFilters(metadataFilters),
                 sort,
                 direction,
                 offset: 0,
@@ -494,16 +512,21 @@ function AllWorksContent(props: { params: { library: string } }): JSX.Element {
                           </select>
                         ) : numberKeys.includes(key) ||
                           dateKeys.includes(key) ? (
-                          <div className="all-works-range-filter">
+                          <div
+                            className={`all-works-range-filter${
+                              key === "duration" ? " duration-range-filter" : ""
+                            }`}
+                          >
                             {(["min", "max"] as const).map((bound) => (
                               <input
                                 key={bound}
                                 aria-label={`${label}: ${
                                   bound === "min" ? "vähintään" : "enintään"
-                                }`}
+                                } tuntia`}
                                 type={
                                   dateKeys.includes(key) ? "date" : "number"
                                 }
+                                step={key === "duration" ? "any" : undefined}
                                 value={metadataFilters[`${key}_${bound}`] || ""}
                                 onChange={(event) =>
                                   updateMetadataFilter(

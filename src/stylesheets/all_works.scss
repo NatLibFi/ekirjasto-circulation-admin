@@ -20,6 +20,11 @@
     gap: 0.25rem;
   }
 
+  .duration-range-filter input {
+    min-width: 0;
+    width: 3rem;
+  }
+
   .body {
     position: relative;
     height: auto;
