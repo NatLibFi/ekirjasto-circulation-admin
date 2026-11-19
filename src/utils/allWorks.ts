@@ -5,7 +5,7 @@ export const columns = [
   ["author", "Tekijä(t)"],
   ["language", "Kieli"],
   ["format", "Formaatti"],
-  ["license_pool_status", "Tila"],
+  ["license_pool_status", "Kirjan tila"],
 ] as const;
 
 export const optionalColumns = [

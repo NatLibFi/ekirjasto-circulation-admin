@@ -36,19 +36,23 @@ export default function AllWorksColumnFilter({
           key === "duration" ? " duration-range-filter" : ""
         }`}
       >
-        {(["min", "max"] as const).map((bound) => {
+        {(["min", "max"] as const).map((bound, index) => {
           const name = `${key}_${bound}` as FilterKey;
           return (
-            <input
-              key={bound}
-              aria-label={`${label}: ${
-                bound === "min" ? "vähintään" : "enintään"
-              }${key === "duration" ? " tuntia" : ""}`}
-              type={isDate ? "date" : "number"}
-              step={key === "duration" ? "any" : undefined}
-              value={filters[name] || ""}
-              onChange={(event) => onFilter(name, event.target.value, !isDate)}
-            />
+            <React.Fragment key={bound}>
+              {index === 1 && <span aria-hidden="true">-</span>}
+              <input
+                aria-label={`${label}: ${
+                  bound === "min" ? "vähintään" : "enintään"
+                }${key === "duration" ? " tuntia" : ""}`}
+                type={isDate ? "date" : "number"}
+                step={key === "duration" ? "any" : undefined}
+                value={filters[name] || ""}
+                onChange={(event) =>
+                  onFilter(name, event.target.value, !isDate)
+                }
+              />
+            </React.Fragment>
           );
         })}
       </div>
@@ -71,7 +75,12 @@ export default function AllWorksColumnFilter({
       .map((code) => ({ value: code, label: languages[code]?.[0] || code }));
   } else if (key === "format") {
     options = Array.from(
-      new Set([...rows.map((work) => work.format), filters.format])
+      new Set([
+        "book",
+        "audio",
+        ...rows.map((work) => work.format),
+        filters.format,
+      ])
     )
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b))

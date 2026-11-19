@@ -82,9 +82,6 @@ function AllWorksContent(props: {
       <Header />
       <main className="body">
         <h1>Kirjaluettelo</h1>
-        <p>
-          {data ? `${data.total} kirjaa, Lajitteluperuste: ${sortLabel}` : ""}
-        </p>
         {fetchError && <ErrorMessage error={fetchError} />}
         {listLoadError && <p role="alert">{listLoadError}</p>}
         {isFetching && !data && <LoadingIndicator />}
@@ -107,6 +104,9 @@ function AllWorksContent(props: {
           position="top"
           onPage={loadPage}
         />
+        <p>
+          {data ? `${data.total} kirjaa, Lajitteluperuste: ${sortLabel}` : ""}
+        </p>
         <AllWorksTable
           library={props.params.library}
           columns={visibleColumns}
