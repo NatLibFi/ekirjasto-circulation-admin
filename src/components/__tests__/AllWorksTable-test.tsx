@@ -114,6 +114,27 @@ describe("All Works table controls", () => {
     wrapper.unmount();
   });
 
+  it("keeps genre and keyword filters without sort buttons", () => {
+    const wrapper = mount(
+      <AllWorksTable
+        {...filterProps}
+        library="lib"
+        columns={[column("genres"), column("keywords")]}
+        rows={[]}
+        sort="title"
+        direction="asc"
+        onSort={() => undefined}
+        renderListAction={() => null}
+      />
+    );
+    const headers = wrapper.find("thead th");
+    expect(headers.at(0).find("button")).to.have.length(0);
+    expect(headers.at(0).find("select")).to.have.length(1);
+    expect(headers.at(1).find("button")).to.have.length(0);
+    expect(headers.at(1).find("input")).to.have.length(1);
+    wrapper.unmount();
+  });
+
   it("uses identical paging behavior at the top and bottom", () => {
     const data = {
       offset: 20,

@@ -147,10 +147,16 @@ export function bookListsUrl(adminUrl?: string): string | null {
   }
 }
 
-export type SortKey = typeof columns[number][0] | OptionalKey;
+export type ColumnKey = typeof columns[number][0] | OptionalKey;
+export type SortKey = Exclude<ColumnKey, "genres" | "keywords">;
+
+export function isSortableKey(key: ColumnKey): key is SortKey {
+  return key !== "genres" && key !== "keywords";
+}
+
 export type SortDirection = "asc" | "desc";
 export type FilterKey =
-  | Exclude<SortKey, "license_pool_status">
+  | Exclude<ColumnKey, "license_pool_status">
   | "status"
   | "published_year_min"
   | "published_year_max"
@@ -196,7 +202,7 @@ export type FilterKind =
   | "numberRange"
   | "select";
 export interface WorkColumn {
-  key: SortKey;
+  key: ColumnKey;
   label: string;
   filterKey: FilterKey;
   filterKind: FilterKind;
