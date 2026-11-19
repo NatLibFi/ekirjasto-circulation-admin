@@ -30,6 +30,7 @@ describe("All Works table controls", () => {
     );
     text.find("input").simulate("change", { target: { value: "Book" } });
     expect(onFilter.lastCall.args).to.deep.equal(["title", "Book", true]);
+    expect(text.find("input").prop("placeholder")).to.equal("Hae nimi…");
     const select = shallow(
       <AllWorksColumnFilter
         {...filterProps}

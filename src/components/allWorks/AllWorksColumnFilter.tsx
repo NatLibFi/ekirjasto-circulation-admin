@@ -63,6 +63,9 @@ export default function AllWorksColumnFilter({
       <input
         aria-label={`Rajaa: ${label}`}
         type={filterKind}
+        placeholder={
+          filterKind === "text" ? `Hae ${label.toLowerCase()}…` : undefined
+        }
         value={filters[filterKey] || ""}
         onChange={(event) => onFilter(filterKey, event.target.value, true)}
       />

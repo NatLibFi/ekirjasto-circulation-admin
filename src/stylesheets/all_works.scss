@@ -76,6 +76,14 @@
       min-width: 4rem;
       width: 100%;
     }
+
+    input:focus::placeholder {
+      opacity: 0;
+    }
+
+    input::placeholder {
+      color: #888;
+    }
   }
 
   .all-works-sort-button {
