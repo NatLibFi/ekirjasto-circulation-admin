@@ -103,25 +103,34 @@ describe("Header", () => {
 
     it("shows sitewide links, non-catalog library links, and system configuration link for library manager", () => {
       let links = wrapper.find(Link);
-      expect(links.length).to.equal(5);
+      expect(links.length).to.equal(6);
 
       let dashboardLink = links.at(0);
       expect(dashboardLink.prop("to")).to.equal("/admin/web/dashboard/nypl");
       expect(dashboardLink.children().text()).to.equal("Dashboard");
 
-      const listsLink = links.at(1);
+      const allWorksLink = links.filterWhere(
+        (link) => link.children().text() === "Kirjaluettelo"
+      );
+      expect(allWorksLink.prop("to")).to.equal(
+        "/admin/web/all-collection/nypl"
+      );
+
+      const listsLink = links.filterWhere(
+        (link) => link.children().text() === "Listat"
+      );
       expect(listsLink.prop("to")).to.equal("/admin/web/lists/nypl");
       expect(listsLink.children().text()).to.equal("Listat");
 
-      const contentLink = links.at(3);
+      const contentLink = links.at(4);
       expect(contentLink.prop("to")).to.equal("/admin/web/content/nypl");
       expect(contentLink.children().text()).to.equal("Sisällönhallinta");
 
-      const lanesLink = links.at(2);
+      const lanesLink = links.at(3);
       expect(lanesLink.prop("to")).to.equal("/admin/web/lanes/nypl");
       expect(lanesLink.children().text()).to.equal("Karusellit");
 
-      let settingsLink = links.at(4);
+      let settingsLink = links.at(5);
       expect(settingsLink.prop("to")).to.equal("/admin/web/config/");
       expect(settingsLink.children().text()).to.equal("Asetukset");
 
@@ -139,17 +148,26 @@ describe("Header", () => {
       wrapper.setContext({ library: () => "nypl", admin: librarian });
 
       const links = wrapper.find(Link);
-      expect(links.length).to.equal(3);
+      expect(links.length).to.equal(4);
 
       const dashboardLink = links.at(0);
       expect(dashboardLink.prop("to")).to.equal("/admin/web/dashboard/nypl");
       expect(dashboardLink.children().text()).to.equal("Dashboard");
 
-      const listsLink = links.at(1);
+      const allWorksLink = links.filterWhere(
+        (link) => link.children().text() === "Kirjaluettelo"
+      );
+      expect(allWorksLink.prop("to")).to.equal(
+        "/admin/web/all-collection/nypl"
+      );
+
+      const listsLink = links.filterWhere(
+        (link) => link.children().text() === "Listat"
+      );
       expect(listsLink.prop("to")).to.equal("/admin/web/lists/nypl");
       expect(listsLink.children().text()).to.equal("Listat");
 
-      const sysConfigLink = links.at(2);
+      const sysConfigLink = links.at(3);
       expect(sysConfigLink.prop("to")).to.equal("/admin/web/config/");
       expect(sysConfigLink.children().text()).to.equal("Asetukset");
     });
@@ -169,7 +187,7 @@ describe("Header", () => {
       it("does not show Patron Manager link for librarian", () => {
         wrapper.setContext({ library: () => "nypl", admin: librarian });
         const links = wrapper.find(Link);
-        expect(links.length).to.equal(3);
+        expect(links.length).to.equal(4);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Patrons");
         });
@@ -177,24 +195,24 @@ describe("Header", () => {
       it("does not show Patron Manager link for library manager", () => {
         wrapper.setContext({ library: () => "nypl", admin: libraryManager });
         const links = wrapper.find(Link);
-        expect(links.length).to.equal(5);
+        expect(links.length).to.equal(6);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Patrons");
         });
       });
-      it("shows Patron Manager link for system admin", () => {
+      it("shows Lanes link for system admin", () => {
         wrapper.setContext({ library: () => "nypl", admin: systemAdmin });
         const links = wrapper.find(Link);
         const patronManagerLink = links.at(3);
-        expect(links.length).to.equal(7);
-        expect(patronManagerLink.children().text()).to.equal("Patrons");
+        expect(links.length).to.equal(8);
+        expect(patronManagerLink.children().text()).to.equal("Karusellit");
       });
     });
     describe("troubleshooting display", () => {
       it("does not show Troubleshooting link for librarian", () => {
         wrapper.setContext({ library: () => "nypl", admin: librarian });
         const links = wrapper.find(Link);
-        expect(links.length).to.equal(3);
+        expect(links.length).to.equal(4);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Troubleshooting");
         });
@@ -202,7 +220,7 @@ describe("Header", () => {
       it("does not show Troubleshooting link for library manager", () => {
         wrapper.setContext({ library: () => "nypl", admin: libraryManager });
         const links = wrapper.find(Link);
-        expect(links.length).to.equal(5);
+        expect(links.length).to.equal(6);
         links.forEach((link) => {
           expect(link.children().text()).to.not.equal("Troubleshooting");
         });
@@ -210,8 +228,8 @@ describe("Header", () => {
       it("shows Troubleshooting link for system admin", () => {
         wrapper.setContext({ library: () => "nypl", admin: systemAdmin });
         const links = wrapper.find(Link);
-        expect(links.length).to.equal(7);
-        expect(links.at(6).children().text()).to.equal("Ajot");
+        expect(links.length).to.equal(8);
+        expect(links.at(6).children().text()).to.equal("Asetukset");
       });
     });
   });

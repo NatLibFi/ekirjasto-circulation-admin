@@ -49,6 +49,20 @@ describe("CatalogPage", () => {
     );
   });
 
+  it("uses the admin details endpoint for the dedicated admin book route", () => {
+    wrapper.setProps({ adminDetails: true });
+    expect(wrapper.instance().expandBookUrl("library/ISBN/11111111")).to.equal(
+      host + "/library/admin/works/ISBN/11111111"
+    );
+  });
+
+  it("continues to use the public work endpoint for ordinary catalog details", () => {
+    wrapper.setProps({ adminDetails: false });
+    expect(wrapper.instance().expandBookUrl("library/ISBN/11111111")).to.equal(
+      host + "/library/works/ISBN/11111111"
+    );
+  });
+
   it("renders welcome page when there's no library", () => {
     const newParams = Object.assign({}, params, {
       collectionUrl: null,

@@ -1,3 +1,4 @@
+import { serializeWorkQuery, workQueryKey } from "./utils/allWorks";
 import {
   AdvancedSearchQuery,
   BookData,
@@ -40,6 +41,8 @@ import {
   getCustomListEditorSearchUrl,
 } from "./reducers/customListEditor";
 
+let allWorksRequestId = 0;
+
 /** Create redux actions to be dispatched by connected components, mostly
     to make requests to the server. */
 export default class ActionCreator extends BaseActionCreator {
@@ -65,6 +68,7 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly EDIT_CUSTOM_LISTS_FOR_BOOK = "EDIT_CUSTOM_LISTS_FOR_BOOK";
   static readonly CIRCULATION_EVENTS = "CIRCULATION_EVENTS";
   static readonly STATS = "STATS";
+  static readonly ALL_WORKS = "ALL_WORKS";
   static readonly LIBRARIES = "LIBRARIES";
   static readonly EDIT_LIBRARY = "EDIT_LIBRARY";
   static readonly DELETE_LIBRARY = "DELETE_LIBRARY";
@@ -178,6 +182,11 @@ export default class ActionCreator extends BaseActionCreator {
   static readonly CIRCULATION_EVENTS_SUCCESS = "CIRCULATION_EVENTS_SUCCESS";
   static readonly CIRCULATION_EVENTS_FAILURE = "CIRCULATION_EVENTS_FAILURE";
   static readonly CIRCULATION_EVENTS_LOAD = "CIRCULATION_EVENTS_LOAD";
+
+  static readonly ALL_WORKS_REQUEST = "ALL_WORKS_REQUEST";
+  static readonly ALL_WORKS_SUCCESS = "ALL_WORKS_SUCCESS";
+  static readonly ALL_WORKS_FAILURE = "ALL_WORKS_FAILURE";
+  static readonly ALL_WORKS_LOAD = "ALL_WORKS_LOAD";
 
   static readonly STATS_REQUEST = "STATS_REQUEST";
   static readonly STATS_SUCCESS = "STATS_SUCCESS";
@@ -458,6 +467,68 @@ export default class ActionCreator extends BaseActionCreator {
   fetchStatistics() {
     const url = "/admin/stats";
     return this.fetchJSON<StatisticsData>(ActionCreator.STATS, url).bind(this);
+  }
+
+  fetchAllWorks(
+    library: string,
+    params: { [key: string]: string | number },
+    append = false
+  ) {
+    const query = serializeWorkQuery(params);
+    const url = `/${encodeURIComponent(library)}/admin/all_works?${query}`;
+    return (dispatch) => {
+      const requestId = ++allWorksRequestId;
+      const queryKey = workQueryKey(library, params);
+      dispatch({
+        type: ActionCreator.ALL_WORKS_REQUEST,
+        url,
+        requestId,
+        queryKey,
+        library,
+      });
+      return (this as any).fetcher
+        .fetch(url)
+        .then(async (response) => {
+          if (!response.ok) {
+            throw {
+              status: response.status,
+              response: await response.text(),
+              url,
+            };
+          }
+          return response.json();
+        })
+        .then((data) => {
+          dispatch({
+            type: ActionCreator.ALL_WORKS_SUCCESS,
+            requestId,
+            queryKey,
+          });
+          dispatch({
+            type: ActionCreator.ALL_WORKS_LOAD,
+            data,
+            append,
+            requestId,
+            queryKey,
+          });
+          return data;
+        })
+        .catch((error) => {
+          const requestError: RequestError = {
+            status: error?.status ?? null,
+            response:
+              error?.response || error?.message || "Could not load works",
+            url,
+          };
+          dispatch({
+            type: ActionCreator.ALL_WORKS_FAILURE,
+            error: requestError,
+            requestId,
+            queryKey,
+          });
+          throw requestError;
+        });
+    };
   }
 
   fetchLibraries() {
