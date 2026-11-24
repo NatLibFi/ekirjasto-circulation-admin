@@ -77,15 +77,21 @@ export default function AllWorksColumnFilter({
       .sort((a, b) => a.localeCompare(b))
       .map((code) => ({ value: code, label: languages[code]?.[0] || code }));
   } else if (key === "format") {
+    const normalizedFormat = (format: string) => {
+      const normalized = format.trim().toLowerCase();
+      return normalized === "audio"
+        ? "Audio"
+        : normalized === "book"
+        ? "Book"
+        : format;
+    };
     options = Array.from(
-      new Set([
-        "book",
-        "audio",
-        ...rows.map((work) => work.format),
-        filters.format,
-      ])
+      new Set(
+        ["Book", "Audio", ...rows.map((work) => work.format), filters.format]
+          .filter(Boolean)
+          .map(normalizedFormat)
+      )
     )
-      .filter(Boolean)
       .sort((a, b) => a.localeCompare(b))
       .map((value) => ({ value, label: formatLabel(value) }));
   } else if (key === "license_pool_status") {
