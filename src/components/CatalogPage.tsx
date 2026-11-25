@@ -16,6 +16,7 @@ import { adapter } from "@natlibfi/ekirjasto-web-opds-client/lib/OPDSDataAdapter
 import title from "../utils/title";
 
 export interface CatalogPageProps extends React.Props<CatalogPage> {
+  adminDetails?: boolean;
   params: {
     collectionUrl: string;
     bookUrl: string;
@@ -121,11 +122,13 @@ export default class CatalogPage extends React.Component<CatalogPageProps, {}> {
   expandBookUrl(url: string): string {
     if (url) {
       const library = this.getLibrary(null, url);
+      const endpoint = this.props.adminDetails ? "admin/works/" : "works/";
       return (
         document.location.origin +
         "/" +
         library +
-        "/works/" +
+        "/" +
+        endpoint +
         url.replace(library + "/", "")
       );
     } else {

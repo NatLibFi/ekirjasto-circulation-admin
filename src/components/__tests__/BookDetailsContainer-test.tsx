@@ -65,4 +65,15 @@ describe("BookDetailsContainer", () => {
     expect(tabContainer.props().refreshCatalog).to.equal(refreshCatalog);
     expect(tabContainer.props().store).to.equal(store);
   });
+
+  it("passes the catalog URL to detail tabs when the book was loaded by admin URL", () => {
+    wrapper.setProps({
+      bookUrl: "http://example.com/library/admin/works/ISBN/978951",
+    });
+
+    const tabContainer = wrapper.find(BookDetailsTabContainer);
+    expect(tabContainer.prop("bookUrl")).to.equal(
+      "http://example.com/library/works/ISBN/978951"
+    );
+  });
 });
