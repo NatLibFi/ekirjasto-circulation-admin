@@ -30,24 +30,25 @@ export default class BookDetailsContainer extends React.Component<
   };
 
   render(): JSX.Element {
+    const catalogBookUrl = this.props.bookUrl?.replace(
+      "/admin/works/",
+      "/works/"
+    );
     const child = React.Children.only(
       this.props.children
     ) as React.ReactElement<BookDetails>;
     const book = React.createElement(ConnectedBookDetails, {
       ...child.props,
-      bookUrl: this.props.bookUrl,
+      bookUrl: catalogBookUrl,
       store: this.context.editorStore,
-      library: this.context.library(
-        this.props.collectionUrl,
-        this.props.bookUrl
-      ),
+      library: this.context.library(this.props.collectionUrl, catalogBookUrl),
     } as any);
 
     return (
       <div className="book-details-container">
         <BookDetailsTabContainer
           class="book-details-tab-container"
-          bookUrl={this.props.bookUrl}
+          bookUrl={catalogBookUrl}
           collectionUrl={this.props.collectionUrl}
           refreshCatalog={this.props.refreshCatalog}
           tab={this.context.tab}
